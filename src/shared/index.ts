@@ -48,6 +48,18 @@ export const FLAVOURS = ['react', 'vue', 'svelte', 'webcomponent'] as const;
 export type Flavour = (typeof FLAVOURS)[number];
 
 /**
+ * Generated flavours whose format id the registry does not list yet. They are built, tested and
+ * exported like the four above, but the registry guard does not require them, and asserts they are
+ * still missing there: once icon-browser lists one, that test fails and the id moves into FLAVOURS.
+ */
+export const PENDING_FLAVOURS = ['reactNative'] as const;
+export type PendingFlavour = (typeof PENDING_FLAVOURS)[number];
+
+/** Every flavour the generator writes, registered or not. */
+export const ALL_FLAVOURS = [...FLAVOURS, ...PENDING_FLAVOURS] as const;
+export type AnyFlavour = Flavour | PendingFlavour;
+
+/**
  * Root attributes in SVG (kebab-case) spelling. Each flavour converts names only if its
  * renderer needs to (React camel-cases); none of them adds or drops an attribute.
  */

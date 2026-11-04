@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { transformSync } from 'esbuild';
 import { compile as compileSvelte } from 'svelte/compiler';
 import { compileScript, compileTemplate, parse as parseSfc } from 'vue/compiler-sfc';
-import { FLAVOURS, type Flavour, type IconData } from '../shared/index.ts';
+import { ALL_FLAVOURS, PENDING_FLAVOURS, type AnyFlavour, type IconData, type PendingFlavour } from '../shared/index.ts';
 import { idPrefix, prefixIds } from './ids.ts';
 import { assignNames } from './naming.ts';
 import { listSvgs, loadPacks, readBlobs, readFileAt, resolveSource, type PackConfig } from './packs.ts';
@@ -25,13 +25,13 @@ export interface PackManifest {
   readonly inputs: number;
   /** Source paths left out by the pack's `exclude` list. `outputs` is `inputs - excluded.length`. */
   readonly excluded: string[];
-  readonly outputs: Record<Flavour, number>;
+  readonly outputs: Record<AnyFlavour, number>;
   /** Attribution and licence files, relative to `dist/`, one copy per flavour. */
   readonly attribution: string[];
 }
 
 export interface Manifest {
-  readonly flavours: readonly Flavour[];
+  readonly flavours: readonly AnyFlavour[];
   readonly packs: PackManifest[];
 }
 
@@ -117,7 +117,7 @@ function emitRuntimes(root: string, outDir: string): void {
   write(join(outDir, 'svelte/index.d.ts'), svelteTypes);
   write(join(outDir, 'svelte/icon.d.ts'), "import type { SvelteIcon } from './index.js';\ndeclare const icon: SvelteIcon;\nexport default icon;\n");
 
-  for (const runtime of ['react/index.js', 'wc/index.js', 'shared/index.js']) {
+  for (const runtime of ['react/index.js', 'wc/index.js', 'shared/index.js', 'react-native/index.js']) {
     try {
       readFileSync(join(outDir, runtime));
     } catch {
@@ -198,8 +198,18 @@ export function readPack(pack: PackConfig, root: string, options: { prefix?: boo
   return readPackWithCounts(pack, root, options).icons;
 }
 
+/**
+ * Where each flavour the format registry does not list yet writes its pack modules, and how. A
+ * `bind` flavour wraps each icon in a component with the named factory from its template; a data
+ * flavour (one generic component that takes `icon`) re-exports each icon's data by name, so the
+ * count guard reads one line per icon either way.
+ */
+export const PENDING_OUTPUTS: Readonly<Record<PendingFlavour, { readonly dir: string; readonly bind?: string; readonly type: string }>> = {
+  reactNative: { dir: 'react-native', bind: 'createIcon', type: 'NativeIchavaIcon' },
+};
+
 /** Directories under dist/ that each get a copy of a pack's attribution files. */
-export const ATTRIBUTION_DIRS: readonly string[] = ['data', 'react', 'vue', 'svelte', 'wc'];
+export const ATTRIBUTION_DIRS: readonly string[] = ['data', 'react', 'vue', 'svelte', 'wc', ...PENDING_FLAVOURS.map((f) => PENDING_OUTPUTS[f].dir)];
 
 /**
  * A legal comment (`/*!`), which bundlers keep, so the artwork's licence reaches a consumer's
@@ -259,16 +269,29 @@ function emitPack(pack: PackConfig, icons: NamedIcon[], outDir: string): void {
 
   write(join(outDir, `wc/packs/${pack.id}.js`), h + `export * from '../../data/${pack.id}.js';\n`);
   write(join(outDir, `wc/packs/${pack.id}.d.ts`), h + `export * from '../../data/${pack.id}.js';\n`);
+
+  for (const flavour of PENDING_FLAVOURS) {
+    const { dir, bind: factory, type } = PENDING_OUTPUTS[flavour];
+    if (factory !== undefined) {
+      write(join(outDir, `${dir}/packs/${pack.id}.js`), bind(factory));
+      write(join(outDir, `${dir}/packs/${pack.id}.d.ts`), h + `import type { ${type} } from '../index.js';\n` + lines((n) => `export declare const ${n}: ${type};`));
+    } else {
+      write(join(outDir, `${dir}/packs/${pack.id}.js`), h + `import * as d from '../../data/${pack.id}.js';\n` + lines((n) => `export const ${n} = d.${n};`));
+      write(join(outDir, `${dir}/packs/${pack.id}.d.ts`), h + "import type { IconData } from '../../shared/index.js';\n" + lines((n) => `export declare const ${n}: IconData;`));
+    }
+  }
 }
 
 /** Counts what was written, from the files, so the count guard is not the generator agreeing with itself. */
-export function countOutputs(outDir: string, packId: string): Record<Flavour, number> {
+export function countOutputs(outDir: string, packId: string): Record<AnyFlavour, number> {
   const exportsIn = (file: string): number => (readFileSync(join(outDir, file), 'utf8').match(/^export const Icon\w+ = /gm) ?? []).length;
+  const pending = Object.fromEntries(PENDING_FLAVOURS.map((f) => [f, exportsIn(`${PENDING_OUTPUTS[f].dir}/packs/${packId}.js`)])) as Record<PendingFlavour, number>;
   return {
     react: exportsIn(`react/packs/${packId}.js`),
     vue: exportsIn(`vue/packs/${packId}.js`),
     svelte: readdirSync(join(outDir, `svelte/packs/${packId}`)).filter((f) => /^Icon\w+\.svelte$/.test(f)).length,
     webcomponent: exportsIn(`data/${packId}.js`),
+    ...pending,
   };
 }
 
@@ -276,13 +299,13 @@ export function generate(options: GenerateOptions): Manifest {
   const packs = loadPacks(options.packsFile ?? join(options.root, 'packs.json'));
   emitRuntimes(options.root, options.outDir);
 
-  const manifest: Manifest = { flavours: FLAVOURS, packs: [] };
+  const manifest: Manifest = { flavours: ALL_FLAVOURS, packs: [] };
   for (const pack of packs) {
     const { icons, inputs, excluded } = readPackWithCounts(pack, options.root);
     emitPack(pack, icons, options.outDir);
     const attribution = emitAttribution(pack, options.root, options.outDir);
     const outputs = countOutputs(options.outDir, pack.id);
-    for (const flavour of FLAVOURS) {
+    for (const flavour of ALL_FLAVOURS) {
       if (outputs[flavour] !== inputs - excluded.length) {
         throw new Error(`${pack.id}: ${flavour} wrote ${outputs[flavour]} icons for ${inputs} inputs less ${excluded.length} excluded`);
       }

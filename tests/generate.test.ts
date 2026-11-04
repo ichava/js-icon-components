@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { build } from 'esbuild';
 import { ATTRIBUTION_DIRS, countOutputs, generate, readPackWithCounts, type Manifest } from '../src/generator/generate.ts';
 import { loadPacks, needsAttribution, resolveSource, type PackConfig } from '../src/generator/packs.ts';
-import { FLAVOURS } from '../src/shared/index.ts';
+import { ALL_FLAVOURS } from '../src/shared/index.ts';
 import { CACHE, packs, ROOT, tabler } from './helpers.ts';
 
 let out: string;
@@ -47,7 +47,7 @@ describe('generation', () => {
     expect(manifest.packs.find((p) => p.id === id)?.inputs).toBe(inputs);
   });
 
-  it.each(rows.flatMap(([id, pack]) => FLAVOURS.map((f) => [id, f, pack] as const)))('%s: writes exactly one %s icon per input SVG, less the listed exclusions', (id, flavour, pack) => {
+  it.each(rows.flatMap(([id, pack]) => ALL_FLAVOURS.map((f) => [id, f, pack] as const)))('%s: writes exactly one %s icon per input SVG, less the listed exclusions', (id, flavour, pack) => {
     const expected = inputCount(pack) - (pack.exclude?.length ?? 0);
     expect(countOutputs(out, id)[flavour]).toBe(expected);
     expect(manifest.packs.find((p) => p.id === id)?.outputs[flavour]).toBe(expected);
