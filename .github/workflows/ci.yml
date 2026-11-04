@@ -59,7 +59,8 @@ jobs:
       # short dist/ would install cleanly and fail at the consumer's first import.
       - name: Every flavour was generated for every pinned pack
         run: |
-          for f in dist/shared/index.js dist/react/index.js dist/vue/index.js dist/svelte/Icon.svelte dist/wc/index.js dist/manifest.json; do
+          for f in dist/shared/index.js dist/react/index.js dist/vue/index.js dist/svelte/Icon.svelte dist/wc/index.js \
+                   dist/react-native/index.js dist/angular/index.js dist/solid/index.js dist/preact/index.js dist/astro/Icon.astro dist/manifest.json; do
             test -s "$f" || { echo "::error::$f is missing or empty"; exit 1; }
           done
           # Single-quoted on purpose: ${...} is JavaScript here, not shell.
@@ -80,7 +81,7 @@ jobs:
               if (!(fs.statSync("dist/" + f, { throwIfNoEntry: false })?.size > 0)) { console.error(`::error::${p.id}: dist/${f} is missing`); process.exit(1); }
             }'
           # A `.ts` specifier in an emitted file names a source that is not shipped.
-          if grep -rnE "from '\.\.?/[^']+\.ts'" dist --include='*.js' --include='*.svelte'; then
+          if grep -rnE "from '\.\.?/[^']+\.ts'" dist --include='*.js' --include='*.svelte' --include='*.astro'; then
             echo "::error::an emitted file imports a .ts path that does not exist in dist/"
             exit 1
           fi
