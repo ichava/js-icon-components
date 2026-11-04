@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/ichava/js-icon-components/tree/main/docs
+    about: Installation, the four flavours and the generator architecture.
+  - name: Security report
+    url: https://github.com/ichava/js-icon-components/security/policy
+    about: Please report vulnerabilities privately. Do not open a public issue.

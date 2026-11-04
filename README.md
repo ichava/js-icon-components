@@ -1,0 +1,100 @@
+# @ichava/js-icon-components
+
+[![Tests](https://github.com/ichava/js-icon-components/actions/workflows/ci.yml/badge.svg)](https://github.com/ichava/js-icon-components/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+Two badges, not four: the package is not on npm (it installs from a git tag), so there is no
+registry version to show, and lint runs in the same CI workflow as the tests.
+
+> React, Vue 3, Svelte 5 and Web Component icon components, generated from Ichava icon packs pinned at a git commit.
+
+Node 24 or newer to install. React 18+, Vue 3.4+ or Svelte 5 as an optional peer, for the flavour you use.
+
+## Install
+
+From a git tag:
+
+```bash
+npm install "github:ichava/js-icon-components#v0.1.0"
+```
+
+`prepare` builds `dist/` during the install, which takes a few seconds and needs `git` on the
+path: it reads each pack from git at the commit pinned in `packs.json`.
+
+## Quick start guide and usage
+
+### Getting started
+
+Nothing to configure. Import the flavour you use and the pack you want; the frameworks are
+optional peers, so only the one you import has to be installed. Exports are tree-shakeable, so a
+bundle carries the icons it imports and nothing else.
+
+### Usage
+
+React:
+
+```tsx
+import { IconMug, IconMugFilled } from '@ichava/js-icon-components/react/tabler';
+
+<IconMug size={20} strokeWidth={1.5} />
+<IconMugFilled color="#7c3aed" title="Coffee" />
+```
+
+Vue 3:
+
+```vue
+<script setup lang="ts">
+import { IconMug } from '@ichava/js-icon-components/vue/tabler';
+</script>
+
+<template><IconMug :size="20" title="Coffee" /></template>
+```
+
+Svelte 5, and the framework-free custom element:
+
+```svelte
+<script>
+  import { IconMug } from '@ichava/js-icon-components/svelte/tabler';
+</script>
+
+<IconMug size={20} />
+```
+
+```ts
+import { defineIchavaIcon, registerIcons } from '@ichava/js-icon-components/wc';
+import { IconMug } from '@ichava/js-icon-components/wc/tabler';
+
+registerIcons([IconMug]);
+defineIchavaIcon(); // <ichava-icon name="tabler:outline/mug" size="20" label="Coffee"></ichava-icon>
+```
+
+The full walkthrough is in [docs/getting-started.md](docs/getting-started.md); everything else is
+under [Documentation](#documentation).
+
+## <a name="documentation"></a>Documentation
+
+The documentation lives in this repository's [`docs/`](https://github.com/ichava/js-icon-components/tree/main/docs) folder.
+
+### Guides
+
+- [Installation](docs/installation.md) — the git-tag install, what `prepare` builds and its size
+- [Getting started](docs/getting-started.md) — props, accessibility and export names in every flavour
+- [Architecture](docs/architecture.md) — why a generator, the pinned input, the SVG gate and the guards
+- [Release](docs/release.md) — tagging, and moving a pack to a new commit
+
+### Reference
+
+- [React](docs/tools/react.md) — `@ichava/js-icon-components/react`
+- [Vue 3](docs/tools/vue.md) — `@ichava/js-icon-components/vue`
+- [Svelte 5](docs/tools/svelte.md) — `@ichava/js-icon-components/svelte`
+- [Web Component](docs/tools/webcomponent.md) — `@ichava/js-icon-components/wc`
+
+## Contributing and security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). This project follows the
+[Contributor Covenant](CODE_OF_CONDUCT.md).
+
+## License
+
+MIT. See [LICENSE](LICENSE). Each pack keeps its own licence: Tabler Icons is MIT, and its
+`ATTRIBUTION.md` and `LICENSE` live in `ichava/icon-sets-tabler`.

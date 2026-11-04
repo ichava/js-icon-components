@@ -1,0 +1,2119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ichava/icon-browser/resources/schema/icon-browser.schema.json",
+  "title": "ichava/icon-browser payloads",
+  "description": "Every REST resource, session and bootstrap document, and Inertia prop this package serves. Version 1.4.0, matching PayloadSchema::VERSION. react-icon-browser generates its types from this file.",
+  "version": "1.4.0",
+  "$defs": {
+    "user": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "avatarUrl": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "abilities": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "avatarUrl",
+        "abilities"
+      ],
+      "description": "The host's signed-in user as presented by core's UserData. Never carries email, password or tokens; extra keys only when the host lists them in ichava.ichava-core.auth.expose.",
+      "propertyNames": {
+        "not": {
+          "enum": [
+            "email",
+            "password",
+            "remember_token",
+            "two_factor_secret",
+            "two_factor_recovery_codes"
+          ]
+        }
+      }
+    },
+    "kind": {
+      "enum": [
+        "icon",
+        "illustration"
+      ]
+    },
+    "kindSource": {
+      "enum": [
+        "host",
+        "item",
+        "rule",
+        "category",
+        "pack",
+        "default"
+      ],
+      "description": "Which D6 row decided an item's kind. Added in 1.4.0."
+    },
+    "kindCounts": {
+      "type": "object",
+      "properties": {
+        "icon": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "illustration": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "icon",
+        "illustration"
+      ],
+      "additionalProperties": false
+    },
+    "kindsInfo": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "$ref": "#/$defs/kind"
+        },
+        "available": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/kind"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "counts": {
+          "$ref": "#/$defs/kindCounts"
+        }
+      },
+      "required": [
+        "default",
+        "available",
+        "counts"
+      ],
+      "additionalProperties": false,
+      "description": "The browser's initial kind, the kinds it may show, and unfiltered counts. Added in 1.4.0."
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "svgMaxNodes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "svgMaxChars": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "svgMaxNodes",
+        "svgMaxChars"
+      ],
+      "additionalProperties": false,
+      "description": "Client SVG ceilings, from core's svg.max_elements and svg.max_bytes. Added in 1.4.0."
+    },
+    "crossLinks": {
+      "type": "object",
+      "properties": {
+        "landing": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "landing"
+      ],
+      "additionalProperties": false,
+      "description": "ichava.icon-browser.links.landing; null renders no link. Added in 1.4.0."
+    },
+    "themeVariant": {
+      "type": "object",
+      "properties": {
+        "svg_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "svg_content": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "svg_url"
+      ]
+    },
+    "format": {
+      "enum": [
+        "svg",
+        "motion",
+        "helper",
+        "blade",
+        "bladeGeneric",
+        "livewire",
+        "alpine",
+        "vue",
+        "react",
+        "svelte",
+        "webcomponent",
+        "api",
+        "name"
+      ],
+      "description": "Code-tab and copy-format ids. The registry is x-ichava-formats at the schema root. Added in 1.4.0."
+    },
+    "icon": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "package": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/kind"
+        },
+        "kind_source": {
+          "$ref": "#/$defs/kindSource"
+        },
+        "themes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "theme_variants": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/$defs/themeVariant"
+              }
+            },
+            {
+              "enum": [
+                []
+              ]
+            }
+          ],
+          "description": "Theme twins by theme, each with its own SVG URL; [] when there are none. Added in 1.4.0."
+        },
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "variant": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sub": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The nested category the icon sits in, below its top-level category: the per-icon counterpart of the subs[] filter. Null at the top level. Added in 1.1.0."
+        },
+        "path": {
+          "type": "string"
+        },
+        "icon_path": {
+          "type": "string"
+        },
+        "file_path": {
+          "type": "string"
+        },
+        "svg_content": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "svg_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "viewbox": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "width": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "height": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "blade_clean": {
+          "type": "string"
+        },
+        "blade_generic": {
+          "type": "string"
+        },
+        "helper": {
+          "type": "string"
+        },
+        "set": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "package",
+        "name",
+        "kind",
+        "themes",
+        "category",
+        "variant",
+        "sub",
+        "path",
+        "icon_path",
+        "file_path",
+        "svg_content",
+        "svg_url",
+        "viewbox",
+        "width",
+        "height",
+        "blade_clean",
+        "blade_generic",
+        "helper",
+        "set"
+      ],
+      "description": "One icon, as IconResource (REST) and IconSnippets::transform (Inertia) send it."
+    },
+    "iconResource": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/icon"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tags": {
+              "type": "array",
+              "items": {}
+            },
+            "keywords": {
+              "type": "array",
+              "items": {}
+            },
+            "created_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "updated_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "tags",
+            "keywords",
+            "created_at",
+            "updated_at"
+          ]
+        }
+      ]
+    },
+    "emptyReason": {
+      "enum": [
+        "no_match",
+        "no_icons",
+        null
+      ]
+    },
+    "iconList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": [
+            "array",
+            "object"
+          ]
+        },
+        "meta": {
+          "type": "object",
+          "properties": {
+            "has_search": {
+              "type": "boolean"
+            },
+            "has_filters": {
+              "type": "boolean"
+            },
+            "empty_reason": {
+              "$ref": "#/$defs/emptyReason"
+            },
+            "group_by": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "has_search",
+            "has_filters",
+            "empty_reason",
+            "group_by"
+          ]
+        }
+      },
+      "required": [
+        "data",
+        "meta"
+      ],
+      "description": "GET {prefix}/api/v1/icons. data is the page of iconResource items (with a grouped map beside them)."
+    },
+    "package": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "vendor": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/kind"
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "by_kind": {
+          "$ref": "#/$defs/kindCounts"
+        }
+      },
+      "required": [
+        "name",
+        "label",
+        "count"
+      ]
+    },
+    "facet": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "count"
+      ]
+    },
+    "variantMeta": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "default": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "slug",
+        "label",
+        "description",
+        "default"
+      ],
+      "description": "One of a pack's variants as the variant picker shows it (core's VariantData): the translated label and description. Added in 1.3.0."
+    },
+    "filters": {
+      "type": "object",
+      "properties": {
+        "packages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/package"
+          }
+        },
+        "categories": {
+          "type": "array",
+          "items": {}
+        },
+        "variants": {
+          "type": "array",
+          "items": {}
+        },
+        "variants_by_package": {
+          "description": "Each pack's variants, keyed by pack name, in display order. PHP sends an empty map as []. Typed in 1.3.0.",
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/variantMeta"
+                }
+              }
+            },
+            {
+              "enum": [
+                []
+              ]
+            }
+          ]
+        },
+        "kinds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/facet"
+          }
+        },
+        "empty": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "packages",
+        "categories",
+        "variants",
+        "kinds"
+      ],
+      "description": "GET {prefix}/api/v1/icons/filters and the Inertia filterOptions prop; counts are scoped by the other filters."
+    },
+    "statistics": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "object",
+          "properties": {
+            "icons": {
+              "type": "integer"
+            },
+            "packages": {
+              "type": "integer"
+            },
+            "categories": {
+              "type": "integer"
+            },
+            "variants": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "icons",
+            "packages",
+            "categories",
+            "variants"
+          ]
+        },
+        "by_kind": {
+          "type": "object",
+          "properties": {
+            "icon": {
+              "type": "integer"
+            },
+            "illustration": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "icon",
+            "illustration"
+          ]
+        },
+        "empty": {
+          "type": "boolean"
+        },
+        "by_package_kind": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/$defs/kindCounts"
+              }
+            },
+            {
+              "enum": [
+                []
+              ]
+            }
+          ],
+          "description": "Icons per pack and kind; [] when nothing is seeded. Added in 1.4.0."
+        }
+      },
+      "required": [
+        "total",
+        "by_kind"
+      ]
+    },
+    "collection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "color": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "icon_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "icon_ids"
+      ]
+    },
+    "historyEntry": {
+      "type": "object",
+      "properties": {
+        "icon_id": {
+          "type": "integer"
+        },
+        "action": {
+          "enum": [
+            "view",
+            "copy",
+            "download"
+          ]
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "icon_id",
+        "action",
+        "timestamp"
+      ]
+    },
+    "command": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "action",
+            "search",
+            "navigation"
+          ]
+        },
+        "metadata": {
+          "type": [
+            "array",
+            "object"
+          ]
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "command",
+        "type",
+        "timestamp"
+      ]
+    },
+    "library": {
+      "type": "object",
+      "properties": {
+        "favorites": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/collection"
+          }
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/historyEntry"
+          }
+        },
+        "commandHistory": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/command"
+          }
+        }
+      },
+      "required": [
+        "favorites",
+        "collections",
+        "history",
+        "commandHistory"
+      ],
+      "description": "GET {prefix}/api/v1/library: everything the current owner keeps."
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "login": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "logout": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "login",
+        "logout"
+      ],
+      "additionalProperties": false
+    },
+    "session": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string"
+        },
+        "authenticated": {
+          "type": "boolean"
+        },
+        "user": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/user"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tier": {
+          "enum": [
+            "browser",
+            "session",
+            "database"
+          ]
+        },
+        "persistent": {
+          "type": "boolean"
+        },
+        "links": {
+          "$ref": "#/$defs/links"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "authenticated",
+        "user",
+        "tier",
+        "persistent",
+        "links"
+      ],
+      "additionalProperties": false,
+      "description": "GET {prefix}/api/v1/session."
+    },
+    "feature": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "reason": {
+          "enum": [
+            "config",
+            "gate",
+            "driver",
+            "empty",
+            null
+          ]
+        },
+        "endpoints": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "enabled",
+        "reason",
+        "endpoints"
+      ],
+      "additionalProperties": false
+    },
+    "features": {
+      "type": "object",
+      "properties": {
+        "favorites": {
+          "$ref": "#/$defs/feature"
+        },
+        "collections": {
+          "$ref": "#/$defs/feature"
+        },
+        "history": {
+          "$ref": "#/$defs/feature"
+        },
+        "commands": {
+          "$ref": "#/$defs/feature"
+        },
+        "library": {
+          "$ref": "#/$defs/feature"
+        },
+        "preferences": {
+          "$ref": "#/$defs/feature"
+        },
+        "status": {
+          "$ref": "#/$defs/feature"
+        },
+        "cacheAdmin": {
+          "$ref": "#/$defs/feature"
+        },
+        "illustrations": {
+          "$ref": "#/$defs/feature"
+        },
+        "searchLanguage": {
+          "$ref": "#/$defs/feature"
+        },
+        "export": {
+          "$ref": "#/$defs/feature"
+        },
+        "motion": {
+          "$ref": "#/$defs/feature"
+        },
+        "themeToggle": {
+          "$ref": "#/$defs/feature"
+        },
+        "presence": {
+          "$ref": "#/$defs/feature"
+        },
+        "invites": {
+          "$ref": "#/$defs/feature"
+        },
+        "sharing": {
+          "$ref": "#/$defs/feature"
+        },
+        "notifications": {
+          "$ref": "#/$defs/feature"
+        },
+        "workspaces": {
+          "$ref": "#/$defs/feature"
+        }
+      },
+      "required": [
+        "favorites",
+        "collections",
+        "history",
+        "commands",
+        "library",
+        "preferences",
+        "status",
+        "cacheAdmin",
+        "illustrations",
+        "searchLanguage",
+        "export",
+        "motion",
+        "themeToggle",
+        "presence",
+        "invites",
+        "sharing",
+        "notifications",
+        "workspaces"
+      ],
+      "additionalProperties": false,
+      "description": "The features manifest: per feature, enabled, why not, and its endpoints."
+    },
+    "modes": {
+      "type": "object",
+      "properties": {
+        "inertia": {
+          "type": "boolean"
+        },
+        "api": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "inertia",
+        "api"
+      ],
+      "additionalProperties": false
+    },
+    "bootstrap": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "modes": {
+          "$ref": "#/$defs/modes"
+        },
+        "session": {
+          "$ref": "#/$defs/session"
+        },
+        "features": {
+          "$ref": "#/$defs/features"
+        },
+        "api": {
+          "$ref": "#/$defs/apiManifest"
+        },
+        "kinds": {
+          "$ref": "#/$defs/kindsInfo"
+        },
+        "limits": {
+          "$ref": "#/$defs/limits"
+        },
+        "crossLinks": {
+          "$ref": "#/$defs/crossLinks"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "locale",
+        "modes",
+        "session",
+        "features",
+        "api"
+      ],
+      "additionalProperties": false,
+      "description": "GET {prefix}/api/v1/bootstrap."
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "lifecycle": {},
+        "registry": {
+          "type": "object",
+          "properties": {
+            "packages": {
+              "type": "integer"
+            },
+            "conflicts": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": [
+            "packages",
+            "conflicts"
+          ]
+        },
+        "orphans": {
+          "type": "array",
+          "items": {}
+        },
+        "discovery": {
+          "type": "object"
+        },
+        "watcher": {
+          "type": "object",
+          "properties": {
+            "lastScan": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "lastScan"
+          ]
+        },
+        "logging": {
+          "type": "object"
+        },
+        "cache": {
+          "type": "object",
+          "properties": {
+            "lastRebuild": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "lastRebuild"
+          ]
+        },
+        "render": {
+          "type": "object",
+          "properties": {
+            "optimizationLevel": {
+              "type": "string"
+            },
+            "fingerprint": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "optimizationLevel",
+            "fingerprint"
+          ]
+        }
+      },
+      "required": [
+        "lifecycle",
+        "registry",
+        "orphans",
+        "discovery",
+        "watcher",
+        "logging",
+        "cache",
+        "render"
+      ],
+      "description": "GET {prefix}/api/v1/status (ichava.admin) and the Stats page status prop: core's StatusData."
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "object"
+        },
+        "sorting": {
+          "type": "object"
+        },
+        "preferences": {
+          "type": "object"
+        },
+        "tree": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "filters",
+        "sorting",
+        "preferences"
+      ]
+    },
+    "ichava": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "modes": {
+          "$ref": "#/$defs/modes"
+        },
+        "features": {
+          "$ref": "#/$defs/features"
+        },
+        "account": {
+          "$ref": "#/$defs/links"
+        },
+        "storage": {
+          "type": "object",
+          "properties": {
+            "tier": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "persistent": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "tier",
+            "persistent"
+          ]
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "perPage": {
+          "type": "integer"
+        },
+        "defaultTheme": {
+          "type": "string"
+        },
+        "ui": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "license": {
+              "type": "string"
+            },
+            "docsUrl": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "links": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string"
+                  },
+                  "href": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "label",
+                  "href"
+                ]
+              }
+            },
+            "themeToggle": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "version",
+            "license",
+            "docsUrl",
+            "links",
+            "themeToggle"
+          ]
+        },
+        "snippets": {
+          "type": [
+            "object",
+            "array"
+          ]
+        },
+        "routes": {
+          "type": "object"
+        },
+        "kinds": {
+          "$ref": "#/$defs/kindsInfo"
+        },
+        "limits": {
+          "$ref": "#/$defs/limits"
+        },
+        "crossLinks": {
+          "$ref": "#/$defs/crossLinks"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "locale",
+        "modes",
+        "features",
+        "account",
+        "storage",
+        "prefix",
+        "perPage",
+        "defaultTheme",
+        "ui",
+        "snippets",
+        "routes"
+      ],
+      "description": "The ichava Inertia prop, shared with every page."
+    },
+    "sharedProps": {
+      "type": "object",
+      "properties": {
+        "auth": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/user"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "flash": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "success",
+            "error"
+          ]
+        },
+        "preferences": {
+          "type": "object"
+        },
+        "ichava": {
+          "$ref": "#/$defs/ichava"
+        }
+      },
+      "required": [
+        "auth",
+        "flash",
+        "preferences",
+        "ichava"
+      ],
+      "description": "Props HandleInertiaRequests shares with every page."
+    },
+    "appliedFilters": {
+      "type": "object",
+      "properties": {
+        "search": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "language": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kind": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/kind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kinds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/kind"
+          },
+          "uniqueItems": true,
+          "description": "Every kind asked for, in order; kind is the single one or null. Added in 1.4.0."
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "subs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sort_by": {
+          "type": "string"
+        },
+        "sort_direction": {
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        },
+        "page": {
+          "type": "integer"
+        },
+        "per_page": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "search",
+        "language",
+        "packages",
+        "kind",
+        "categories",
+        "subs",
+        "variants",
+        "tags",
+        "keywords",
+        "sort_by",
+        "sort_direction",
+        "page",
+        "per_page"
+      ]
+    },
+    "browserPage": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/sharedProps"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "icons": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/icon"
+              }
+            },
+            "pagination": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer"
+                },
+                "per_page": {
+                  "type": "integer"
+                },
+                "current_page": {
+                  "type": "integer"
+                },
+                "last_page": {
+                  "type": "integer"
+                },
+                "from": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "to": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "empty_reason": {
+                  "$ref": "#/$defs/emptyReason"
+                }
+              },
+              "required": [
+                "total",
+                "per_page",
+                "current_page",
+                "last_page",
+                "from",
+                "to",
+                "empty_reason"
+              ]
+            },
+            "appliedFilters": {
+              "$ref": "#/$defs/appliedFilters"
+            },
+            "filterOptions": {
+              "$ref": "#/$defs/filters"
+            },
+            "statistics": {
+              "$ref": "#/$defs/statistics"
+            },
+            "tree": {
+              "type": "array",
+              "items": {},
+              "description": "The category tree counted over the applied filters less the category selection (as GET /api/v1/icons/tree is asked by the browser). Reloaded with every listing visit since 1.3.0."
+            },
+            "packages": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/package"
+              },
+              "description": "Every installed pack, whatever is selected, with the one the browser opens on marked default; the Inertia catalog's getCatalogMeta reads it with filterOptions.variants_by_package."
+            },
+            "favorites": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "collections": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/collection"
+              }
+            },
+            "history": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/historyEntry"
+              }
+            },
+            "commandHistory": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/command"
+              }
+            }
+          },
+          "required": [
+            "icons",
+            "pagination",
+            "appliedFilters",
+            "filterOptions",
+            "statistics",
+            "tree",
+            "packages",
+            "favorites",
+            "collections",
+            "history",
+            "commandHistory"
+          ]
+        }
+      ],
+      "description": "Props of the Browser/Index Inertia page."
+    },
+    "statsPage": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/sharedProps"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "statistics": {
+              "type": "object"
+            },
+            "packageStats": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "icon_count": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "name",
+                  "icon_count"
+                ]
+              }
+            },
+            "topCategories": {
+              "type": "array",
+              "items": {}
+            },
+            "cacheStats": {
+              "type": [
+                "object",
+                "array"
+              ]
+            },
+            "cacheHealthy": {
+              "type": "boolean"
+            },
+            "updateStatus": {
+              "type": [
+                "object",
+                "array"
+              ]
+            },
+            "status": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/status"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "statistics",
+            "packageStats",
+            "topCategories",
+            "cacheStats",
+            "cacheHealthy",
+            "updateStatus",
+            "status"
+          ]
+        }
+      ],
+      "description": "Props of the Stats/Index Inertia page."
+    },
+    "sessionResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/session"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "bootstrapResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/bootstrap"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "statusResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/status"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "libraryResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/library"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "iconResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/iconResource"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "statisticsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/statistics"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "packagesResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/package"
+          }
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "favoritesResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "ids": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "icons": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "package": {
+                    "type": "string"
+                  },
+                  "svg_url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "package",
+                  "svg_url"
+                ]
+              }
+            },
+            "count": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "ids",
+            "icons",
+            "count"
+          ]
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "collectionsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/collection"
+          }
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "historyResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/historyEntry"
+          }
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "commandHistoryResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/command"
+          }
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "preferencesResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/preferences"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "apiManifest": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": "v1"
+        },
+        "base": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Absolute URL of {prefix}/api/v1, or null when the REST API is not mounted."
+        },
+        "endpoints": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "session": {
+              "type": "string"
+            },
+            "bootstrap": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "icons.list": {
+              "type": "string"
+            },
+            "icons.show": {
+              "type": "string"
+            },
+            "icons.svg": {
+              "type": "string"
+            },
+            "icons.filters": {
+              "type": "string"
+            },
+            "icons.tree": {
+              "type": "string"
+            },
+            "icons.statistics": {
+              "type": "string"
+            },
+            "icons.updateStatus": {
+              "type": "string"
+            },
+            "packages.list": {
+              "type": "string"
+            },
+            "packages.show": {
+              "type": "string"
+            },
+            "terms.categories": {
+              "type": "string"
+            },
+            "terms.variants": {
+              "type": "string"
+            },
+            "terms.hierarchy": {
+              "type": "string"
+            },
+            "library.show": {
+              "type": "string"
+            },
+            "library.destroy": {
+              "type": "string"
+            },
+            "favorites.list": {
+              "type": "string"
+            },
+            "favorites.add": {
+              "type": "string"
+            },
+            "favorites.remove": {
+              "type": "string"
+            },
+            "favorites.toggle": {
+              "type": "string"
+            },
+            "collections.list": {
+              "type": "string"
+            },
+            "collections.create": {
+              "type": "string"
+            },
+            "collections.show": {
+              "type": "string"
+            },
+            "collections.rename": {
+              "type": "string"
+            },
+            "collections.delete": {
+              "type": "string"
+            },
+            "collections.addIcon": {
+              "type": "string"
+            },
+            "collections.removeIcon": {
+              "type": "string"
+            },
+            "history.list": {
+              "type": "string"
+            },
+            "history.log": {
+              "type": "string"
+            },
+            "history.clear": {
+              "type": "string"
+            },
+            "commands.list": {
+              "type": "string"
+            },
+            "commands.log": {
+              "type": "string"
+            },
+            "commands.clear": {
+              "type": "string"
+            },
+            "preferences.show": {
+              "type": "string"
+            },
+            "preferences.update": {
+              "type": "string"
+            },
+            "preferences.search": {
+              "type": "string"
+            },
+            "preferences.filters": {
+              "type": "string"
+            },
+            "preferences.reset": {
+              "type": "string"
+            },
+            "cache.stats": {
+              "type": "string"
+            },
+            "cache.clear": {
+              "type": "string"
+            },
+            "cache.rebuild": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Every REST endpoint the client may call, by its own key, as an absolute URL under {prefix}/api/v1. Templated URLs keep {iconId}, {collectionId} and {package}. A key is absent when its route is not mounted or the feature gating it is off."
+        }
+      },
+      "required": [
+        "version",
+        "base",
+        "endpoints"
+      ],
+      "additionalProperties": false,
+      "description": "The bootstrap document's REST map, separate from each feature's Inertia-first endpoints. Added in 1.2.0."
+    }
+  },
+  "x-ichava-formats": [
+    {
+      "id": "svg",
+      "label": "Raw SVG",
+      "group": "raw",
+      "delivery": "client",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": true
+    },
+    {
+      "id": "motion",
+      "label": "Motion",
+      "group": "motion",
+      "delivery": "client",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "helper",
+      "label": "ichava() helper",
+      "group": "laravel",
+      "delivery": "laravel",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": true
+    },
+    {
+      "id": "blade",
+      "label": "Blade tag",
+      "group": "laravel",
+      "delivery": "laravel",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": true
+    },
+    {
+      "id": "bladeGeneric",
+      "label": "Generic Blade",
+      "group": "laravel",
+      "delivery": "laravel",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "livewire",
+      "label": "Livewire",
+      "group": "laravel",
+      "delivery": "laravel",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "alpine",
+      "label": "Alpine.js",
+      "group": "js",
+      "delivery": "client",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "vue",
+      "label": "Vue",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": true
+    },
+    {
+      "id": "react",
+      "label": "React",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": true
+    },
+    {
+      "id": "svelte",
+      "label": "Svelte",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "webcomponent",
+      "label": "Web Component",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "api",
+      "label": "REST URL",
+      "group": "reference",
+      "delivery": "laravel",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "name",
+      "label": "Icon name",
+      "group": "reference",
+      "delivery": "client",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": true
+    }
+  ]
+}

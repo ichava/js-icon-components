@@ -1,0 +1,216 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    # ready_for_review: a draft runs nothing, so marking it ready must start the run.
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+  # The post-merge check. With CI on pull_request only, nothing re-runs after a merge,
+  # and with no lock file committed a dependency release that breaks main would stay
+  # invisible until an unrelated pull request went red. Weekly, Monday 10:00 UTC.
+  schedule:
+    - cron: '0 10 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Typecheck, test, build & generate (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Drafts run nothing: CI starts when the pull request is marked ready.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['24', '26']
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+
+      # No lock file: this is a library, so it must not pin a resolution its consumers
+      # never use. npm install, not npm ci. `prepare` builds and generates dist/ here,
+      # exactly as it does when a consumer installs this repository by git tag. With no
+      # sibling pack checkout on the runner, that also proves the shallow fetch of each
+      # pinned pack commit works.
+      - name: Install dependencies (runs the build and the generator)
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build and generate again from a clean dist/
+        run: npm run build
+
+      # The build is what a consumer installing by git tag receives. An empty or
+      # short dist/ would install cleanly and fail at the consumer's first import.
+      - name: Every flavour was generated for every pinned pack
+        run: |
+          for f in dist/shared/index.js dist/react/index.js dist/vue/index.js dist/svelte/Icon.svelte dist/wc/index.js dist/manifest.json; do
+            test -s "$f" || { echo "::error::$f is missing or empty"; exit 1; }
+          done
+          node -e '
+            const m = require("./dist/manifest.json");
+            if (m.packs.length === 0) { console.error("::error::manifest lists no packs"); process.exit(1); }
+            for (const p of m.packs) for (const f of m.flavours) {
+              if (p.outputs[f] !== p.inputs) { console.error(`::error::${p.id} ${f}: ${p.outputs[f]} of ${p.inputs}`); process.exit(1); }
+              console.log(`${p.id} ${f}: ${p.outputs[f]}`);
+            }'
+          # A `.ts` specifier in an emitted file names a source that is not shipped.
+          if grep -rnE "from '\.\.?/[^']+\.ts'" dist --include='*.js' --include='*.svelte'; then
+            echo "::error::an emitted file imports a .ts path that does not exist in dist/"
+            exit 1
+          fi
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Drafts run nothing: CI starts when the pull request is marked ready.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: ESLint
+        run: npm run lint -- --max-warnings 0
+
+  config-drift:
+    name: Shared config matches the kernel
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Drafts run nothing: CI starts when the pull request is marked ready.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    # config/ holds copies of ichava/js-ui-kernel's config/. Fails when a copy stops matching
+    # the kernel's main, on a non-200 answer or an empty body; the second step proves it fails
+    # on a planted one-byte change.
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Copies match the kernel
+        run: npm run check:config-drift
+
+      - name: A drifted copy fails the check
+        run: |
+          printf ' ' >> config/tsconfig.base.json
+          if npm run check:config-drift; then
+            echo "::error::the drift check passed on a modified copy, so it checks nothing"
+            exit 1
+          fi
+          git checkout -- config/tsconfig.base.json
+
+  actionlint:
+    name: Workflow lint
+    runs-on: ubuntu-latest
+    # Drafts run nothing: CI starts when the pull request is marked ready.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    timeout-minutes: 5
+
+    # Nothing else reads these files until a tag is pushed. `release.yml` triggers
+    # on `push: tags`, so until now a broken workflow was first observed as a
+    # release that refused to start -- after the decision to release had been made.
+    #
+    # A YAML parse is not a substitute. `yaml.safe_load` accepts a duplicate key
+    # and silently keeps the last one, which is how a double-applied patch shipped
+    # a step carrying `continue-on-error:` twice and still validated clean.
+    # actionlint rejects what Actions rejects.
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: actionlint
+        uses: raven-actions/actionlint@3d39aea434753780c3b3d4a1a31c854b4dbf49d7 # v2.2.0
+
+  changelog:
+    runs-on: ubuntu-latest
+    # Drafts run nothing: CI starts when the pull request is marked ready.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    timeout-minutes: 5
+    name: Changelog order
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # A misordered CHANGELOG still releases correctly, because release.yml
+      # finds a section by heading rather than by position -- so nothing else
+      # in this ecosystem catches it. Two packs had it: browser carried
+      # [Unreleased] below [0.2.7], and icon-sets-emoji had [0.2.6] filed
+      # between [0.1.1] and [0.1.0]. Closing [Unreleased] in place would have
+      # filed the new version underneath an older one.
+      - name: Check CHANGELOG section order
+        run: |
+          python3 - CHANGELOG.md <<'PYEOF'
+          import collections
+          import re, sys
+
+          path = sys.argv[1]
+          try:
+              text = open(path, encoding='utf-8').read()
+          except FileNotFoundError:
+              print(f'::error::{path} not found'); sys.exit(1)
+
+          heads = re.findall(r'^## \[([^\]]+)\]', text, re.M)
+          if not heads:
+              print(f'::error::{path} has no "## [version]" headings'); sys.exit(1)
+
+          def order_key(v):
+              nums = [int(n) for n in re.findall(r'\d+', v)[:3]]
+              return tuple(nums + [0] * (3 - len(nums)))
+
+          problems = []
+          # Duplicates first. Ordering says nothing about how many [Unreleased]
+          # headings there are, and release.yml extracts exactly one section by
+          # version heading: a second [Unreleased] means the next release
+          # publishes part of its notes and strands the rest under a heading no
+          # version will ever match. Four had accumulated here before anyone
+          # looked, and three other repos in the ecosystem had the same.
+          seen = [h for h, n in collections.Counter(heads).items() if n > 1]
+          if seen:
+              problems.append(
+                  'duplicate section headings: ' + ', '.join(f'[{h}]' for h in seen)
+                  + '. Each branch must add to the existing section, not prepend its own.')
+
+          if 'Unreleased' in heads and heads[0] != 'Unreleased':
+              problems.append(
+                  f'[Unreleased] is section {heads.index("Unreleased") + 1}, not the first. '
+                  'Closing it in place would file the new version below an older one.')
+
+          versions = [h for h in heads if h != 'Unreleased']
+          for older, newer in zip(versions, versions[1:]):
+              if order_key(older) < order_key(newer):
+                  problems.append(f'[{older}] is listed above [{newer}], but is the lower version.')
+
+          if problems:
+              print(f'::error::{path} sections are out of order:')
+              for p in problems:
+                  print(f'::error::  {p}')
+              sys.exit(1)
+
+          print(f'{path}: {len(heads)} sections, correctly ordered')
+          PYEOF

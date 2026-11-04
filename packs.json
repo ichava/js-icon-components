@@ -1,0 +1,16 @@
+{
+  "$comment": "The packs this repository generates components for. Each is read from git at the pinned commit `ref` (a full SHA, never a branch), from the sibling checkout `checkout` when it holds that commit, else by a shallow fetch of `repository`. Adding a pack is a new entry here; moving a pack forward is a new `ref`. `minIcons` is the floor the count guard enforces, set a little under the measured count.",
+  "packs": [
+    {
+      "id": "tabler",
+      "repository": "https://github.com/ichava/icon-sets-tabler.git",
+      "ref": "10a5f39c60859b864abd2899622bdedb824e5664",
+      "checkout": "../icon-sets-tabler",
+      "path": "resources/assets/svg/files",
+      "sets": ["outline", "filled"],
+      "defaultSet": "outline",
+      "kind": "icon",
+      "minIcons": 6000
+    }
+  ]
+}
