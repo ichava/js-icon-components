@@ -118,7 +118,7 @@ writes no `dist/` at all.
 
 Measured 2026-11-04 on an Apple-silicon laptop with Node 24.17 and npm 11.13, a warm npm cache,
 the four packs (17,365 icons), twelve flavours and six asset exports. Install times are wall-clock
-for a fresh application installing the tarball offline; on disk is `du`, which is larger than the
+for a fresh application, offline for a tarball and from GitHub for a git build; on disk is `du`, which is larger than the
 byte count because each small file takes at least one 4 KB block.
 
 | Install | Download | Unpacked | On disk | Files | Time |
@@ -128,6 +128,9 @@ byte count because each small file takes at least one 4 KB block.
 | Release tarball, `flag` | 10.9 MB | 33.9 MB | 35 MB | 722 | 2 s |
 | Release tarball, `emoji` | 40.0 MB | 91.5 MB | 101 MB | 3,615 | 4 s |
 | Release tarball, `openmoji` | 57.4 MB | 192.9 MB | 211 MB | 7,325 | 6 s |
+| Git, every pack, flavour and export | | | 408 MB | 17,636 | 59 s |
+| Git, `tabler` for `react,css-mask` | | | 18 MB | 166 | 31 s |
+| Git, `ICHAVA_ICONS_SKIP_BUILD=1` | | | 0 | 3 | 14 s |
 
 Before the Tier 3 flavours and the exports (0.1.0 as merged in #5), the full tarball was 7.0 MB to
 download and 64.2 MB unpacked. The exports are most of the difference, and they are already
@@ -144,7 +147,8 @@ compressed (the zips) or large text (the CSS and JSON), so gzip barely shrinks t
 
 The whole build (`npm run build`: `tsc`, `ngc`, then the generator for every pack, flavour and
 export) takes 27 s, of which generation is 24 s; a git build that names only the flavours it uses
-writes no export at all. None of this reaches an application bundle beyond the icons it imports.
+writes no export at all. About 14 seconds of every git install is npm installing the development
+dependencies in its temporary clone, which no selection avoids. None of this reaches an application bundle beyond the icons it imports.
 
 ## Peers
 
