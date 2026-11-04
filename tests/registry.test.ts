@@ -22,7 +22,7 @@ const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { ex
 /** Subpath each flavour ships under. `webcomponent` is `./wc`, the only one that differs. */
 const SUBPATH: Record<(typeof FLAVOURS)[number] | (typeof PENDING_FLAVOURS)[number], string> = {
   react: './react', vue: './vue', svelte: './svelte', webcomponent: './wc',
-  reactNative: './react-native', angular: './angular', solid: './solid', preact: './preact',
+  reactNative: './react-native', angular: './angular', solid: './solid', preact: './preact', astro: './astro',
 };
 
 describe('format registry', () => {

@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { transform as transformAstro } from '@astrojs/compiler-rs';
 import { transformSync } from 'esbuild';
 import { compile as compileSvelte } from 'svelte/compiler';
 import { compileScript, compileTemplate, parse as parseSfc } from 'vue/compiler-sfc';
@@ -85,6 +86,16 @@ export function checkSvelte(source: string, filename: string): void {
   compileSvelte(source, { filename, generate: 'server' });
 }
 
+/**
+ * Fails the build if an Astro template does not compile. The options are the ones Astro 7 passes
+ * itself (astro/dist/core/compile/compile.js) that change the emitted code.
+ */
+export function checkAstro(source: string, filename: string): void {
+  const result = transformAstro(source, { filename, internalURL: 'astro/compiler-runtime', resultScopedSlot: true, resolvePath: (s: string) => s });
+  const errors = result.diagnostics.filter((d) => d.severity === 'error');
+  if (errors.length > 0) throw new Error(`${filename}: ${errors.map((d) => d.text).join('; ')}`);
+}
+
 function emitRuntimes(root: string, outDir: string): void {
   const vueSource = rewriteSharedImport(readFileSync(join(root, 'src/vue/Icon.vue'), 'utf8'), 'src/vue/Icon.vue');
   write(join(outDir, 'vue/index.js'), compileVue(vueSource, 'Icon.vue'));
@@ -116,6 +127,25 @@ function emitRuntimes(root: string, outDir: string): void {
   ].join('\n');
   write(join(outDir, 'svelte/index.d.ts'), svelteTypes);
   write(join(outDir, 'svelte/icon.d.ts'), "import type { SvelteIcon } from './index.js';\ndeclare const icon: SvelteIcon;\nexport default icon;\n");
+
+  // Astro components ship as source, as Svelte's do; the application's Astro compiles them.
+  for (const file of ['Icon.astro', 'Nodes.astro']) {
+    const source = rewriteSharedImport(readFileSync(join(root, `src/astro/${file}`), 'utf8'), `src/astro/${file}`);
+    checkAstro(source, file);
+    write(join(outDir, `astro/${file}`), source);
+  }
+  write(join(outDir, 'astro/index.js'), "export { default as Icon } from './Icon.astro';\n");
+  write(
+    join(outDir, 'astro/index.d.ts'),
+    [
+      "import type { IconData, IconProps } from '../shared/index.js';",
+      "export type { IconData, IconProps } from '../shared/index.js';",
+      'export type AstroIconProps = IconProps & { icon: IconData; class?: string; [attribute: string]: unknown };',
+      '/** The Astro component. Import it in an `.astro` file and pass `icon`. */',
+      'export declare function Icon(props: AstroIconProps): unknown;',
+      '',
+    ].join('\n'),
+  );
 
   for (const runtime of ['react/index.js', 'wc/index.js', 'shared/index.js', 'react-native/index.js', 'angular/index.js', 'solid/index.js', 'preact/index.js']) {
     try {
@@ -209,6 +239,7 @@ export const PENDING_OUTPUTS: Readonly<Record<PendingFlavour, { readonly dir: st
   angular: { dir: 'angular', type: 'IconData' },
   solid: { dir: 'solid', bind: 'createIcon', type: 'SolidIcon' },
   preact: { dir: 'preact', bind: 'createIcon', type: 'PreactIcon' },
+  astro: { dir: 'astro', type: 'IconData' },
 };
 
 /** Directories under dist/ that each get a copy of a pack's attribution files. */

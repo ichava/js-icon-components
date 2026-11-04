@@ -1,7 +1,7 @@
 {
   "name": "@ichava/js-icon-components",
   "version": "0.1.0",
-  "description": "Generates React, Vue 3, Svelte 5 and Web Component icon components from Ichava icon packs pinned at a git ref.",
+  "description": "Generates React, Vue 3, Svelte 5, Web Component, React Native, Angular, SolidJS, Preact and Astro icon components from Ichava icon packs pinned at a git ref.",
   "license": "MIT",
   "author": "Simtabi LLC <ichava@simtabi.com> (https://simtabi.com)",
   "homepage": "https://github.com/ichava/js-icon-components",
@@ -23,7 +23,8 @@
     "react-native",
     "angular",
     "solid",
-    "preact"
+    "preact",
+    "astro"
   ],
   "type": "module",
   "sideEffects": false,
@@ -107,6 +108,15 @@
       "types": "./dist/preact/packs/*.d.ts",
       "import": "./dist/preact/packs/*.js"
     },
+    "./astro": {
+      "types": "./dist/astro/index.d.ts",
+      "import": "./dist/astro/index.js"
+    },
+    "./astro/Icon.astro": "./dist/astro/Icon.astro",
+    "./astro/*": {
+      "types": "./dist/astro/packs/*.d.ts",
+      "import": "./dist/astro/packs/*.js"
+    },
     "./manifest.json": "./dist/manifest.json",
     "./package.json": "./package.json"
   },
@@ -120,6 +130,7 @@
   },
   "peerDependencies": {
     "@angular/core": ">=20",
+    "astro": ">=5.0.0",
     "preact": ">=10.19.0",
     "react": ">=18",
     "react-native-svg": ">=15",
@@ -129,6 +140,9 @@
   },
   "peerDependenciesMeta": {
     "@angular/core": {
+      "optional": true
+    },
+    "astro": {
       "optional": true
     },
     "preact": {
@@ -167,12 +181,14 @@
     "@angular/core": "^22.2.4",
     "@angular/platform-browser": "^22.2.4",
     "@angular/platform-server": "^22.2.4",
+    "@astrojs/compiler-rs": "^0.5.2",
     "@eslint/js": "^10.0.1",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@typescript/native": "npm:typescript@^7.0.2",
+    "astro": "^7.4.5",
     "esbuild": "^0.28.2",
     "eslint": "^10.12.0",
     "globals": "^17.13.0",
