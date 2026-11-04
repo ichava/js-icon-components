@@ -167,7 +167,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json && ngc -p tsconfig.angular.json && node dist/generator/cli.js",
     "generate": "node dist/generator/cli.js",
-    "prepare": "npm run build",
+    "prepare": "node scripts/prepare.mjs",
     "typecheck": "tsc -p tsconfig.json && ngc -p tsconfig.angular.json --noEmit",
     "lint": "eslint .",
     "test": "vitest run",

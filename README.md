@@ -3,8 +3,9 @@
 [![Tests](https://github.com/ichava/js-icon-components/actions/workflows/ci.yml/badge.svg)](https://github.com/ichava/js-icon-components/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Two badges, not four: the package is not on npm (it installs from a git tag), so there is no
-registry version to show, and lint runs in the same CI workflow as the tests.
+Two badges, not four: the package is not on npm (it installs from a GitHub release tarball or a
+git tag), so there is no registry version to show, and lint runs in the same CI workflow as the
+tests.
 
 > React, Vue 3, Svelte 5, Web Component, React Native, Angular, SolidJS, Preact and Astro icon components, generated from Ichava icon packs pinned at a git commit.
 
@@ -14,14 +15,34 @@ Node 24 or newer to install. The framework is an optional peer, for the flavour 
 
 ## Install
 
-From a git tag:
+The prebuilt tarball from the GitHub release. Nothing is compiled on your machine and nothing
+needs configuring:
 
 ```bash
-npm install "github:ichava/js-icon-components#v0.1.0"
+npm install https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-0.1.0.tgz
 ```
 
-`prepare` builds `dist/` during the install, which takes a few seconds and needs `git` on the
-path: it reads each pack from git at the commit pinned in `packs.json`.
+It has every pack and flavour (7.0 MB to download). Each release also carries one tarball per pack,
+`ichava-js-icon-components-<pack>-0.1.0.tgz` (`tabler`, `flag`, `emoji` or `openmoji`), with the
+same import paths and only that pack's icons.
+
+Or build from a git tag. npm clones the repository, installs the compilers and runs `prepare`,
+which needs `git` on the path. Choose what it builds with environment variables, or the same keys
+under `"ichava": { "icons": { … } }` in your `package.json`:
+
+```bash
+ICHAVA_ICONS_PACKS=tabler ICHAVA_ICONS_FLAVOURS=react \
+  npm install "github:ichava/js-icon-components#v0.1.0"
+```
+
+| Variable | `package.json` key | Effect |
+|---|---|---|
+| `ICHAVA_ICONS_PACKS=tabler,flag` | `"packs": ["tabler", "flag"]` | builds only those packs |
+| `ICHAVA_ICONS_FLAVOURS=react,vue` | `"flavours": ["react", "vue"]` | builds only those flavours |
+| `ICHAVA_ICONS_SKIP_BUILD=1` | `"skipBuild": true` | builds nothing |
+
+An import of a pack or flavour that was not built throws, naming the variable that adds it. See
+[Installation](docs/installation.md) for the sizes and times of each.
 
 ## Quick start guide and usage
 
@@ -108,7 +129,7 @@ The documentation lives in this repository's [`docs/`](https://github.com/ichava
 
 ### Guides
 
-- [Installation](docs/installation.md) — the git-tag install, what `prepare` builds and its size
+- [Installation](docs/installation.md) — the release tarball, the git build and its options, sizes and times
 - [Getting started](docs/getting-started.md) — props, accessibility and export names in every flavour
 - [Packs](docs/packs.md) — the four pinned packs, their licences, attribution and id prefixing
 - [Architecture](docs/architecture.md) — why a generator, the pinned input, the SVG gate and the guards

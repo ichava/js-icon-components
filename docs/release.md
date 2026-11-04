@@ -2,11 +2,11 @@
 
 Tagging a release, and moving a pack to a new commit.
 
-## Distribution is git only
+## Distribution is GitHub only
 
-There is no npm release. Consumers pin `github:ichava/js-icon-components#vX.Y.Z`, the way
-react-icon-browser pins js-ui-kernel. Publishing to a registry is a separate decision for the
-owner.
+There is no npm release. Consumers install the tarball attached to a GitHub release, or pin
+`github:ichava/js-icon-components#vX.Y.Z` and build, the way react-icon-browser pins js-ui-kernel.
+Publishing to a registry is a separate decision for the owner.
 
 ## Cutting a release
 
@@ -15,7 +15,31 @@ owner.
 2. Close `[Unreleased]` as `## [X.Y.Z] - date`, bump `version` in `package.json` and the tag in
    the install lines of `README.md` and `docs/installation.md`, in one pull request.
 3. After it merges, tag the merge commit `vX.Y.Z` and push the tag. `release.yml` creates the
-   GitHub release with that CHANGELOG section as its body, and refuses a tag that has none.
+   GitHub release with that CHANGELOG section as its body, and refuses a tag that has none, or a
+   tag that does not match `version` in `package.json`.
+
+## The release tarballs
+
+The same run installs and builds the package once and attaches:
+
+| Asset | Holds |
+|---|---|
+| `ichava-js-icon-components-X.Y.Z.tgz` | every pack and flavour |
+| `ichava-js-icon-components-<pack>-X.Y.Z.tgz` | one pack, every flavour, one per entry in `packs.json` |
+| `SHA256SUMS` | the checksum of each tarball |
+| `js-icon-components.cdx.json` | the SBOM |
+
+Each tarball is `npm pack` output, checked by `scripts/check-tarball.mjs` before upload: `dist/`
+for everything its manifest says was built, a stand-in for the rest, nothing from the development
+tree, and no dependencies. To rebuild them for a tag, which creates or updates that tag's release
+only:
+
+```bash
+gh workflow run release.yml --repo ichava/js-icon-components -f tag=v0.1.0
+```
+
+A pre-release tag (`vX.Y.Z-rc.N`) packs with its own version, so its tarballs are
+`ichava-js-icon-components-X.Y.Z-rc.N.tgz`; `package.json` keeps `X.Y.Z`.
 
 ## Moving a pack forward
 
