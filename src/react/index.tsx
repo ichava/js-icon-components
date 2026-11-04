@@ -18,9 +18,39 @@ function reactName(name: string): string {
   return name.replace(/[:-]([a-z])/g, (_, c: string) => c.toUpperCase());
 }
 
-function reactAttrs(attrs: Readonly<Record<string, string>>): Record<string, string> {
+function styleKey(name: string): string {
+  if (name.startsWith('--')) return name;
+  const camel = (s: string): string => s.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+  if (name.startsWith('-ms-')) return camel(name.slice(1));
+  if (name.startsWith('-')) {
+    const rest = camel(name.slice(1));
+    return rest.charAt(0).toUpperCase() + rest.slice(1);
+  }
+  return camel(name);
+}
+
+/**
+ * React takes `style` as an object and throws on a string, so a source `style="marker:none"` (the
+ * flag pack has eight) is split into declarations. Custom properties keep their name; others are
+ * camel-cased, with a vendor prefix capitalised (`-webkit-x` → `WebkitX`) as React expects. The
+ * value was checked by the SVG policy before it reached the data.
+ */
+export function styleObject(css: string): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const [name, value] of Object.entries(attrs)) out[reactName(name)] = value;
+  for (const declaration of css.split(';')) {
+    const colon = declaration.indexOf(':');
+    if (colon === -1) continue;
+    const name = declaration.slice(0, colon).trim();
+    const value = declaration.slice(colon + 1).trim();
+    if (name === '' || value === '') continue;
+    out[styleKey(name)] = value;
+  }
+  return out;
+}
+
+function reactAttrs(attrs: Readonly<Record<string, string>>): Record<string, string | Record<string, string>> {
+  const out: Record<string, string | Record<string, string>> = {};
+  for (const [name, value] of Object.entries(attrs)) out[reactName(name)] = name === 'style' ? styleObject(value) : value;
   return out;
 }
 
@@ -34,7 +64,7 @@ export const Icon = forwardRef<SVGSVGElement, ReactIconProps & { icon: IconData 
   { icon, size, color, strokeWidth, title, className, ...rest },
   ref,
 ) {
-  const root = reactAttrs(rootAttributes(icon, { size, color, strokeWidth, title }));
+  const root = reactAttrs(rootAttributes(icon, { size, color, strokeWidth, title })) as Record<string, string>;
   // A caller's class adds to `ichava-icon` rather than replacing it, as Vue's fallthrough does.
   if (className) root.className = `${root.className} ${className}`;
   return (
