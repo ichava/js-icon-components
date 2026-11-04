@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/ichava/icon-browser/resources/schema/icon-browser.schema.json",
   "title": "ichava/icon-browser payloads",
-  "description": "Every REST resource, session and bootstrap document, and Inertia prop this package serves. Version 1.5.0, matching PayloadSchema::VERSION. react-icon-browser generates its types from this file.",
-  "version": "1.5.0",
+  "description": "Every REST resource, session and bootstrap document, and Inertia prop this package serves. Version 1.6.0, matching PayloadSchema::VERSION. react-icon-browser generates its types from this file.",
+  "version": "1.6.0",
   "$defs": {
     "user": {
       "type": "object",
@@ -180,10 +180,19 @@
         "solid",
         "preact",
         "astro",
+        "qwik",
+        "ember",
+        "elm",
+        "css-mask",
+        "data-uri",
+        "png-zip",
+        "flutter",
+        "swiftui",
+        "android-vd",
         "api",
         "name"
       ],
-      "description": "Code-tab and copy-format ids. The registry is x-ichava-formats at the schema root. Added in 1.4.0; reactNative, angular, solid, preact and astro added in 1.5.0."
+      "description": "Code-tab and copy-format ids. The registry is x-ichava-formats at the schema root. Added in 1.4.0; reactNative, angular, solid, preact and astro added in 1.5.0; qwik, ember, elm, css-mask, data-uri, png-zip, flutter, swiftui and android-vd added in 1.6.0."
     },
     "icon": {
       "type": "object",
@@ -2155,6 +2164,117 @@
       ],
       "copy": true,
       "defaultCopy": false
+    },
+    {
+      "id": "qwik",
+      "label": "Qwik",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "ember",
+      "label": "Ember",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "elm",
+      "label": "Elm",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "css-mask",
+      "label": "CSS mask",
+      "group": "export",
+      "delivery": "asset",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": false,
+      "defaultCopy": false
+    },
+    {
+      "id": "data-uri",
+      "label": "Data URI",
+      "group": "export",
+      "delivery": "asset",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": false,
+      "defaultCopy": false
+    },
+    {
+      "id": "png-zip",
+      "label": "PNG (zip)",
+      "group": "export",
+      "delivery": "asset",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": false,
+      "defaultCopy": false
+    },
+    {
+      "id": "flutter",
+      "label": "Flutter",
+      "group": "export",
+      "delivery": "asset",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": false,
+      "defaultCopy": false,
+      "native": true
+    },
+    {
+      "id": "swiftui",
+      "label": "SwiftUI",
+      "group": "export",
+      "delivery": "asset",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": false,
+      "defaultCopy": false,
+      "native": true
+    },
+    {
+      "id": "android-vd",
+      "label": "Android VectorDrawable",
+      "group": "export",
+      "delivery": "asset",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": false,
+      "defaultCopy": false,
+      "native": true
     },
     {
       "id": "api",
