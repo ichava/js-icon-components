@@ -6,11 +6,11 @@
 Two badges, not four: the package is not on npm (it installs from a git tag), so there is no
 registry version to show, and lint runs in the same CI workflow as the tests.
 
-> React, Vue 3, Svelte 5 and Web Component icon components, generated from Ichava icon packs pinned at a git commit.
+> React, Vue 3, Svelte 5, Web Component, React Native, Angular, SolidJS, Preact and Astro icon components, generated from Ichava icon packs pinned at a git commit.
 
 Four packs: Tabler, flags, Twemoji and OpenMoji, 17,365 icons in all.
 
-Node 24 or newer to install. React 18+, Vue 3.4+ or Svelte 5 as an optional peer, for the flavour you use.
+Node 24 or newer to install. The framework is an optional peer, for the flavour you use: React 18+, Vue 3.4+, Svelte 5, `react-native-svg` 15+, Angular 20+, SolidJS 1.8+, Preact 10.19+ or Astro 5+.
 
 ## Install
 
@@ -84,6 +84,21 @@ registerIcons([IconMug]);
 defineIchavaIcon(); // <ichava-icon name="tabler:outline/mug" size="20" label="Coffee"></ichava-icon>
 ```
 
+React Native, Angular, SolidJS, Preact and Astro take the same icons from their own subpath:
+
+```tsx
+import { IconMug } from '@ichava/js-icon-components/react-native/tabler';  // also /solid and /preact
+<IconMug size={20} color="#7c3aed" />
+```
+
+```astro
+---
+import { Icon } from '@ichava/js-icon-components/astro';
+import { IconMug } from '@ichava/js-icon-components/astro/tabler';  // Angular: <ichava-ng-icon [icon]="mug" />
+---
+<Icon icon={IconMug} size={20} title="Coffee" />
+```
+
 The full walkthrough is in [docs/getting-started.md](docs/getting-started.md); everything else is
 under [Documentation](#documentation).
 
@@ -105,6 +120,11 @@ The documentation lives in this repository's [`docs/`](https://github.com/ichava
 - [Vue 3](docs/tools/vue.md) — `@ichava/js-icon-components/vue`
 - [Svelte 5](docs/tools/svelte.md) — `@ichava/js-icon-components/svelte`
 - [Web Component](docs/tools/webcomponent.md) — `@ichava/js-icon-components/wc`
+- [React Native](docs/tools/react-native.md) — `@ichava/js-icon-components/react-native`
+- [Angular](docs/tools/angular.md) — `@ichava/js-icon-components/angular`
+- [SolidJS](docs/tools/solid.md) — `@ichava/js-icon-components/solid`
+- [Preact](docs/tools/preact.md) — `@ichava/js-icon-components/preact`
+- [Astro](docs/tools/astro.md) — `@ichava/js-icon-components/astro`
 
 ## Contributing and security
 

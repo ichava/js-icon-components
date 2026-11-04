@@ -38,7 +38,7 @@ packs.json ─▶ git at the pinned commit ─▶ SVG gate ─▶ id prefix ─�
 | Names | `src/generator/naming.ts` |
 | Emit and count | `src/generator/generate.ts` |
 | Shared contract | `src/shared/index.ts` (`IconData`, `IconProps`, `rootAttributes`) |
-| Templates | `src/react/index.tsx`, `src/vue/Icon.vue`, `src/svelte/Icon.svelte`, `src/wc/index.ts` |
+| Templates | `src/react/index.tsx`, `src/vue/Icon.vue`, `src/svelte/Icon.svelte`, `src/wc/index.ts`, `src/react-native/index.tsx`, `src/angular/icon.component.ts`, `src/solid/index.ts`, `src/preact/index.tsx`, `src/astro/Icon.astro` |
 
 ## Input is a pinned commit
 
@@ -85,12 +85,30 @@ with no attribution files is refused when `packs.json` loads.
 | No id repeats on a page holding two icons from one pack, or from two packs; every id carries its icon's prefix; prefixing breaks no reference | `tests/page-ids.test.ts`, `tests/ids.test.ts` |
 | Every multi-colour flag and emoji renders every source colour, in order; three are snapshotted | `tests/colours.test.ts` |
 | Attribution and licence files ship beside every flavour of every pack, and name the CC licence | `tests/generate.test.ts` |
-| Every flavour is a `generated` format in icon-browser's registry, and the reverse | `tests/registry.test.ts` |
+| Every flavour is a `generated` format in icon-browser's registry, and the reverse; a pending flavour is still missing there | `tests/registry.test.ts` |
+| Each template compiles with its framework's compiler, or type-checks where none applies, and renders three icons | `tests/<flavour>.test.ts` |
 | No lock file is tracked | `tests/lockfile.test.ts` |
 | Vendored policy and schema match their digests and siblings | `tests/vendored.test.ts` |
 
 Each was seen failing before it was trusted, and each counts what it inspected so an empty input
 cannot pass.
+
+## Flavours the registry does not list yet
+
+React Native (`reactNative`), Angular (`angular`), SolidJS (`solid`), Preact (`preact`) and Astro
+(`astro`) are generated, counted, exported and tested like the first four, but icon-browser's
+format registry does not list their ids yet. They sit in `PENDING_FLAVOURS` (`src/shared/index.ts`),
+outside the registry guard's required set, and `tests/registry.test.ts` asserts each is still
+missing from the registry. Once icon-browser lists one and the vendored schema copy is refreshed,
+that assertion fails and the id moves into `FLAVOURS`, where the two-way guard covers it.
+
+| Flavour | Compiled or checked by | Rendered by |
+|---|---|---|
+| React Native | `tsc`; esbuild TSX in the test | `react-dom/server`, with a host-element stand-in for `react-native-svg` |
+| Angular | `ngc`, partial mode | `@angular/platform-server`, linked by `@angular/compiler` |
+| SolidJS | `tsc` (no JSX: nothing for `babel-preset-solid` to compile) | Solid's server build, and its client build in jsdom |
+| Preact | `tsc`; esbuild TSX with Preact's JSX runtime in the test | `preact-render-to-string` |
+| Astro | `@astrojs/compiler-rs`, at build and in the test | Astro's container API |
 
 ## Illustrations
 

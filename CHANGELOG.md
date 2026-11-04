@@ -12,6 +12,8 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 - `packs.json` fields `licence`, `attribution`, `categories` (one level of category directories) and `exclude` (rejected SVGs left out, each with a reason; a stale entry fails the build).
 - Guards: output equals input per pack, less listed exclusions; no repeated id on a page of icons from one pack or two; every multi-colour flag and emoji keeps every source colour; attribution files present for every pack and flavour.
 
+- Five flavours, each an optional peer with its own subpath, template, compile test and render snapshot: React Native on `react-native-svg` (`./react-native`), Angular as a standalone `ichava-ng-icon` component compiled by `ngc` in partial mode (`./angular`), SolidJS (`./solid`), Preact (`./preact`) and Astro (`./astro`, shipped as `.astro` source). Their format ids (`reactNative`, `angular`, `solid`, `preact`, `astro`) are not in icon-browser's registry yet, so they are listed as pending and the registry guard asserts they are still missing there.
+
 ### Fixed
 
 - The React flavour passes a source `style` attribute as an object. React throws on a string, so the eight flag SVGs with `style="marker:none"` and similar could not render.
