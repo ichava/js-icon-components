@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/ichava/icon-browser/resources/schema/icon-browser.schema.json",
   "title": "ichava/icon-browser payloads",
-  "description": "Every REST resource, session and bootstrap document, and Inertia prop this package serves. Version 1.4.0, matching PayloadSchema::VERSION. react-icon-browser generates its types from this file.",
-  "version": "1.4.0",
+  "description": "Every REST resource, session and bootstrap document, and Inertia prop this package serves. Version 1.5.0, matching PayloadSchema::VERSION. react-icon-browser generates its types from this file.",
+  "version": "1.5.0",
   "$defs": {
     "user": {
       "type": "object",
@@ -175,10 +175,15 @@
         "react",
         "svelte",
         "webcomponent",
+        "reactNative",
+        "angular",
+        "solid",
+        "preact",
+        "astro",
         "api",
         "name"
       ],
-      "description": "Code-tab and copy-format ids. The registry is x-ichava-formats at the schema root. Added in 1.4.0."
+      "description": "Code-tab and copy-format ids. The registry is x-ichava-formats at the schema root. Added in 1.4.0; reactNative, angular, solid, preact and astro added in 1.5.0."
     },
     "icon": {
       "type": "object",
@@ -2082,6 +2087,66 @@
     {
       "id": "webcomponent",
       "label": "Web Component",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "reactNative",
+      "label": "React Native",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "angular",
+      "label": "Angular",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "solid",
+      "label": "Solid",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "preact",
+      "label": "Preact",
+      "group": "js",
+      "delivery": "generated",
+      "kinds": [
+        "icon",
+        "illustration"
+      ],
+      "copy": true,
+      "defaultCopy": false
+    },
+    {
+      "id": "astro",
+      "label": "Astro",
       "group": "js",
       "delivery": "generated",
       "kinds": [

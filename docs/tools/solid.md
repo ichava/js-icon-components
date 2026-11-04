@@ -44,7 +44,7 @@ element the SVG policy allows lands in the SVG namespace and that props update i
 
 ## Format id
 
-`solid`, pending: icon-browser's format registry does not list it yet.
+`solid`, listed in icon-browser's format registry since schema 1.5.0 and required by the registry guard.
 
 ---
 

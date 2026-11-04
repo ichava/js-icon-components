@@ -48,14 +48,14 @@ export const FLAVOURS = ['react', 'vue', 'svelte', 'webcomponent'] as const;
 export type Flavour = (typeof FLAVOURS)[number];
 
 /**
- * Generated flavours whose format id the registry does not list yet. They are built, tested and
- * exported like the four above, but the registry guard does not require them, and asserts they are
- * still missing there: once icon-browser lists one, that test fails and the id moves into FLAVOURS.
+ * The Tier 2 generated flavours. icon-browser's registry lists them since schema 1.5.0, so the
+ * registry guard (`tests/registry.test.ts`) requires them like the four above; they stay a separate
+ * list because the generator writes them through `PENDING_OUTPUTS`.
  */
 export const PENDING_FLAVOURS = ['reactNative', 'angular', 'solid', 'preact', 'astro'] as const;
 export type PendingFlavour = (typeof PENDING_FLAVOURS)[number];
 
-/** Every flavour the generator writes, registered or not. */
+/** Every flavour the generator writes; the registry guard requires all of them. */
 export const ALL_FLAVOURS = [...FLAVOURS, ...PENDING_FLAVOURS] as const;
 export type AnyFlavour = Flavour | PendingFlavour;
 

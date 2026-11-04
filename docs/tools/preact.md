@@ -38,7 +38,7 @@ renders three icons with `preact-render-to-string`.
 
 ## Format id
 
-`preact`, pending: icon-browser's format registry does not list it yet.
+`preact`, listed in icon-browser's format registry since schema 1.5.0 and required by the registry guard.
 
 ---
 
