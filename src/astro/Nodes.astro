@@ -1,0 +1,18 @@
+---
+/*
+ * Renders an icon's element tree. Astro takes an element name from a variable, so each node is
+ * written as its own tag, and children recurse through Astro.self.
+ */
+import type { IconChild } from '../shared/index.ts';
+
+interface Props {
+  nodes: readonly IconChild[];
+}
+
+const { nodes } = Astro.props as Props;
+---
+{nodes.map((child) => {
+  if (typeof child === 'string') return child;
+  const [Tag, attrs, children] = child;
+  return <Tag {...attrs}>{children && <Astro.self nodes={children} />}</Tag>;
+})}

@@ -1,0 +1,179 @@
+# Installation
+
+There is no release yet, so today there is one way in: a build from git, from the default branch or
+a commit you pin, that you can limit to the packs and flavours you use. The first release adds a
+prebuilt tarball, described below so its shape is known; this page names its URL once the tag exists.
+`tests/install-docs.test.ts` fails if a page names a tag the repository does not have.
+
+## From a release tarball (after the first release)
+
+```bash
+npm install https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-<version>.tgz
+```
+
+```json
+{
+  "dependencies": {
+    "@ichava/js-icon-components": "https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-<version>.tgz"
+  }
+}
+```
+
+The tarball is `npm pack` output, built once by `release.yml` when the release is tagged. It
+holds `dist/` for every pack, flavour and asset export and nothing else: no source, no tests, and no
+dependencies. npm runs no build for a tarball, so no compiler, `git` or network access to the
+packs is needed. Then import the flavour you use, as in the [README](../README.md#quick-start-guide-and-usage).
+
+### One pack only
+
+Each release also attaches one tarball per pack, built with every flavour and export. Each is its
+own package, `@ichava/js-icon-components-<pack>`, with the same subpaths as the full one, so two
+or more install side by side:
+
+```bash
+npm install \
+  https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-tabler-<version>.tgz \
+  https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-flag-<version>.tgz
+```
+
+```ts
+import { IconMug } from '@ichava/js-icon-components-tabler/react/tabler';
+import { IconKe } from '@ichava/js-icon-components-flag/react/flag';
+```
+
+An import of another pack from a per-pack package throws, naming the pack. Moving from a per-pack
+tarball to the full one changes the package name in your imports. Until this release every per-pack
+tarball shared the full package's name, so npm kept only one of them; `tests/per-pack-tarball.test.ts`
+installs two and imports from both.
+
+`SHA256SUMS` on the release lists the checksum of every tarball.
+
+## From git
+
+```bash
+npm install "github:ichava/js-icon-components"
+npm install "github:ichava/js-icon-components#<commit-sha>"   # pinned
+```
+
+npm clones the repository, installs its development dependencies (the compilers) in a temporary
+directory and runs `prepare`, which is `scripts/prepare.mjs`:
+
+1. If `dist/` is already built, it does nothing.
+2. If `ICHAVA_ICONS_SKIP_BUILD=1`, it does nothing.
+3. Otherwise it runs `npm run build`: `tsc` and Angular's `ngc` compile the templates, then the
+   generator reads each selected pack at its pinned commit, from a shallow `git fetch` of exactly
+   that commit, checks every SVG against the policy and writes the modules.
+
+So `git` must be on the path and `github.com` reachable. Only `dist/` reaches your
+`node_modules`; the compilers stay in npm's temporary clone. Until the first tag, pin a commit SHA for
+reproducible installs; after it, pin the tag, which is final and never moves.
+
+### Choosing what to build
+
+| Variable | `package.json` key | Effect |
+|---|---|---|
+| `ICHAVA_ICONS_PACKS=tabler,flag` | `"packs": ["tabler", "flag"]` | builds only those packs |
+| `ICHAVA_ICONS_FLAVOURS=react,css-mask` | `"flavours": ["react", "css-mask"]` | builds only those flavours and exports |
+| `ICHAVA_ICONS_SKIP_BUILD=1` | `"skipBuild": true` | builds nothing |
+
+Packs are `tabler`, `flag`, `twemoji` and `openmoji`. Flavours are named by their subpath: `react`,
+`vue`, `svelte`, `wc`, `react-native`, `angular`, `solid`, `preact`, `astro`, `qwik`, `ember` and
+`elm` (the registry ids `webcomponent` and `reactNative` work too). The asset exports go in the same
+list, by registry id: `css-mask`, `data-uri`, `flutter` and `swiftui`. The ichava icon ecosystem is
+strictly SVG, so there is no PNG export (`png-zip`, dropped with icon-browser's schema 1.7.0) and no
+Android VectorDrawable export (`android-vd`, dropped with schema 1.8.0), both by owner decision on
+2026-11-04.
+Unset or empty means everything; a list builds exactly what it names, so `react` alone builds no
+export and `css-mask` alone builds no flavour. An unknown name fails the install, listing the valid
+ones. An Elm module or an export that was not built is simply absent: neither is a JavaScript module,
+so neither has a stand-in.
+
+The keys live under `"ichava"` → `"icons"` in the installing application's `package.json`, as an
+array or a comma-separated string. A variable that is set wins over the file:
+
+```json
+{
+  "ichava": {
+    "icons": { "packs": ["tabler"], "flavours": ["react"] }
+  }
+}
+```
+
+npm installs a git dependency only once, so after changing the selection remove
+`node_modules/@ichava/js-icon-components` and install again.
+
+### What an unbuilt import does
+
+A pack or flavour left out still has its subpath, as a stand-in module. It exports every name the
+real one would, so a named import links, then throws when it is evaluated:
+
+```text
+Error: @ichava/js-icon-components: the "vue" flavour was not built by this install, which built
+the packs tabler for the flavours react. Reinstall with ICHAVA_ICONS_FLAVOURS=react,vue (or the
+same list under "ichava.icons" in your package.json), or install the prebuilt release tarball,
+which has every pack and flavour.
+```
+
+The stand-ins take up to about 6 MB, a fraction of the icons they replace. Two imports have no stand-in
+and fail with the bundler's own "not found" error instead: a per-icon Svelte deep import
+(`/svelte/tabler/IconMug.svelte`) of a pack or flavour that was not built, because a stand-in per
+icon would cost what the selection saves; and everything after `ICHAVA_ICONS_SKIP_BUILD=1`, which
+writes no `dist/` at all.
+
+## Size and time
+
+Measured 2026-11-04 on an Apple-silicon laptop with Node 24.17 and npm 11.13, a warm npm cache,
+the four packs (18,802 icons), twelve flavours and four asset exports, after the PNG and Android VectorDrawable exports were dropped. The tarball rows were re-measured after the Android export left; the git rows' times were measured before it, when the tree held about 16 MB more. Install times are wall-clock
+for a fresh application, offline for a tarball and from GitHub for a git build; on disk is `du`, which is larger than the
+byte count because each small file takes at least one 4 KB block.
+
+| Install | Download | Unpacked | On disk | Files | Time |
+|---|---:|---:|---:|---:|---:|
+| Release tarball, full | 49.6 MB | 249.4 MB | 303 MB | 17,622 | 12 s |
+| Release tarball, `tabler` | 7.6 MB | 42.1 MB | 64 MB | 6,446 | 6 s |
+| Release tarball, `flag` | 8.6 MB | 31.2 MB | 32 MB | 717 | 2 s |
+| Release tarball, `twemoji` | 13.1 MB | 61.1 MB | 72 MB | 3,610 | 4 s |
+| Release tarball, `openmoji` | 23.5 MB | 143.2 MB | 164 MB | 7,320 | 6 s |
+| Git, every pack, flavour and export | | | 303 MB | 17,622 | 69 s |
+| Git, `tabler` for `react,css-mask` | | | 17 MB | 166 | 24 s |
+| Git, `ICHAVA_ICONS_SKIP_BUILD=1` | | | 0 | 3 | 17 s |
+
+Before the Tier 3 flavours and the exports (0.1.0 as merged in #5), the full tarball was 7.0 MB to
+download and 64.2 MB unpacked. The exports are most of the difference, and they are already
+compressed (the zips) or large text (the CSS and JSON), so gzip barely shrinks the tarball:
+
+| Export | All four packs | Generated in |
+|---|---:|---:|
+| CSS mask (`icons.css`) | 37.0 MB | 0.8 s |
+| Data URI (`data-uri.json`) | 36.5 MB | 0.8 s |
+| Flutter (`flutter.zip`) | 16.1 MB | 1.0 s |
+| SwiftUI (`swiftui.zip`) | 23.7 MB | 1.4 s |
+
+The whole build (`npm run build`: `tsc`, `ngc`, then the generator for every pack, flavour and
+export) takes about 15 s, of which generation is 11 to 12 s (27 s and 24 s while it still rasterised PNGs); a git build that names only the flavours it uses
+writes no export at all. About 14 seconds of every git install is npm installing the development
+dependencies in its temporary clone, which no selection avoids. None of this reaches an application bundle beyond the icons it imports.
+
+## Peers
+
+| Flavour | Peer | Import |
+|---|---|---|
+| React | `react` 18 or newer | `@ichava/js-icon-components/react/<pack>` |
+| Vue 3 | `vue` 3.4 or newer | `@ichava/js-icon-components/vue/<pack>` |
+| Svelte 5 | `svelte` 5 | `@ichava/js-icon-components/svelte/<pack>` |
+| Web Component | none | `@ichava/js-icon-components/wc/<pack>` |
+| React Native | `react-native-svg` 15 or newer | `@ichava/js-icon-components/react-native/<pack>` |
+| Angular | `@angular/core` 20 or newer | `@ichava/js-icon-components/angular` and `/angular/<pack>` |
+| SolidJS | `solid-js` 1.8 or newer | `@ichava/js-icon-components/solid/<pack>` |
+| Preact | `preact` 10.19 or newer | `@ichava/js-icon-components/preact/<pack>` |
+| Astro | `astro` 5 or newer | `@ichava/js-icon-components/astro` and `/astro/<pack>` |
+| Qwik | `@builder.io/qwik` 1.5 or newer | `@ichava/js-icon-components/qwik/<pack>` |
+| Ember | `ember-source` 6.3 or newer | `@ichava/js-icon-components/ember` and `/ember/<pack>` |
+| Elm | `elm/svg` and `elm/virtual-dom` in your `elm.json` | `dist/elm/` as a source directory |
+| Exports | none | `@ichava/js-icon-components/assets/<pack>/<file>` |
+
+Every peer is optional. Install only the one you use.
+
+---
+
+[← Docs index](../README.md#documentation)

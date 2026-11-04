@@ -1,0 +1,235 @@
+# Tag-driven. Every release carries a real description, extracted from that
+# version's CHANGELOG section — never auto-generated notes alone, which list
+# commit subjects and explain nothing.
+#
+# It also builds the package once and attaches it as prebuilt tarballs, so an
+# application installs with one command and no compiler:
+#   ichava-js-icon-components-<version>.tgz          every pack, flavour and asset export
+#   ichava-js-icon-components-<pack>-<version>.tgz   one pack, every flavour and export, as the
+#                                                     package @ichava/js-icon-components-<pack>
+#   SHA256SUMS                                        over the tarballs
+# Each is `npm pack` output, checked by scripts/check-tarball.mjs before upload.
+#
+# A tag is the only legitimate `push` trigger in this ecosystem; everything else
+# runs on `pull_request`.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'v*.*.*-*'
+
+  # Recovery path for a tag push that started nothing, or a release whose
+  # tarballs need rebuilding: `gh workflow run release.yml --repo
+  # ichava/js-icon-components -f tag=vX.Y.Z`. It creates or updates that tag's
+  # release only, and refuses a tag that is not a release tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to build and attach to, e.g. v0.1.0'
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.tag || github.ref_name }}
+  # Never cancel a release in flight. A half-published release is worse than a
+  # queued one.
+  cancel-in-progress: false
+
+# Read-only by default; the one job that writes the release asks for it.
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    env:
+      # The tag being released: the pushed tag, or the dispatch input.
+      TAG: ${{ inputs.tag || github.ref_name }}
+
+    steps:
+      - name: Refuse a ref that is not a release tag
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = 'push' ] && [ "$GITHUB_REF_TYPE" != 'tag' ]; then
+            echo "::error::Run this on a tag push, not the ${GITHUB_REF_TYPE} '${GITHUB_REF_NAME}'."
+            exit 1
+          fi
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::'${TAG}' is not a vX.Y.Z or vX.Y.Z-rc.N release tag."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # The tag itself, never the branch a dispatch ran from. A tag that does
+          # not exist fails here, before anything is built.
+          ref: refs/tags/${{ env.TAG }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          # A release never restores a cache another run could have written.
+          package-manager-cache: false
+
+      # --ignore-scripts: `prepare` builds with the dev toolchain, which --omit=dev leaves
+      # out. The SBOM describes what ships, and this package ships no runtime dependency.
+      - name: Install runtime dependencies
+        run: npm install --omit=dev --ignore-scripts --no-audit --no-fund
+
+      # Two attempts, 45s apart, and the release publishes either way.
+      #
+      # The Syft installer fetches its checksums from GitHub's release-asset CDN.
+      # On 2026-09-21 that answered 504 for ~20 minutes and failed this job four
+      # times before the publish step, leaving a pushed tag with no release behind
+      # it -- the drift the release table exists to catch, produced by the release
+      # machinery itself.
+      #
+      # So a missing SBOM must not fail the publish. The two states are not
+      # equally bad: a release missing an attachment is repaired by re-running
+      # this job, which re-attaches it, while a tag with no release persists
+      # silently until a person notices. The warning below is what makes the
+      # first state visible in the run rather than only in the absent asset.
+      #
+      # The retry covers a single transient 504, the common case. It does not try
+      # to cover a sustained outage -- no in-job backoff is worth twenty minutes.
+      - name: Generate SBOM
+        id: sbom
+        continue-on-error: true
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          format: cyclonedx-json
+          output-file: js-icon-components.cdx.json
+          artifact-name: js-icon-components.cdx.json
+
+      - name: Back off before retrying the SBOM
+        if: steps.sbom.outcome == 'failure'
+        run: sleep 45
+
+      - name: Generate SBOM (retry)
+        id: sbom_retry
+        if: steps.sbom.outcome == 'failure'
+        continue-on-error: true
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          format: cyclonedx-json
+          output-file: js-icon-components.cdx.json
+          artifact-name: js-icon-components.cdx.json
+
+      - name: Note that the release ships without an SBOM
+        if: steps.sbom.outcome == 'failure' && steps.sbom_retry.outcome == 'failure'
+        run: |
+          echo "::warning title=SBOM missing::Syft could not be installed after two"
+          echo "::warning::attempts, so this release publishes without its SBOM asset."
+          echo "::warning::Re-run this workflow once the download recovers to attach it."
+
+
+      - name: Extract the changelog section
+        id: changelog
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+
+          SECTION="$(awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { found = 1; next }
+            found && /^## \[/        { exit }
+            found                    { print }
+          ' CHANGELOG.md)"
+
+          # A pre-release tag (vX.Y.Z-rc.N) is a test build: it publishes as a GitHub
+          # pre-release and needs no CHANGELOG section of its own. A final tag still
+          # fails closed below.
+          if [ -z "$(printf '%s' "$SECTION" | tr -d '[:space:]')" ] && [[ "$VERSION" == *-* ]]; then
+            SECTION="Pre-release build ${TAG}, for testing. It is not a release; the notes ship with the final v${VERSION%%-*} tag."
+          fi
+
+          # Fail closed. A tag whose version has no CHANGELOG section is a tag
+          # pointing at the wrong commit, or a release nobody wrote notes for —
+          # both are reasons to stop, not to publish auto-generated notes and
+          # call it a description.
+          if [ -z "$(printf '%s' "$SECTION" | tr -d '[:space:]')" ]; then
+            echo "::error::CHANGELOG.md has no '## [$VERSION]' section. Refusing to publish $TAG."
+            exit 1
+          fi
+
+          {
+            echo 'body<<CHANGELOG_EOF'
+            printf '%s\n' "$SECTION"
+            echo ''
+            echo "**Full changelog:** https://github.com/ichava/js-icon-components/blob/main/CHANGELOG.md"
+            echo 'CHANGELOG_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      # The tarball's name carries package.json's version, and the install line in
+      # the README is built from the tag, so the two must agree. A final tag must
+      # match package.json exactly; a pre-release tag stamps its own version into
+      # the packed copy (never committed) so its tarball is named for it.
+      - name: Check the version matches the tag
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          PACKAGE="$(node -p 'require("./package.json").version')"
+          if [ "$PACKAGE" != "$VERSION" ]; then
+            if [[ "$VERSION" != *-* ]] || [ "$PACKAGE" != "${VERSION%%-*}" ]; then
+              echo "::error::package.json is ${PACKAGE}, but the tag is ${TAG}. Bump the version before tagging."
+              exit 1
+            fi
+            npm pkg set version="$VERSION"
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      # The full install: devDependencies, then `prepare` builds every pack and
+      # flavour, exactly as a git install does. This runner is the only place the
+      # compilers run for a tarball user.
+      - name: Install and build
+        run: npm install --no-audit --no-fund --no-package-lock
+
+      # pack-tarball.mjs runs `npm pack --ignore-scripts`: it packs exactly the dist/ just
+      # built. Each build starts from an empty dist/, so a per-pack tarball holds that pack and
+      # the stubs only. A per-pack tarball is named @ichava/js-icon-components-<pack>, so two
+      # install side by side; the script renames package.json only while it packs.
+      - name: Pack the tarballs
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          node scripts/pack-tarball.mjs release
+          node scripts/check-tarball.mjs "release/ichava-js-icon-components-${VERSION}.tgz"
+          for pack in $(node -p 'require("./packs.json").packs.map((p) => p.id).join(" ")'); do
+            ICHAVA_ICONS_PACKS="$pack" npm run build
+            node scripts/pack-tarball.mjs release "$pack"
+            node scripts/check-tarball.mjs "release/ichava-js-icon-components-${pack}-${VERSION}.tgz" --packs "$pack"
+          done
+          # The rename is undone after every pack; a pre-release's version stamp stays.
+          test "$(node -p 'require("./package.json").name')" = '@ichava/js-icon-components'
+          (cd release && sha256sum -- *.tgz > SHA256SUMS)
+          ls -l release
+
+      - name: Publish
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          # That tag's release, created or updated in place. A re-run replaces its
+          # tarballs rather than adding a second copy.
+          tag_name: ${{ env.TAG }}
+          body: ${{ steps.changelog.outputs.body }}
+          generate_release_notes: true
+          # A `vX.Y.Z-rc.N` tag is a test build, never a release users should pick up.
+          prerelease: ${{ contains(env.TAG, '-') }}
+          overwrite_files: true
+          files: |
+            js-icon-components.cdx.json
+            release/*.tgz
+            release/SHA256SUMS
+          # Explicit, though it is the action's default: a missing SBOM must not
+          # fail the publish, so it must not rest on a default a reader has to know.
+          # The tarballs cannot go missing silently: the pack step fails first.
+          fail_on_unmatched_files: false

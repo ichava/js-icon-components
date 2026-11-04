@@ -1,0 +1,11 @@
+{
+  "$comment": "The Contents.json keys Apple documents for an asset catalog (Asset Catalog Format Reference: Asset Catalog, Image Set). A key outside these lists is not part of the format; the swiftui test validates every Contents.json against them.",
+  "catalog": { "keys": ["info", "properties"], "info": ["author", "version"], "properties": ["provides-namespace"] },
+  "imageset": {
+    "keys": ["images", "info", "properties"],
+    "image": ["filename", "idiom", "scale", "appearances", "subtype", "display-gamut", "language-direction", "width-class", "height-class", "memory", "graphics-feature-set"],
+    "idiom": ["universal", "iphone", "ipad", "mac", "tv", "watch", "car", "vision"],
+    "properties": ["preserves-vector-representation", "template-rendering-intent", "compression-type", "localizable", "auto-scaling"],
+    "template-rendering-intent": ["original", "template"]
+  }
+}
