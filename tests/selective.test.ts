@@ -4,8 +4,9 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { countOutputs, FLAVOUR_DIRS, generate, parseSelection, unbuiltMessage, type Manifest } from '../src/generator/generate.ts';
-import { ALL_FLAVOURS } from '../src/shared/index.ts';
-import { FLAVOUR_DIRS as TARBALL_FLAVOUR_DIRS } from '../scripts/check-tarball.mjs';
+import { ALL_FLAVOURS, ASSET_TARGETS } from '../src/shared/index.ts';
+import { ASSET_FILES as TARBALL_ASSET_FILES, FLAVOUR_DIRS as TARBALL_FLAVOUR_DIRS } from '../scripts/check-tarball.mjs';
+import { ASSET_FILES } from '../src/generator/assets.ts';
 import { packs, ROOT } from './helpers.ts';
 
 /**
@@ -37,12 +38,20 @@ function importIn(file: string, name: string): { status: number | null; stderr: 
 
 describe('selection', () => {
   it('reads names by subpath or registry id, and defaults to everything', () => {
-    expect(parseSelection({}, IDS)).toEqual({ packs: IDS, flavours: [...ALL_FLAVOURS] });
-    expect(parseSelection({ packs: ' ', flavours: '' }, IDS)).toEqual({ packs: IDS, flavours: [...ALL_FLAVOURS] });
+    expect(parseSelection({}, IDS)).toEqual({ packs: IDS, flavours: [...ALL_FLAVOURS], assets: [...ASSET_TARGETS] });
+    expect(parseSelection({ packs: ' ', flavours: '' }, IDS)).toEqual({ packs: IDS, flavours: [...ALL_FLAVOURS], assets: [...ASSET_TARGETS] });
     expect(parseSelection({ packs: 'openmoji, tabler,tabler', flavours: 'wc,react-native,reactNative' }, IDS)).toEqual({
       packs: ['tabler', 'openmoji'],
       flavours: ['webcomponent', 'reactNative'],
+      assets: [],
     });
+  });
+
+  it('names asset exports in the same list as flavours, and a list of exports alone builds no flavour', () => {
+    expect(parseSelection({ flavours: 'png-zip,react,css-mask' }, IDS)).toEqual({ packs: IDS, flavours: ['react'], assets: ['css-mask', 'png-zip'] });
+    expect(parseSelection({ flavours: 'android-vd' }, IDS)).toEqual({ packs: IDS, flavours: [], assets: ['android-vd'] });
+    expect(parseSelection({ flavours: 'qwik,elm,ember' }, IDS)).toEqual({ packs: IDS, flavours: ['qwik', 'ember', 'elm'], assets: [] });
+    expect(() => parseSelection({ flavours: 'png' }, IDS)).toThrow(/the asset exports are css-mask, data-uri, png-zip, flutter, swiftui, android-vd/);
   });
 
   it('refuses an unknown pack or flavour, naming the variable and the valid names', () => {
@@ -50,8 +59,9 @@ describe('selection', () => {
     expect(() => parseSelection({ flavours: 'jquery' }, IDS)).toThrow(/ICHAVA_ICONS_FLAVOURS: unknown flavour "jquery"\. The flavours are react, vue, svelte, wc,/);
   });
 
-  it('the tarball checker knows the same flavour directories as the generator', () => {
+  it('the tarball checker knows the same flavour directories and asset files as the generator', () => {
     expect(TARBALL_FLAVOUR_DIRS).toEqual(FLAVOUR_DIRS);
+    expect(TARBALL_ASSET_FILES).toEqual(ASSET_FILES);
   });
 });
 
@@ -59,7 +69,8 @@ describe('a selective build (flag, react)', () => {
   it('records what it built and what it left out', () => {
     expect(manifest.packs.map((p) => p.id)).toEqual(['flag']);
     expect(manifest.flavours).toEqual(['react']);
-    expect(manifest.unbuilt).toEqual({ packs: ['tabler', 'emoji', 'openmoji'], flavours: ALL_FLAVOURS.filter((f) => f !== 'react') });
+    expect(manifest.unbuilt).toEqual({ packs: ['tabler', 'emoji', 'openmoji'], flavours: ALL_FLAVOURS.filter((f) => f !== 'react'), assets: [...ASSET_TARGETS] });
+    expect(manifest.assets).toEqual([]);
   });
 
   it('writes every flag icon for React, and the data behind it', () => {
@@ -75,11 +86,14 @@ describe('a selective build (flag, react)', () => {
       for (const f of ALL_FLAVOURS) {
         if (id === 'flag' && f === 'react') continue;
         if (f === 'webcomponent' && id === 'flag') continue; // wc re-exports data, which flag has
-        if (f === 'svelte') expect(readdirSync(join(out, `svelte/packs/${id}`)).sort(), `${id} ${f}`).toEqual(['index.d.ts', 'index.js']);
+        // Elm is source with no stand-in: an unbuilt Elm module is simply not there.
+        if (f === 'elm') expect(existsSync(join(out, 'elm'))).toBe(false);
+        else if (f === 'svelte') expect(readdirSync(join(out, `svelte/packs/${id}`)).sort(), `${id} ${f}`).toEqual(['index.d.ts', 'index.js']);
         else expect(countOutputs(out, id, [f])[f], `${id} ${f}`).toBe(0);
       }
     }
     expect(existsSync(join(out, 'vue/flag'))).toBe(false);
+    expect(existsSync(join(out, 'assets'))).toBe(false);
     for (const id of ['tabler', 'emoji', 'openmoji']) expect(statSync(join(out, `data/${id}.js`)).size).toBeLessThan(400_000);
   });
 

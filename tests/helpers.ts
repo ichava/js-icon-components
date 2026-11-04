@@ -1,8 +1,9 @@
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync } from 'node:fs';
+import { inflateRawSync } from 'node:zlib';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { build, type BuildOptions } from 'esbuild';
-import { readPack } from '../src/generator/generate.ts';
+import { buildIcons, readPack, type NamedIcon } from '../src/generator/generate.ts';
 import { loadPacks, type PackConfig } from '../src/generator/packs.ts';
 import type { IconData } from '../src/shared/index.ts';
 
@@ -57,4 +58,36 @@ export async function bundleAndImport<T>(name: string, options: BuildOptions): P
   const outfile = join(CACHE, `${name}.mjs`);
   await build({ bundle: true, format: 'esm', platform: 'node', target: 'es2022', logLevel: 'silent', ...options, outfile, write: true });
   return (await import(/* @vite-ignore */ `${pathToFileURL(outfile).href}?t=${Date.now()}`)) as T;
+}
+
+/** The test-only illustration pack: three CC0 shapes drawn for these tests, two with a dark twin. */
+export const ILLUSTRATION_DIR = join(ROOT, 'tests/fixtures/packs/illustration-demo');
+
+export function illustrations(): NamedIcon[] {
+  const dir = join(ILLUSTRATION_DIR, 'scenes');
+  const files = readdirSync(dir)
+    .filter((f) => f.endsWith('.svg'))
+    .sort()
+    .map((f) => ({ set: 'scenes', name: f.replace(/\.svg$/, ''), path: `scenes/${f}`, svg: readFileSync(join(dir, f), 'utf8') }));
+  return buildIcons({ id: 'illustration-demo', defaultSet: 'scenes', kind: 'illustration', themeVariants: { dark: '-dark' } }, files).icons;
+}
+
+/** A zip's entries by path, read from its central directory and inflated. */
+export function readZip(buf: Buffer): Map<string, Buffer> {
+  const out = new Map<string, Buffer>();
+  const end = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  const count = buf.readUInt16LE(end + 10);
+  let at = buf.readUInt32LE(end + 16);
+  for (let n = 0; n < count; n++) {
+    const method = buf.readUInt16LE(at + 10);
+    const size = buf.readUInt32LE(at + 20);
+    const nameLength = buf.readUInt16LE(at + 28);
+    const local = buf.readUInt32LE(at + 42);
+    const name = buf.subarray(at + 46, at + 46 + nameLength).toString('utf8');
+    const start = local + 30 + buf.readUInt16LE(local + 26) + buf.readUInt16LE(local + 28);
+    const body = buf.subarray(start, start + size);
+    out.set(name, method === 8 ? inflateRawSync(body) : Buffer.from(body));
+    at += 46 + nameLength + buf.readUInt16LE(at + 30) + buf.readUInt16LE(at + 32);
+  }
+  return out;
 }

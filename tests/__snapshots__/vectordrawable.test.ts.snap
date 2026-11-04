@@ -1,0 +1,40 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`VectorDrawable converter > matches the golden XML for five Tabler icons 1`] = `
+[
+  "<?xml version="1.0" encoding="utf-8"?>
+<!-- tabler:outline/mug -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M4.083 5 h10.834 a1.08 1.08 0 0 1 1.083 1.077 v8.615 c0 2.38 -1.94 4.308 -4.333 4.308 h-4.334 c-2.393 0 -4.333 -1.929 -4.333 -4.308 v-8.615 a1.08 1.08 0 0 1 1.083 -1.077" android:strokeColor="?attr/colorControlNormal" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M16 8 h2.5 c1.38 0 2.5 1.045 2.5 2.333 v2.334 c0 1.288 -1.12 2.333 -2.5 2.333 h-2.5" android:strokeColor="?attr/colorControlNormal" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+</vector>
+",
+  "<?xml version="1.0" encoding="utf-8"?>
+<!-- tabler:filled/mug -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M3.903 4.008 l.183 -.008 h10.828 a2.08 2.08 0 0 1 2.086 2.077 v.923 h1.5 c1.917 0 3.5 1.477 3.5 3.333 v2.334 c0 1.856 -1.583 3.333 -3.5 3.333 h-1.663 a5.33 5.33 0 0 1 -5.17 4 h-4.334 c-2.944 0 -5.333 -2.375 -5.333 -5.308 v-8.618 a2.08 2.08 0 0 1 1.903 -2.066 m13.097 9.992 h1.5 c.843 0 1.5 -.613 1.5 -1.333 v-2.334 c0 -.72 -.657 -1.333 -1.5 -1.333 h-1.5 z" android:fillColor="?attr/colorControlNormal"/>
+</vector>
+",
+  "<?xml version="1.0" encoding="utf-8"?>
+<!-- tabler:outline/brand-github -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M9 19 c-4.3 1.4 -4.3 -2.5 -6 -3 m12 5 v-3.5 c0 -1 .1 -1.4 -.5 -2 c2.8 -.3 5.5 -1.4 5.5 -6 a4.6 4.6 0 0 0 -1.3 -3.2 a4.2 4.2 0 0 0 -.1 -3.2 s-1.1 -.3 -3.5 1.3 a12.3 12.3 0 0 0 -6.2 0 c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3 a4.2 4.2 0 0 0 -.1 3.2 a4.6 4.6 0 0 0 -1.3 3.2 c0 4.6 2.7 5.7 5.5 6 c-.6 .6 -.6 1.2 -.5 2 v3.5" android:strokeColor="?attr/colorControlNormal" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+</vector>
+",
+  "<?xml version="1.0" encoding="utf-8"?>
+<!-- tabler:outline/circle-check -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M3 12 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0" android:strokeColor="?attr/colorControlNormal" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M9 12 l2 2 l4 -4" android:strokeColor="?attr/colorControlNormal" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+</vector>
+",
+  "<?xml version="1.0" encoding="utf-8"?>
+<!-- tabler:outline/square-rounded-plus -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M12 3 c7.2 0 9 1.8 9 9 c0 7.2 -1.8 9 -9 9 c-7.2 0 -9 -1.8 -9 -9 c0 -7.2 1.8 -9 9 -9" android:strokeColor="?attr/colorControlNormal" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M15 12 h-6" android:strokeColor="?attr/colorControlNormal" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M12 9 v6" android:strokeColor="?attr/colorControlNormal" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+</vector>
+",
+]
+`;

@@ -42,6 +42,12 @@ export interface PackConfig {
    * that names no file, or a file that now passes, fails the build: an exemption is a ceiling.
    */
   readonly exclude?: readonly { readonly path: string; readonly reason: string }[];
+  /**
+   * Theme twins, core's `theme_variants` rule: `{ "dark": "-dark" }` pairs `scene-dark.svg` with
+   * `scene.svg` in the same set, and the dark file becomes `variants.dark` of the light one rather
+   * than an icon of its own. A suffixed file with no light sibling stays an ordinary icon.
+   */
+  readonly themeVariants?: Readonly<Record<string, string>>;
 }
 
 /** Whether the artwork's licence carries an attribution condition the generated files must honour. */
@@ -84,6 +90,12 @@ export function loadPacks(file: string): PackConfig[] {
     if (needsAttribution(p) && p.attribution.length === 0) throw new Error(`${where}: a ${p.licence} pack must list its attribution files`);
     const basenames = p.attribution.map((f) => f.split('/').pop());
     if (new Set(basenames).size !== basenames.length) throw new Error(`${where}: attribution files must have distinct basenames`);
+    if (p.themeVariants !== undefined) {
+      const entries = Object.entries(p.themeVariants);
+      if (entries.length === 0 || entries.some(([t, suffix]) => t !== 'dark' || typeof suffix !== 'string' || !/^-[a-z0-9-]+$/.test(suffix))) {
+        throw new Error(`${where}: themeVariants maps "dark" to a filename suffix such as "-dark"`);
+      }
+    }
     for (const e of p.exclude ?? []) {
       if (typeof e.path !== 'string' || typeof e.reason !== 'string' || e.reason.trim() === '') throw new Error(`${where}: every exclude entry needs a path and a reason`);
     }
