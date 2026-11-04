@@ -17,6 +17,7 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ### Fixed
 
+- **The generator accepts `display`, `color` and `marker-*`, each behind a value guard** (parity with ichava/icon-sets-sync#85 and ichava/core#163). `vendor/svg-policy.json` is core's new policy (sha256 `7a7c07fd…`, pinned in `tests/vendored.test.ts`). `presentationValueIsSafe` in `src/generator/svgPolicy.ts` is the same as react-icon-browser's: `display` must be bare keywords, `color` must pass `cssValueIsSafe`, and `marker-*` must be `none` or `url(#id)`. Anything else is still rejected. Stray text is still rejected rather than stripped, so the openmoji `high-speed-train` exclusion stays. Regenerated output is byte-identical: no icon changed in the four shipped packs (17,532 dist files). Across all 142,247 pack SVGs, 14 decisions changed, all in icon-sets-bundled, which is not generated. `tests/presentation.test.ts`, with `tests/fixtures/svg/presentation-vectors.json` shared with core and react-icon-browser.
 - The React flavour passes a source `style` attribute as an object. React throws on a string, so the eight flag SVGs with `style="marker:none"` and similar could not render.
 
 ## [0.1.0] - TBD

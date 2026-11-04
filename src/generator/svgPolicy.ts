@@ -177,3 +177,40 @@ export function cssValueIsSafe(value: string): boolean {
 export function styleValueIsSafe(value: string): boolean {
   return cssValueIsSafe(value);
 }
+
+/**
+ * `display` holds one or more bare keywords: no parens, so no `url()` or other function, and no
+ * backslash, so no escape that spells one.
+ */
+const DISPLAY_KEYWORDS = /^[A-Za-z][A-Za-z-]*(?: [A-Za-z][A-Za-z-]*)*$/;
+
+/** The only non-keyword a `marker-*` attribute may hold: `url(#id)`, quotes matched. */
+const MARKER_REFERENCE = /^url\(\s*(?:#[A-Za-z_][\w.:-]*|"#[A-Za-z_][\w.:-]*"|'#[A-Za-z_][\w.:-]*')\s*\)$/;
+
+/**
+ * Value guards for the presentation attributes added in icon-sets-sync#85. OpenMoji hides the
+ * construction shapes of its subdivision flags with `display="none"`, and stripping it makes them
+ * render.
+ *
+ *  - `display`: bare keywords only, and through `cssValueIsSafe`.
+ *  - `color`: `cssValueIsSafe`.
+ *  - `marker-start`, `marker-mid`, `marker-end`: `none`, or `url(#id)` through `cssValueIsSafe`.
+ *
+ * Every other name passes.
+ */
+export function presentationValueIsSafe(name: string, value: string): boolean {
+  const v = value.trim();
+
+  switch (name.toLowerCase()) {
+    case 'display':
+      return DISPLAY_KEYWORDS.test(v) && cssValueIsSafe(v);
+    case 'color':
+      return cssValueIsSafe(value);
+    case 'marker-start':
+    case 'marker-mid':
+    case 'marker-end':
+      return v.toLowerCase() === 'none' || (MARKER_REFERENCE.test(v) && cssValueIsSafe(v));
+    default:
+      return true;
+  }
+}
