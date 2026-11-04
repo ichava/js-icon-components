@@ -1,5 +1,13 @@
 import type { IconChild } from '../shared/index.ts';
-import { allowedAttributeNames, CSS_VALUE_ATTRIBUTES, cssValueIsSafe, fragmentPattern, normaliseCss, svgPolicy } from './svgPolicy.ts';
+import {
+  allowedAttributeNames,
+  CSS_VALUE_ATTRIBUTES,
+  cssValueIsSafe,
+  fragmentPattern,
+  normaliseCss,
+  presentationValueIsSafe,
+  svgPolicy,
+} from './svgPolicy.ts';
 
 /**
  * The generator's SVG gate: parse strictly, check every element and attribute against the shared
@@ -156,6 +164,7 @@ function checkElement(el: Element): void {
     const byPrefix = svgPolicy.allowedAttributePrefixes.some((p) => lower.startsWith(p));
     if (!allowedAttrs.has(name) && !byPrefix) throw new SvgRejected(`attribute ${name} on <${el.tag}> is not on the allow-list`);
     if (fragmentRefs.has(name) && !fragment.test(value)) throw new SvgRejected(`${name} on <${el.tag}> is not a #fragment`);
+    if (!presentationValueIsSafe(name, value)) throw new SvgRejected(`unsafe ${name} value on <${el.tag}>`);
     if (cssAttrs.has(name) && !cssValueIsSafe(value)) throw new SvgRejected(`unsafe CSS value in ${name} on <${el.tag}>`);
     const v = normaliseCss(value);
     if (v.includes('javascript:') || (v.includes('url(') && !cssAttrs.has(name))) {
