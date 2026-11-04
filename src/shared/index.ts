@@ -52,7 +52,7 @@ export type Flavour = (typeof FLAVOURS)[number];
  * exported like the four above, but the registry guard does not require them, and asserts they are
  * still missing there: once icon-browser lists one, that test fails and the id moves into FLAVOURS.
  */
-export const PENDING_FLAVOURS = ['reactNative', 'angular'] as const;
+export const PENDING_FLAVOURS = ['reactNative', 'angular', 'solid'] as const;
 export type PendingFlavour = (typeof PENDING_FLAVOURS)[number];
 
 /** Every flavour the generator writes, registered or not. */
