@@ -93,6 +93,26 @@ with no attribution files is refused when `packs.json` loads.
 Each was seen failing before it was trusted, and each counts what it inspected so an empty input
 cannot pass.
 
+## Why a prebuilt tarball and a git build?
+
+A git install has to compile: npm clones the repository, installs every development dependency
+and runs `prepare`, because nothing generated is committed. That is a minute and a set of
+compilers for output that is the same for every consumer of a tag. So `release.yml` builds it once
+and attaches `npm pack` output to the release, and the default install is that tarball: nothing to
+compile, no `git`, no configuration.
+
+The git build stays for an application that wants less than everything or an unreleased commit.
+`ICHAVA_ICONS_PACKS` and `ICHAVA_ICONS_FLAVOURS` (or `"ichava.icons"` in its `package.json`) limit
+what the generator writes. Everything left out keeps its subpath as a stand-in module that exports
+the real names, so a named import links, and throws naming the variable that adds it. The names are
+local exports rather than an `export *`, because a bundler honouring `sideEffects: false` may skip
+a module that only re-exports, and with it the throw. Exports are one map for every install, so a
+missing subpath is never a missing file.
+
+One package name for every tarball keeps the import paths the same whichever one is installed. The
+cost is that two per-pack tarballs cannot sit side by side; the full tarball or a git build covers
+that case.
+
 ## Tier 2 flavours
 
 React Native (`reactNative`), Angular (`angular`), SolidJS (`solid`), Preact (`preact`) and Astro

@@ -3,7 +3,7 @@
 ## Before you start
 
 ```bash
-npm install          # also runs `prepare`: tsc, then the generator
+npm install          # also runs `prepare`, which builds dist/ only when it is missing
 npm run typecheck
 npm run lint
 npm test
@@ -20,7 +20,9 @@ without the sibling pack checkouts, so it also proves the shallow fetch of each 
   these four files, never to generated output.
 - **No runtime dependencies.** The frameworks are optional peers; everything else is a
   development dependency used by the build.
-- **No generated output in git.** `dist/` is built on install by `prepare`.
+- **No generated output in git.** `dist/` is built on install by `prepare`, and `npm run build`
+  rebuilds it after a change: `prepare` leaves an existing `dist/` alone. `ICHAVA_ICONS_PACKS` and
+  `ICHAVA_ICONS_FLAVOURS` limit a local build too, for a faster loop.
 
 ## Adding a pack, or moving one forward
 
