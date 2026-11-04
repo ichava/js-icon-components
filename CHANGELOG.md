@@ -4,6 +4,18 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ## [Unreleased]
 
+### Added
+
+- Three packs: `flag` (`ichava/icon-sets-flag` at `67075d3f`, 542 flags in `4x3` and `1x1`), `emoji` (`ichava/icon-sets-emoji` at `833f11fb`, the 3,435 Twemoji icons) and `openmoji` (`ichava/icon-sets-openmoji` at `d492519e`, 7,131 icons in `openmoji-color` and `openmoji-black`). `icon-sets-bundled` is not generated: it is private and for internal and client use only.
+- Per-icon id prefixing: every `id`, and every `url(#…)`, `href`, `xlink:href` and ARIA id reference to it, becomes `<pack>_<set>_<name>_<id>`, so two icons on one page never share an id.
+- Artwork licences travel with the icons: each pack's `ATTRIBUTION.md`, and its licence text where it has one, is copied from the pinned commit to `dist/<flavour>/<pack>/`; each generated module carries a `/*!` legal comment; `manifest.json` lists each pack's `licence`, `excluded` and `attribution`.
+- `packs.json` fields `licence`, `attribution`, `categories` (one level of category directories) and `exclude` (rejected SVGs left out, each with a reason; a stale entry fails the build).
+- Guards: output equals input per pack, less listed exclusions; no repeated id on a page of icons from one pack or two; every multi-colour flag and emoji keeps every source colour; attribution files present for every pack and flavour.
+
+### Fixed
+
+- The React flavour passes a source `style` attribute as an object. React throws on a string, so the eight flag SVGs with `style="marker:none"` and similar could not render.
+
 ## [0.1.0] - TBD
 
 First release.

@@ -66,8 +66,15 @@ jobs:
             const m = require("./dist/manifest.json");
             if (m.packs.length === 0) { console.error("::error::manifest lists no packs"); process.exit(1); }
             for (const p of m.packs) for (const f of m.flavours) {
-              if (p.outputs[f] !== p.inputs) { console.error(`::error::${p.id} ${f}: ${p.outputs[f]} of ${p.inputs}`); process.exit(1); }
+              const expected = p.inputs - p.excluded.length;
+              if (p.outputs[f] !== expected) { console.error(`::error::${p.id} ${f}: ${p.outputs[f]} of ${expected}`); process.exit(1); }
               console.log(`${p.id} ${f}: ${p.outputs[f]}`);
+            }'
+          # The artwork's licence travels with it: every listed attribution file is in dist/.
+          node -e '
+            const fs = require("fs");
+            for (const p of require("./dist/manifest.json").packs) for (const f of p.attribution) {
+              if (!(fs.statSync("dist/" + f, { throwIfNoEntry: false })?.size > 0)) { console.error(`::error::${p.id}: dist/${f} is missing`); process.exit(1); }
             }'
           # A `.ts` specifier in an emitted file names a source that is not shipped.
           if grep -rnE "from '\.\.?/[^']+\.ts'" dist --include='*.js' --include='*.svelte'; then

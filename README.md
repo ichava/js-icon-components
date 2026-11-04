@@ -8,6 +8,8 @@ registry version to show, and lint runs in the same CI workflow as the tests.
 
 > React, Vue 3, Svelte 5 and Web Component icon components, generated from Ichava icon packs pinned at a git commit.
 
+Four packs: Tabler, flags, Twemoji and OpenMoji, 17,365 icons in all.
+
 Node 24 or newer to install. React 18+, Vue 3.4+ or Svelte 5 as an optional peer, for the flavour you use.
 
 ## Install
@@ -25,9 +27,13 @@ path: it reads each pack from git at the commit pinned in `packs.json`.
 
 ### Getting started
 
-Nothing to configure. Import the flavour you use and the pack you want; the frameworks are
-optional peers, so only the one you import has to be installed. Exports are tree-shakeable, so a
-bundle carries the icons it imports and nothing else.
+Nothing to configure. Import the flavour you use and the pack you want (`tabler`, `flag`,
+`emoji` or `openmoji`); the frameworks are optional peers, so only the one you import has to be
+installed. Exports are tree-shakeable, so a bundle carries the icons it imports and nothing else.
+
+Twemoji (`emoji`) is CC-BY 4.0 and OpenMoji (`openmoji`) is CC-BY-SA 4.0: an application that ships
+them takes on their attribution terms. Each pack's `ATTRIBUTION.md` ships at
+`dist/<flavour>/<pack>/`; see [Packs](docs/packs.md).
 
 ### Usage
 
@@ -38,6 +44,16 @@ import { IconMug, IconMugFilled } from '@ichava/js-icon-components/react/tabler'
 
 <IconMug size={20} strokeWidth={1.5} />
 <IconMugFilled color="#7c3aed" title="Coffee" />
+```
+
+Flags and emoji keep their own colours:
+
+```tsx
+import { IconKe } from '@ichava/js-icon-components/react/flag';
+import { IconGrinningFace } from '@ichava/js-icon-components/react/emoji';
+
+<IconKe size={32} title="Kenya" />
+<IconGrinningFace size={24} />
 ```
 
 Vue 3:
@@ -79,6 +95,7 @@ The documentation lives in this repository's [`docs/`](https://github.com/ichava
 
 - [Installation](docs/installation.md) — the git-tag install, what `prepare` builds and its size
 - [Getting started](docs/getting-started.md) — props, accessibility and export names in every flavour
+- [Packs](docs/packs.md) — the four pinned packs, their licences, attribution and id prefixing
 - [Architecture](docs/architecture.md) — why a generator, the pinned input, the SVG gate and the guards
 - [Release](docs/release.md) — tagging, and moving a pack to a new commit
 
@@ -96,5 +113,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). This proj
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Each pack keeps its own licence: Tabler Icons is MIT, and its
-`ATTRIBUTION.md` and `LICENSE` live in `ichava/icon-sets-tabler`.
+MIT. See [LICENSE](LICENSE). That covers the generator and templates, not the artwork: each pack
+keeps its own licence. Tabler Icons and flag-icons are MIT, Twemoji is CC-BY 4.0 and OpenMoji is
+CC-BY-SA 4.0. Each pack's `ATTRIBUTION.md`, and its licence text where the pack carries one, is
+copied from the pinned commit to `dist/<flavour>/<pack>/`.

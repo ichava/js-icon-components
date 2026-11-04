@@ -97,9 +97,9 @@ describe('attribution', () => {
     expect(ccPacks.map((p) => [p.id, p.licence])).toEqual([['emoji', 'CC-BY-4.0'], ['openmoji', 'CC-BY-SA-4.0']]);
   });
 
-  it.each(PACKS.flatMap((p) => p.attribution.flatMap((file) => ATTRIBUTION_DIRS.map((dir) => [p.id, dir, file.split('/').pop() as string] as const))))(
-    '%s ships %s/%s/%s',
-    (id, dir, name) => {
+  it.each(PACKS.flatMap((p) => p.attribution.flatMap((file) => ATTRIBUTION_DIRS.map((dir) => [p.id, dir, p.id, file.split('/').pop() as string] as const))))(
+    '%s ships dist/%s/%s/%s',
+    (id, dir, _id, name) => {
       const file = join(out, dir, id, name);
       expect(existsSync(file), file).toBe(true);
       expect(statSync(file).size).toBeGreaterThan(200);

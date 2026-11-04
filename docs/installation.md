@@ -28,16 +28,17 @@ npm clones the repository, installs its development dependencies and runs `prepa
    of exactly that commit (or a sibling checkout, when one holds it), checks every SVG against the
    policy, and writes the data and flavour modules.
 
-So `git` must be on the path and `github.com` reachable. Measured 2026-11-04 for the one pack,
-Tabler at `10a5f39c`: the build takes about 1.5 seconds on an Apple-silicon laptop, and the
-shallow fetch about 1 second.
+So `git` must be on the path and `github.com` reachable. Measured 2026-11-04 with the four packs
+on an Apple-silicon laptop: the whole build takes about 5 seconds, and generating from a cold
+cache, shallow-fetching all four pinned commits (9.5 MB of git objects), about 5 seconds too.
 
 ## Size
 
-`dist/` for the Tabler pack is about 7.5 MB in 6,300 files: 4.1 MB of icon data shared by every
-flavour, about 0.8 MB each for the React and Vue binding modules, and 1.8 MB for the 6,257 small
-Svelte wrappers; npm's packed tarball is 0.8 MB. None of that reaches an application bundle
-beyond the icons it imports.
+Measured 2026-11-04 with the four packs, `dist/` is 51.4 MB in 17,465 files (npm's figure). The icon
+data shared by every flavour is 40.0 MB of it, mostly the emoji, whose artwork is detailed; the
+React and Vue binding modules are about 2.7 MB each, and the 17,365 small Svelte wrappers 5.9 MB.
+On disk that is about 114 MB, because each small file takes at least one 4 KB block. npm's packed
+tarball is 6.0 MB. None of that reaches an application bundle beyond the icons it imports.
 
 ## Peers
 
