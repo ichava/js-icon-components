@@ -59,11 +59,11 @@ jobs:
       # short dist/ would install cleanly and fail at the consumer's first import.
       - name: Every flavour was generated for every pinned pack
         run: |
-          # The node -e programs are single-quoted on purpose: ${...} is JavaScript, not shell.
-          # shellcheck disable=SC2016
           for f in dist/shared/index.js dist/react/index.js dist/vue/index.js dist/svelte/Icon.svelte dist/wc/index.js dist/manifest.json; do
             test -s "$f" || { echo "::error::$f is missing or empty"; exit 1; }
           done
+          # Single-quoted on purpose: ${...} is JavaScript here, not shell.
+          # shellcheck disable=SC2016
           node -e '
             const m = require("./dist/manifest.json");
             if (m.packs.length === 0) { console.error("::error::manifest lists no packs"); process.exit(1); }
@@ -73,6 +73,7 @@ jobs:
               console.log(`${p.id} ${f}: ${p.outputs[f]}`);
             }'
           # The artwork's licence travels with it: every listed attribution file is in dist/.
+          # shellcheck disable=SC2016
           node -e '
             const fs = require("fs");
             for (const p of require("./dist/manifest.json").packs) for (const f of p.attribution) {
