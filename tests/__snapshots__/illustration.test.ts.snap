@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`React > recolours and switches variant 1`] = `
+[
+  "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="120" height="120" class="ichava-icon" role="img" color="#ff0000" style="--ichava-primary:#ff0000" aria-hidden="true"><rect width="120" height="80" fill="#f4f1ea"></rect><path d="M0 60Q30 30 60 60T120 60V80H0Z" fill="var(--ichava-primary, #2e86de)"></path><circle cx="92" cy="22" r="10" fill="#f6b93b"></circle></svg>",
+  "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="120" height="120" class="ichava-icon" role="img" color="#ff0000" style="--ichava-primary:#ff0000" aria-hidden="true"><rect width="120" height="80" fill="#1e2230"></rect><path d="M0 60Q30 30 60 60T120 60V80H0Z" fill="var(--ichava-primary, #2e86de)"></path><circle cx="92" cy="22" r="10" fill="#dfe4ea"></circle></svg>",
+]
+`;
+
+exports[`Svelte > recolours and switches variant 1`] = `
+[
+  "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="120" height="120" class="ichava-icon" role="img" color="#ff0000" style="--ichava-primary:#ff0000" aria-hidden="true"><rect width="120" height="80" fill="#f4f1ea"></rect><path d="M0 60Q30 30 60 60T120 60V80H0Z" fill="var(--ichava-primary, #2e86de)"></path><circle cx="92" cy="22" r="10" fill="#f6b93b"></circle></svg>",
+  "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="120" height="120" class="ichava-icon" role="img" color="#ff0000" style="--ichava-primary:#ff0000" aria-hidden="true"><rect width="120" height="80" fill="#1e2230"></rect><path d="M0 60Q30 30 60 60T120 60V80H0Z" fill="var(--ichava-primary, #2e86de)"></path><circle cx="92" cy="22" r="10" fill="#dfe4ea"></circle></svg>",
+]
+`;
+
+exports[`Vue > recolours and switches variant 1`] = `
+[
+  "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="120" height="120" class="ichava-icon" role="img" color="#ff0000" style="--ichava-primary:#ff0000" aria-hidden="true"><!--v-if--><!--[--><rect width="120" height="80" fill="#f4f1ea"></rect><path d="M0 60Q30 30 60 60T120 60V80H0Z" fill="var(--ichava-primary, #2e86de)"></path><circle cx="92" cy="22" r="10" fill="#f6b93b"></circle><!--]--></svg>",
+  "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="120" height="120" class="ichava-icon" role="img" color="#ff0000" style="--ichava-primary:#ff0000" aria-hidden="true"><!--v-if--><!--[--><rect width="120" height="80" fill="#1e2230"></rect><path d="M0 60Q30 30 60 60T120 60V80H0Z" fill="var(--ichava-primary, #2e86de)"></path><circle cx="92" cy="22" r="10" fill="#dfe4ea"></circle><!--]--></svg>",
+]
+`;
+
+exports[`Web Component > recolours and switches variant, live on attribute change 1`] = `
+[
+  "<svg viewBox="0 0 120 80" width="120" height="120" class="ichava-icon" role="img" color="#ff0000" style="--ichava-primary:#ff0000" aria-hidden="true"><rect width="120" height="80" fill="#f4f1ea"></rect><path d="M0 60Q30 30 60 60T120 60V80H0Z" fill="var(--ichava-primary, #2e86de)"></path><circle cx="92" cy="22" r="10" fill="#f6b93b"></circle></svg>",
+  "<svg viewBox="0 0 120 80" width="120" height="120" class="ichava-icon" role="img" color="#ff0000" style="--ichava-primary:#ff0000" aria-hidden="true"><rect width="120" height="80" fill="#1e2230"></rect><path d="M0 60Q30 30 60 60T120 60V80H0Z" fill="var(--ichava-primary, #2e86de)"></path><circle cx="92" cy="22" r="10" fill="#dfe4ea"></circle></svg>",
+]
+`;

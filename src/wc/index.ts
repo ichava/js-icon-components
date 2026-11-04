@@ -1,4 +1,4 @@
-import { rootAttributes, SVG_NS, type IconChild, type IconData } from '../shared/index.ts';
+import { rootAttributes, SVG_NS, themed, type IconChild, type IconVariant, type IconData } from '../shared/index.ts';
 
 /**
  * The Web Component flavour's one template: a framework-free custom element, no Lit, no shadow
@@ -12,7 +12,8 @@ import { rootAttributes, SVG_NS, type IconChild, type IconData } from '../shared
  *   // <ichava-icon name="tabler:outline/mug" size="20" label="Coffee"></ichava-icon>
  *
  * Or skip the registry and assign the data: `element.icon = IconMug`. Attributes: `name`, `size`,
- * `color`, `stroke-width`, and `label` for the accessible name. It is `label` and not `title`
+ * `color`, `stroke-width`, `label` for the accessible name, and for illustrations `primary-color` and
+ * `variant` (`light` or `dark`). It is `label` and not `title`
  * because `title` is a global HTML attribute: on the host it would add a second, native tooltip.
  */
 
@@ -38,11 +39,14 @@ function build(doc: Document, child: IconChild): Node {
   return el;
 }
 
+/** The `variant` attribute: `light` or `dark`; anything else draws the item itself. */
+const variant = (value: string | null): IconVariant | undefined => (value === 'light' || value === 'dark' ? value : undefined);
+
 // Importing this module during server rendering must not throw: there is no HTMLElement there.
 const Base = (typeof HTMLElement === 'undefined' ? class {} : HTMLElement) as typeof HTMLElement;
 
 export class IchavaIconElement extends Base {
-  static readonly observedAttributes = ['name', 'size', 'color', 'stroke-width', 'label'];
+  static readonly observedAttributes = ['name', 'size', 'color', 'stroke-width', 'label', 'primary-color', 'variant'];
 
   #icon: IconData | undefined;
 
@@ -78,6 +82,8 @@ export class IchavaIconElement extends Base {
       color: this.getAttribute('color') ?? undefined,
       strokeWidth: this.getAttribute('stroke-width') ?? undefined,
       title,
+      primaryColor: this.getAttribute('primary-color') ?? undefined,
+      variant: variant(this.getAttribute('variant')),
     });
 
     const svg = doc.createElementNS(SVG_NS, 'svg');
@@ -87,7 +93,7 @@ export class IchavaIconElement extends Base {
       t.textContent = title;
       svg.append(t);
     }
-    for (const child of icon.nodes) svg.append(build(doc, child));
+    for (const child of themed(icon, variant(this.getAttribute('variant'))).nodes) svg.append(build(doc, child));
     this.replaceChildren(svg);
   }
 }

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, Renderer2 } from '@angular/core';
-import { rootAttributes, type IconChild, type IconData } from '../shared/index.ts';
+import { rootAttributes, themed, type IconChild, type IconData, type IconVariant } from '../shared/index.ts';
 
 /**
  * The Angular flavour's one template: a standalone component that takes an icon's data.
@@ -30,6 +30,10 @@ export class IchavaIcon {
   readonly size = input<number | string>();
   readonly color = input<string>();
   readonly strokeWidth = input<number | string>();
+  /** Illustrations: the brand colour, as `--ichava-primary` and `color`. */
+  readonly primaryColor = input<string>();
+  /** Illustrations: which theme twin to draw. */
+  readonly variant = input<IconVariant>();
   /**
    * The accessible name. `label`, not `title`, for the Web Component's reason: `title` is a global
    * HTML attribute, and written statically on the host it would also add a native tooltip.
@@ -67,13 +71,17 @@ export class IchavaIcon {
   #render(): void {
     const icon = this.icon();
     const title = this.label();
-    const svg = this.#element('svg', rootAttributes(icon, { size: this.size(), color: this.color(), strokeWidth: this.strokeWidth(), title }));
+    const variant = this.variant();
+    const svg = this.#element(
+      'svg',
+      rootAttributes(icon, { size: this.size(), color: this.color(), strokeWidth: this.strokeWidth(), title, primaryColor: this.primaryColor(), variant }),
+    );
     if (title) {
       const t = this.#element('title', {});
       this.#renderer.appendChild(t, this.#renderer.createText(title));
       this.#renderer.appendChild(svg, t);
     }
-    for (const child of icon.nodes) this.#append(svg, child);
+    for (const child of themed(icon, variant).nodes) this.#append(svg, child);
 
     const host = this.#host.nativeElement;
     for (const old of Array.from(host.childNodes)) this.#renderer.removeChild(host, old);

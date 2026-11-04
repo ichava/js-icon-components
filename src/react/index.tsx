@@ -1,5 +1,5 @@
 import { createElement, forwardRef, type ForwardRefExoticComponent, type ReactNode, type RefAttributes, type SVGProps } from 'react';
-import { rootAttributes, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
+import { rootAttributes, themed, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
 
 /**
  * The React flavour's one template. Every generated React icon is `createIcon(data)`, so this
@@ -61,16 +61,16 @@ function renderChild(child: IconChild, key: number): ReactNode {
 }
 
 export const Icon = forwardRef<SVGSVGElement, ReactIconProps & { icon: IconData }>(function Icon(
-  { icon, size, color, strokeWidth, title, className, ...rest },
+  { icon, size, color, strokeWidth, title, primaryColor, variant, className, ...rest },
   ref,
 ) {
-  const root = reactAttrs(rootAttributes(icon, { size, color, strokeWidth, title })) as Record<string, string>;
+  const root = reactAttrs(rootAttributes(icon, { size, color, strokeWidth, title, primaryColor, variant })) as Record<string, string>;
   // A caller's class adds to `ichava-icon` rather than replacing it, as Vue's fallthrough does.
   if (className) root.className = `${root.className} ${className}`;
   return (
     <svg {...root} {...rest} ref={ref}>
       {title ? <title>{title}</title> : null}
-      {icon.nodes.map(renderChild)}
+      {themed(icon, variant).nodes.map(renderChild)}
     </svg>
   );
 });
