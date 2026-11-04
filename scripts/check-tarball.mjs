@@ -6,7 +6,9 @@
  *
  *   node scripts/check-tarball.mjs <file.tgz> [--packs tabler,flag]
  *
- * `--packs` asserts which packs the tarball was built with (every one when omitted).
+ * `--packs` asserts which packs the tarball was built with (every one when omitted). A tarball
+ * built for one pack must carry that pack's own package name, `@ichava/js-icon-components-<pack>`,
+ * so two of them install side by side; the full tarball keeps `@ichava/js-icon-components`.
  */
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -24,14 +26,32 @@ export const FLAVOUR_DIRS = {
   solid: 'solid',
   preact: 'preact',
   astro: 'astro',
+  qwik: 'qwik',
+  ember: 'ember',
+  elm: 'elm',
 };
+
+/** Each asset export's files under dist/assets/<pack>/; mirrors ASSET_FILES in src/generator/assets.ts. */
+export const ASSET_FILES = {
+  'css-mask': ['icons.css'],
+  'data-uri': ['data-uri.json'],
+  'png-zip': ['png.zip'],
+  flutter: ['flutter.zip'],
+  swiftui: ['swiftui.zip'],
+  'android-vd': ['android-vd.zip', 'android-vd-skipped.json'],
+};
+
+export const BASE_NAME = '@ichava/js-icon-components';
+
+/** The package name a tarball carries: the base name, or the base name and the one pack it holds. */
+export const packageName = (/** @type {string[] | undefined} */ packs) => (packs !== undefined && packs.length === 1 ? `${BASE_NAME}-${packs[0]}` : BASE_NAME);
 
 /** Development-tree paths that must never ship. */
 export const FORBIDDEN = ['src/', 'tests/', 'scripts/', 'node_modules/', '.cache/', 'vendor/', 'config/', '.github/', 'docs/', 'packs.json', 'tsconfig'];
 
 /**
  * @typedef {{ id: string, outputs: Record<string, number>, attribution: string[] }} PackEntry
- * @typedef {{ flavours: string[], packs: PackEntry[], unbuilt?: { packs: string[], flavours: string[] } }} Manifest
+ * @typedef {{ flavours: string[], assets?: string[], packs: PackEntry[], unbuilt?: { packs: string[], flavours: string[] } }} Manifest
  */
 
 /**
@@ -57,14 +77,23 @@ export function tarballProblems({ files, manifest, pkg, packIds, expectPacks }) 
   const built = manifest.packs.map((p) => p.id);
   const wanted = expectPacks ?? packIds;
   if (built.join(',') !== wanted.join(',')) problems.push(`built packs are [${built.join(', ')}], expected [${wanted.join(', ')}]`);
-  if (manifest.flavours.length !== Object.keys(FLAVOUR_DIRS).length) problems.push(`built flavours are [${manifest.flavours.join(', ')}], expected all nine`);
+  if (manifest.flavours.length !== Object.keys(FLAVOUR_DIRS).length) problems.push(`built flavours are [${manifest.flavours.join(', ')}], expected all twelve`);
+  if ((manifest.assets ?? []).length !== Object.keys(ASSET_FILES).length) problems.push(`built asset exports are [${(manifest.assets ?? []).join(', ')}], expected all six`);
+  if (pkg.name !== packageName(expectPacks)) problems.push(`package.json name is ${pkg.name}, expected ${packageName(expectPacks)}`);
 
   for (const id of packIds) {
     need(`dist/data/${id}.js`);
     for (const [flavour, dir] of Object.entries(FLAVOUR_DIRS)) {
+      // Elm is source for an Elm compiler, written only for a built pack; it has no stand-in.
+      if (flavour === 'elm') continue;
       need(flavour === 'svelte' ? `dist/svelte/packs/${id}/index.js` : `dist/${dir}/packs/${id}.js`);
       need(`dist/${dir}/index.js`);
     }
+  }
+  for (const id of built) {
+    const segment = id.split('-').map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+    need(`dist/elm/Ichava/Icons/${segment}.elm`);
+    for (const filesOf of Object.values(ASSET_FILES)) for (const f of filesOf) need(`dist/assets/${id}/${f}`);
   }
   for (const pack of manifest.packs) {
     for (const f of pack.attribution) need(`dist/${f}`);

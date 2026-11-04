@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { readTarball, tarballProblems } from '../scripts/check-tarball.mjs';
+import { packTarball } from '../scripts/pack-tarball.mjs';
 import type { Manifest } from '../src/generator/generate.ts';
 import { packs, ROOT } from './helpers.ts';
 
@@ -18,11 +19,10 @@ let tgz: string;
 
 beforeAll(() => {
   const built = existsSync(join(ROOT, 'dist/manifest.json')) ? (JSON.parse(readFileSync(join(ROOT, 'dist/manifest.json'), 'utf8')) as Manifest) : undefined;
-  if (built === undefined || built.packs.length !== IDS.length || built.flavours.length !== 9) {
+  if (built === undefined || built.packs.length !== IDS.length || built.flavours.length !== 12 || built.assets?.length !== 6) {
     throw new Error('dist/ is missing or was built selectively; run `npm run build` first');
   }
-  const [packed] = JSON.parse(execFileSync('npm', ['pack', '--ignore-scripts', '--json', '--pack-destination', work], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 256 * 1024 * 1024 })) as { filename: string }[];
-  tgz = join(work, packed?.filename as string);
+  tgz = packTarball(ROOT, work);
 }, 300_000);
 
 afterAll(() => rmSync(work, { recursive: true, force: true }));
@@ -41,12 +41,15 @@ describe('the release tarball', () => {
 
   it('the checker refuses source, tests, a missing module and a required dependency', () => {
     const contents = readTarball(tgz);
-    const files = [...contents.files.filter((f) => f !== 'dist/vue/packs/tabler.js'), 'src/react/index.tsx', 'tests/react.test.ts'];
+    const gone = ['dist/vue/packs/tabler.js', 'dist/elm/Ichava/Icons/Tabler.elm', 'dist/assets/tabler/png.zip'];
+    const files = [...contents.files.filter((f) => !gone.includes(f)), 'src/react/index.tsx', 'tests/react.test.ts'];
     const pkg = { ...contents.pkg, dependencies: { esbuild: '^0.28.0' } };
     expect(tarballProblems({ ...contents, files, pkg, packIds: IDS })).toEqual([
       'ships src/react/index.tsx (nothing under src/ belongs in the tarball)',
       'ships tests/react.test.ts (nothing under tests/ belongs in the tarball)',
       'missing dist/vue/packs/tabler.js',
+      'missing dist/elm/Ichava/Icons/Tabler.elm',
+      'missing dist/assets/tabler/png.zip',
       'package.json declares dependencies; the tarball must install with nothing but the framework peers',
     ]);
   });
@@ -66,7 +69,7 @@ describe('the release tarball', () => {
 
     // The runtimes the application would have as peers. react-native-svg needs a React Native
     // runtime, so a three-line stand-in takes its place.
-    for (const peer of ['react', 'react-dom', 'vue', 'preact', 'preact-render-to-string', 'solid-js']) symlinkSync(join(ROOT, 'node_modules', peer), join(modules, peer));
+    for (const peer of ['react', 'react-dom', 'vue', 'preact', 'preact-render-to-string', 'solid-js', '@builder.io']) symlinkSync(join(ROOT, 'node_modules', peer), join(modules, peer));
     mkdirSync(join(modules, 'react-native-svg'));
     writeFileSync(join(modules, 'react-native-svg/package.json'), JSON.stringify({ name: 'react-native-svg', type: 'module', exports: './index.js' }));
     // The stand-in exports exactly the element names the shipped module imports.
@@ -95,6 +98,8 @@ describe('the release tarball', () => {
       import { IconMug as Solid } from '@ichava/js-icon-components/solid/tabler';
       import { IconMug as Preact } from '@ichava/js-icon-components/preact/tabler';
       import { IconMug as Astro } from '@ichava/js-icon-components/astro/tabler';
+      import { IconMug as Qwik } from '@ichava/js-icon-components/qwik/tabler';
+      import { IconMug as Ember } from '@ichava/js-icon-components/ember/tabler';
       import { IconKe } from '@ichava/js-icon-components/react/flag';
       import { IconGrinningFace } from '@ichava/js-icon-components/react/emoji';
       import { existsSync } from 'node:fs';
@@ -105,14 +110,17 @@ describe('the release tarball', () => {
         vue: (await renderToString(h(Vue, { size: 20 }))).slice(0, 4),
         preact: prender(ph(Preact, { size: 20 })).slice(0, 4),
         wc: Wc.id, angular: Angular.id, astro: Astro.id,
-        native: typeof Native, solid: typeof Solid,
+        native: typeof Native, solid: typeof Solid, qwik: typeof Qwik, ember: Ember.id,
+        elm: existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/elm/Ichava/Icons/Tabler.elm'))),
+        assets: ['icons.css', 'data-uri.json', 'png.zip', 'flutter.zip', 'swiftui.zip', 'android-vd.zip', 'android-vd-skipped.json']
+          .every((f) => existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/assets/tabler/' + f)))),
         flag: renderToStaticMarkup(createElement(IconKe)).slice(0, 4),
         emoji: renderToStaticMarkup(createElement(IconGrinningFace)).slice(0, 4),
         // Svelte ships .svelte source, compiled by the application's own Svelte.
         svelte: existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/svelte/tabler')))
           && existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/svelte/tabler/IconMug.svelte'))),
       };
-      for (const tool of ['typescript', 'esbuild', '@angular/compiler-cli', '@astrojs/compiler-rs', 'svelte']) {
+      for (const tool of ['typescript', 'esbuild', '@angular/compiler-cli', '@astrojs/compiler-rs', 'svelte', 'content-tag', '@glimmer/compiler', '@resvg/resvg-js', 'elm']) {
         try { import.meta.resolve(tool); out[tool] = 'present'; } catch { /* absent, as it must be */ }
       }
       console.log(JSON.stringify(out));
@@ -130,6 +138,10 @@ describe('the release tarball', () => {
       astro: 'tabler:outline/mug',
       native: 'object',
       solid: 'function',
+      qwik: 'function',
+      ember: 'tabler:outline/mug',
+      elm: true,
+      assets: true,
       flag: '<svg',
       emoji: '<svg',
       svelte: true,
