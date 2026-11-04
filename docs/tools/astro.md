@@ -44,7 +44,7 @@ renders three icons with Astro's container API.
 
 ## Format id
 
-`astro`, pending: icon-browser's format registry does not list it yet.
+`astro`, listed in icon-browser's format registry since schema 1.5.0 and required by the registry guard.
 
 ---
 

@@ -17,7 +17,7 @@ const COPIES = [
   },
   {
     file: 'vendor/icon-browser.schema.json',
-    sha256: 'f91acc9ab0b8bf6ec92f48c1076b6ed4fe378232e1a38a149a59b77829baaee8',
+    sha256: '205a5dd111759ba462202577e022fbde7a2ca9a4f8217ad1cbde56f7e3d2d4fe',
     canonical: '../icon-browser/resources/schema/icon-browser.schema.json',
   },
 ];

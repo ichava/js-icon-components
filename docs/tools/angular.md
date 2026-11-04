@@ -55,7 +55,7 @@ own compiler links. `tests/angular.test.ts` runs that compiler, links the output
 
 ## Format id
 
-`angular`, pending: icon-browser's format registry does not list it yet.
+`angular`, listed in icon-browser's format registry since schema 1.5.0 and required by the registry guard.
 
 ---
 

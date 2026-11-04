@@ -45,8 +45,8 @@ package needs native modules that do not load in Node.
 
 ## Format id
 
-`reactNative`, pending: icon-browser's format registry does not list it yet, so the registry guard
-does not require it (`PENDING_FLAVOURS` in `src/shared/index.ts`).
+`reactNative`, listed in icon-browser's format registry since schema 1.5.0 and required by the registry
+guard (`tests/registry.test.ts`).
 
 ---
 
