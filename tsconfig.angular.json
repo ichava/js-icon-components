@@ -1,0 +1,18 @@
+{
+  "extends": "./config/tsconfig.base.json",
+  "compilerOptions": {
+    "types": [],
+    "experimentalDecorators": true,
+    "noEmit": false,
+    "declaration": true,
+    "rewriteRelativeImportExtensions": true,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src/angular"],
+  "angularCompilerOptions": {
+    "compilationMode": "partial",
+    "strictTemplates": true,
+    "strictInjectionParameters": true
+  }
+}

@@ -117,11 +117,11 @@ function emitRuntimes(root: string, outDir: string): void {
   write(join(outDir, 'svelte/index.d.ts'), svelteTypes);
   write(join(outDir, 'svelte/icon.d.ts'), "import type { SvelteIcon } from './index.js';\ndeclare const icon: SvelteIcon;\nexport default icon;\n");
 
-  for (const runtime of ['react/index.js', 'wc/index.js', 'shared/index.js', 'react-native/index.js']) {
+  for (const runtime of ['react/index.js', 'wc/index.js', 'shared/index.js', 'react-native/index.js', 'angular/index.js']) {
     try {
       readFileSync(join(outDir, runtime));
     } catch {
-      throw new Error(`${runtime} is missing from ${outDir}: run tsc -p tsconfig.build.json first`);
+      throw new Error(`${runtime} is missing from ${outDir}: run tsc -p tsconfig.build.json and ngc -p tsconfig.angular.json first`);
     }
   }
 }
@@ -206,6 +206,7 @@ export function readPack(pack: PackConfig, root: string, options: { prefix?: boo
  */
 export const PENDING_OUTPUTS: Readonly<Record<PendingFlavour, { readonly dir: string; readonly bind?: string; readonly type: string }>> = {
   reactNative: { dir: 'react-native', bind: 'createIcon', type: 'NativeIchavaIcon' },
+  angular: { dir: 'angular', type: 'IconData' },
 };
 
 /** Directories under dist/ that each get a copy of a pack's attribution files. */

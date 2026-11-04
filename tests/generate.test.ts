@@ -15,6 +15,7 @@ beforeAll(() => {
   // The real build into a scratch directory: tsc for the runtimes, then the generator.
   out = mkdtempSync(join(ROOT, '.cache', 'generate-'));
   execFileSync(join(ROOT, 'node_modules/.bin/tsc'), ['-p', join(ROOT, 'tsconfig.build.json'), '--outDir', out], { cwd: ROOT });
+  execFileSync(join(ROOT, 'node_modules/.bin/ngc'), ['-p', join(ROOT, 'tsconfig.angular.json'), '--outDir', out], { cwd: ROOT });
   manifest = generate({ root: ROOT, outDir: out });
 });
 
