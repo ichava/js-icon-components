@@ -42,6 +42,17 @@ describe('React flavour', () => {
     expect(titled).toContain('<title>Coffee</title>');
   });
 
+  it('turns a style string into the object React requires', async () => {
+    const { styleObject } = await flavour();
+    expect(styleObject('marker:none; -webkit-text-stroke:1px;-ms-flex-x:2;--ichava-primary:#f00;stroke-width : 2;;bad')).toEqual({
+      marker: 'none',
+      WebkitTextStroke: '1px',
+      msFlexX: '2',
+      '--ichava-primary': '#f00',
+      strokeWidth: '2',
+    });
+  });
+
   it('applies strokeWidth only to stroked icons', async () => {
     const { createIcon } = await flavour();
     const [, mugFilled] = sampleIcons();

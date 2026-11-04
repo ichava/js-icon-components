@@ -9,6 +9,7 @@ const manifest = generate({ root, outDir: join(root, 'dist') });
 
 for (const pack of manifest.packs) {
   const outputs = Object.entries(pack.outputs).map(([f, n]) => `${f} ${n}`).join(', ');
-  console.log(`${pack.id}@${pack.ref.slice(0, 12)}: ${pack.inputs} SVGs → ${outputs}`);
+  const excluded = pack.excluded.length > 0 ? ` (${pack.excluded.length} excluded)` : '';
+  console.log(`${pack.id}@${pack.ref.slice(0, 12)}: ${pack.inputs} SVGs${excluded} → ${outputs}`);
 }
 console.log(`generated in ${((performance.now() - started) / 1000).toFixed(1)}s`);

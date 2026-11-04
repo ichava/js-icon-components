@@ -1,5 +1,5 @@
 {
-  "$comment": "The packs this repository generates components for. Each is read from git at the pinned commit `ref` (a full SHA, never a branch), from the sibling checkout `checkout` when it holds that commit, else by a shallow fetch of `repository`. Adding a pack is a new entry here; moving a pack forward is a new `ref`. `minIcons` is the floor the count guard enforces, set a little under the measured count.",
+  "$comment": "The packs this repository generates components for. Each is read from git at the pinned commit `ref` (a full SHA, never a branch), from the sibling checkout `checkout` when it holds that commit, else by a shallow fetch of `repository`. Adding a pack is a new entry here; moving a pack forward is a new `ref`. `minIcons` is the floor the count guard enforces, set a little under the measured count. `licence` is the artwork's SPDX expression; `attribution` lists the files, read at `ref`, copied to dist/<flavour>/<pack>/. `exclude` lists source SVGs the policy rejects, each with its reason; an entry that stops being rejected fails the build. ichava/icon-sets-bundled is not here: it is private, proprietary and for internal and client use only, so a public package cannot ship it. ichava/icon-sets-metronic is private and never shown publicly.",
   "packs": [
     {
       "id": "tabler",
@@ -10,7 +10,57 @@
       "sets": ["outline", "filled"],
       "defaultSet": "outline",
       "kind": "icon",
-      "minIcons": 6000
+      "minIcons": 6000,
+      "licence": "MIT",
+      "attribution": ["ATTRIBUTION.md", "resources/assets/svg/licenses/tabler-icons/LICENSE"]
+    },
+    {
+      "id": "flag",
+      "repository": "https://github.com/ichava/icon-sets-flag.git",
+      "ref": "67075d3f8d41e9d95635200e91ba8f8135feeb34",
+      "checkout": "../icon-sets-flag",
+      "path": "resources/assets/svg/files",
+      "sets": ["4x3", "1x1"],
+      "defaultSet": "4x3",
+      "kind": "icon",
+      "minIcons": 520,
+      "licence": "MIT",
+      "attribution": ["ATTRIBUTION.md"]
+    },
+    {
+      "id": "emoji",
+      "$comment": "Twemoji only. The pack's two OpenMoji sets are deprecated there and moved to ichava/icon-sets-openmoji, which the openmoji entry generates; carrying them here too would ship 7,132 icons twice.",
+      "repository": "https://github.com/ichava/icon-sets-emoji.git",
+      "ref": "833f11fb7c3a0b34135dab53aae91dfd8019ff98",
+      "checkout": "../icon-sets-emoji",
+      "path": "resources/assets/svg/files",
+      "sets": ["twemoji"],
+      "defaultSet": "twemoji",
+      "categories": true,
+      "kind": "icon",
+      "minIcons": 3300,
+      "licence": "CC-BY-4.0",
+      "attribution": ["ATTRIBUTION.md"]
+    },
+    {
+      "id": "openmoji",
+      "repository": "https://github.com/ichava/icon-sets-openmoji.git",
+      "ref": "d492519e061732592a7d7c57bd6531747f10694c",
+      "checkout": "../icon-sets-openmoji",
+      "path": "resources/assets/svg/files",
+      "sets": ["openmoji-color", "openmoji-black"],
+      "defaultSet": "openmoji-color",
+      "categories": true,
+      "kind": "icon",
+      "minIcons": 7000,
+      "licence": "CC-BY-SA-4.0",
+      "attribution": ["ATTRIBUTION.md", "resources/assets/svg/licenses/openmoji/LICENSE"],
+      "exclude": [
+        {
+          "path": "openmoji-color/travel-places/high-speed-train.svg",
+          "reason": "A stray text node (\"d\") inside <g id=\"color\">, outside any text element, at d492519e. The policy rejects rather than strips; the fix belongs upstream in icon-sets-openmoji. Measured 2026-11-04: the only one of 7,132."
+        }
+      ]
     }
   ]
 }

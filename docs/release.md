@@ -19,8 +19,9 @@ owner.
 
 ## Moving a pack forward
 
-Set the pack's `ref` in `packs.json` to the new full commit SHA, and adjust `minIcons` if the
-count moved. CI generates from the new commit; an icon the policy rejects, a name collision or a
+Set the pack's `ref` in `packs.json` to the new full commit SHA, adjust `minIcons` if the
+count moved, and update the measured count in `tests/generate.test.ts`. An `exclude` entry the new
+commit fixes upstream fails the build until it is removed. CI generates from the new commit; an icon the policy rejects, a name collision or a
 count below the floor fails the build. A new pack ref is a release-worthy change, because every
 consumer's next install generates from it.
 

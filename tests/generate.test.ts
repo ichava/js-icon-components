@@ -1,12 +1,12 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { build } from 'esbuild';
-import { countOutputs, generate, type Manifest } from '../src/generator/generate.ts';
-import { resolveSource } from '../src/generator/packs.ts';
-import { FLAVOURS } from '../src/shared/index.ts';
-import { CACHE, ROOT, tabler } from './helpers.ts';
+import { ATTRIBUTION_DIRS, countOutputs, generate, readPackWithCounts, type Manifest } from '../src/generator/generate.ts';
+import { loadPacks, needsAttribution, resolveSource, type PackConfig } from '../src/generator/packs.ts';
+import { ALL_FLAVOURS } from '../src/shared/index.ts';
+import { CACHE, packs, ROOT, tabler } from './helpers.ts';
 
 let out: string;
 let manifest: Manifest;
@@ -15,39 +15,55 @@ beforeAll(() => {
   // The real build into a scratch directory: tsc for the runtimes, then the generator.
   out = mkdtempSync(join(ROOT, '.cache', 'generate-'));
   execFileSync(join(ROOT, 'node_modules/.bin/tsc'), ['-p', join(ROOT, 'tsconfig.build.json'), '--outDir', out], { cwd: ROOT });
+  execFileSync(join(ROOT, 'node_modules/.bin/ngc'), ['-p', join(ROOT, 'tsconfig.angular.json'), '--outDir', out], { cwd: ROOT });
   manifest = generate({ root: ROOT, outDir: out });
 });
 
 afterAll(() => rmSync(out, { recursive: true, force: true }));
 
 /** Counts the pack's SVGs straight from git, independently of the generator's own listing. */
-function inputCount(): number {
-  const pack = tabler();
-  const listing = execFileSync('git', ['-C', resolveSource(pack, ROOT), 'ls-tree', '-r', '--name-only', pack.ref, '--', pack.path], { encoding: 'utf8' });
-  return listing.split('\n').filter((p) => pack.sets.some((s) => p.startsWith(`${pack.path}/${s}/`) && p.endsWith('.svg'))).length;
+function inputCount(pack: PackConfig): number {
+  const listing = execFileSync('git', ['-C', resolveSource(pack, ROOT), 'ls-tree', '-r', '--name-only', pack.ref, '--', pack.path], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const depth = pack.categories === true ? 3 : 2;
+  return listing.split('\n').filter((p) => pack.sets.some((s) => p.startsWith(`${pack.path}/${s}/`) && p.endsWith('.svg') && p.slice(pack.path.length + 1).split('/').length === depth)).length;
 }
 
+/** Measured 2026-11-04 at the pinned refs. A ref bump that changes a count updates this table. */
+const MEASURED: Record<string, number> = { tabler: 6257, flag: 542, emoji: 3435, openmoji: 7132 };
+
+const PACKS = packs();
+const rows = PACKS.map((p) => [p.id, p] as const);
+
 describe('generation', () => {
-  it('reads at least the floor of input SVGs', () => {
-    const pack = tabler();
-    expect(inputCount()).toBeGreaterThanOrEqual(pack.minIcons);
+  it('generates the four pinned packs, and none of the private ones', () => {
+    expect(PACKS.map((p) => p.id)).toEqual(['tabler', 'flag', 'emoji', 'openmoji']);
+    expect(manifest.packs.map((p) => p.id)).toEqual(['tabler', 'flag', 'emoji', 'openmoji']);
+    for (const p of PACKS) expect(p.repository).not.toMatch(/icon-sets-(bundled|metronic)/);
   });
 
-  it.each(FLAVOURS)('writes exactly one %s icon per input SVG', (flavour) => {
-    const inputs = inputCount();
-    expect(countOutputs(out, 'tabler')[flavour]).toBe(inputs);
-    expect(manifest.packs[0]?.outputs[flavour]).toBe(inputs);
+  it.each(rows)('%s: reads its measured number of input SVGs, above the floor', (id, pack) => {
+    const inputs = inputCount(pack);
+    expect(inputs).toBe(MEASURED[id]);
+    expect(inputs).toBeGreaterThanOrEqual(pack.minIcons);
+    expect(manifest.packs.find((p) => p.id === id)?.inputs).toBe(inputs);
+  });
+
+  it.each(rows.flatMap(([id, pack]) => ALL_FLAVOURS.map((f) => [id, f, pack] as const)))('%s: writes exactly one %s icon per input SVG, less the listed exclusions', (id, flavour, pack) => {
+    const expected = inputCount(pack) - (pack.exclude?.length ?? 0);
+    expect(countOutputs(out, id)[flavour]).toBe(expected);
+    expect(manifest.packs.find((p) => p.id === id)?.outputs[flavour]).toBe(expected);
   });
 
   it('the counter notices a missing output', () => {
     rmSync(join(out, 'svelte/packs/tabler/IconMug.svelte'));
-    expect(countOutputs(out, 'tabler').svelte).toBe(inputCount() - 1);
+    expect(countOutputs(out, 'tabler').svelte).toBe(inputCount(tabler()) - 1);
   });
 
   it('records the pinned ref in the manifest and in every generated module', () => {
-    const pack = tabler();
-    expect(manifest.packs[0]?.ref).toBe(pack.ref);
-    expect(readFileSync(join(out, 'react/packs/tabler.js'), 'utf8')).toContain(pack.ref);
+    for (const pack of PACKS) {
+      expect(manifest.packs.find((p) => p.id === pack.id)?.ref).toBe(pack.ref);
+      for (const f of ['data', 'react/packs', 'vue/packs', 'wc/packs']) expect(readFileSync(join(out, `${f}/${pack.id}.js`), 'utf8')).toContain(pack.ref);
+    }
   });
 
   it.each([
@@ -59,6 +75,56 @@ describe('generation', () => {
     expect(code).toContain('tabler:outline/mug');
     expect(code).not.toContain('tabler:outline/mug-off');
     expect(code.length).toBeLessThan(20_000);
+  });
+});
+
+describe('exclusions', () => {
+  it('lists only icons the policy still rejects', () => {
+    const openmoji = PACKS.find((p) => p.id === 'openmoji') as PackConfig;
+    expect(readPackWithCounts(openmoji, ROOT).excluded).toEqual(['resources/assets/svg/files/openmoji-color/travel-places/high-speed-train.svg']);
+  });
+
+  it('fails on an entry that now passes, or that names no file', () => {
+    const t = tabler();
+    expect(() => readPackWithCounts({ ...t, exclude: [{ path: 'outline/mug.svg', reason: 'test' }] }, ROOT)).toThrow(/now passes the policy/);
+    expect(() => readPackWithCounts({ ...t, exclude: [{ path: 'outline/no-such-icon.svg', reason: 'test' }] }, ROOT)).toThrow(/names no SVG/);
+  });
+});
+
+describe('attribution', () => {
+  const ccPacks = PACKS.filter(needsAttribution);
+
+  it('the CC-BY and CC-BY-SA packs are the two emoji packs', () => {
+    expect(ccPacks.map((p) => [p.id, p.licence])).toEqual([['emoji', 'CC-BY-4.0'], ['openmoji', 'CC-BY-SA-4.0']]);
+  });
+
+  it.each(PACKS.flatMap((p) => p.attribution.flatMap((file) => ATTRIBUTION_DIRS.map((dir) => [p.id, dir, p.id, file.split('/').pop() as string] as const))))(
+    '%s ships dist/%s/%s/%s',
+    (id, dir, _id, name) => {
+      const file = join(out, dir, id, name);
+      expect(existsSync(file), file).toBe(true);
+      expect(statSync(file).size).toBeGreaterThan(200);
+    },
+  );
+
+  it.each(ccPacks.map((p) => [p.id, p] as const))('%s: the attribution names the artwork licence, and the manifest lists every copy', (id, pack) => {
+    const text = readFileSync(join(out, 'react', id, 'ATTRIBUTION.md'), 'utf8');
+    expect(text).toContain(pack.licence === 'CC-BY-SA-4.0' ? 'CC-BY-SA 4.0' : 'CC-BY 4.0');
+    expect(manifest.packs.find((p) => p.id === id)?.attribution).toHaveLength(pack.attribution.length * ATTRIBUTION_DIRS.length);
+  });
+
+  it('every generated module carries the artwork licence in a comment bundlers keep', () => {
+    for (const pack of PACKS) {
+      expect(readFileSync(join(out, `react/packs/${pack.id}.js`), 'utf8')).toContain(`/*! ${pack.id} artwork: ${pack.licence}.`);
+    }
+  });
+
+  it('refuses a CC pack that lists no attribution files', () => {
+    const file = join(CACHE, 'packs-no-attribution.json');
+    const emoji = PACKS.find((p) => p.id === 'emoji');
+    execFileSync('mkdir', ['-p', CACHE]);
+    execFileSync('node', ['-e', `require('fs').writeFileSync(${JSON.stringify(file)}, JSON.stringify({ packs: [${JSON.stringify({ ...emoji, attribution: [] })}] }))`]);
+    expect(() => loadPacks(file)).toThrow(/must list its attribution files/);
   });
 });
 

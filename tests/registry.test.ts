@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { FLAVOURS } from '../src/shared/index.ts';
+import { FLAVOURS, PENDING_FLAVOURS } from '../src/shared/index.ts';
 import { ROOT } from './helpers.ts';
 
 /**
@@ -20,7 +20,10 @@ const registry = schema['x-ichava-formats'];
 const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { exports: Record<string, unknown> };
 
 /** Subpath each flavour ships under. `webcomponent` is `./wc`, the only one that differs. */
-const SUBPATH: Record<(typeof FLAVOURS)[number], string> = { react: './react', vue: './vue', svelte: './svelte', webcomponent: './wc' };
+const SUBPATH: Record<(typeof FLAVOURS)[number] | (typeof PENDING_FLAVOURS)[number], string> = {
+  react: './react', vue: './vue', svelte: './svelte', webcomponent: './wc',
+  reactNative: './react-native', angular: './angular', solid: './solid', preact: './preact', astro: './astro',
+};
 
 describe('format registry', () => {
   it('read a registry of a plausible size', () => {
@@ -41,7 +44,15 @@ describe('format registry', () => {
     expect(generated.sort()).toEqual([...FLAVOURS].sort());
   });
 
-  it.each(FLAVOURS)('%s has its entry point and pack subpath in package.json exports', (flavour) => {
+  // A generated flavour the registry does not list yet is built and tested here but kept out of the
+  // required set above. Once icon-browser lists it (and the vendored schema copy is refreshed), this
+  // fails: move the id from PENDING_FLAVOURS into FLAVOURS so the registry guard covers it.
+  it.each(PENDING_FLAVOURS)('%s is not in the registry yet, so it stays pending', (flavour) => {
+    expect(registry.find((f) => f.id === flavour)).toBeUndefined();
+    expect(schema.$defs.format.enum).not.toContain(flavour);
+  });
+
+  it.each([...FLAVOURS, ...PENDING_FLAVOURS])('%s has its entry point and pack subpath in package.json exports', (flavour) => {
     expect(pkg.exports).toHaveProperty([SUBPATH[flavour]]);
     expect(pkg.exports).toHaveProperty([`${SUBPATH[flavour]}/*`]);
   });

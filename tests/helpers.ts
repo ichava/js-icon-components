@@ -9,10 +9,32 @@ import type { IconData } from '../src/shared/index.ts';
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const CACHE = join(ROOT, '.cache', 'test');
 
-export function tabler(): PackConfig {
-  const pack = loadPacks(join(ROOT, 'packs.json')).find((p) => p.id === 'tabler');
-  if (!pack) throw new Error('packs.json has no tabler entry');
-  return pack;
+export function packs(): PackConfig[] {
+  return loadPacks(join(ROOT, 'packs.json'));
+}
+
+export function pack(id: string): PackConfig {
+  const found = packs().find((p) => p.id === id);
+  if (!found) throw new Error(`packs.json has no ${id} entry`);
+  return found;
+}
+
+export const tabler = (): PackConfig => pack('tabler');
+
+const byPack = new Map<string, Map<string, IconData>>();
+
+/** Icons from any pinned pack by export name, read (and id-prefixed) as the generator reads them. */
+export function iconsFrom(id: string, names: readonly string[]): IconData[] {
+  let icons = byPack.get(id);
+  if (!icons) {
+    icons = new Map(readPack(pack(id), ROOT).map((i) => [i.exportName, i.data]));
+    byPack.set(id, icons);
+  }
+  return names.map((name) => {
+    const icon = icons.get(name);
+    if (!icon) throw new Error(`${name} is not in the pinned ${id} pack`);
+    return icon;
+  });
 }
 
 let icons: Map<string, IconData> | undefined;
