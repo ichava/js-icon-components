@@ -4,8 +4,9 @@
 #
 # It also builds the package once and attaches it as prebuilt tarballs, so an
 # application installs with one command and no compiler:
-#   ichava-js-icon-components-<version>.tgz          every pack and flavour
-#   ichava-js-icon-components-<pack>-<version>.tgz   one pack, every flavour
+#   ichava-js-icon-components-<version>.tgz          every pack, flavour and asset export
+#   ichava-js-icon-components-<pack>-<version>.tgz   one pack, every flavour and export, as the
+#                                                     package @ichava/js-icon-components-<pack>
 #   SHA256SUMS                                        over the tarballs
 # Each is `npm pack` output, checked by scripts/check-tarball.mjs before upload.
 #
@@ -188,20 +189,23 @@ jobs:
       - name: Install and build
         run: npm install --no-audit --no-fund --no-package-lock
 
-      # --ignore-scripts: pack exactly the dist/ just built. Each build starts from
-      # an empty dist/, so a per-pack tarball holds that pack and the stubs only.
+      # pack-tarball.mjs runs `npm pack --ignore-scripts`: it packs exactly the dist/ just
+      # built. Each build starts from an empty dist/, so a per-pack tarball holds that pack and
+      # the stubs only. A per-pack tarball is named @ichava/js-icon-components-<pack>, so two
+      # install side by side; the script renames package.json only while it packs.
       - name: Pack the tarballs
         run: |
           set -euo pipefail
           mkdir -p release
-          npm pack --ignore-scripts --pack-destination release
+          node scripts/pack-tarball.mjs release
           node scripts/check-tarball.mjs "release/ichava-js-icon-components-${VERSION}.tgz"
           for pack in $(node -p 'require("./packs.json").packs.map((p) => p.id).join(" ")'); do
             ICHAVA_ICONS_PACKS="$pack" npm run build
-            npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
-            mv "$RUNNER_TEMP/ichava-js-icon-components-${VERSION}.tgz" "release/ichava-js-icon-components-${pack}-${VERSION}.tgz"
+            node scripts/pack-tarball.mjs release "$pack"
             node scripts/check-tarball.mjs "release/ichava-js-icon-components-${pack}-${VERSION}.tgz" --packs "$pack"
           done
+          # The rename is undone after every pack; a pre-release's version stamp stays.
+          test "$(node -p 'require("./package.json").name')" = '@ichava/js-icon-components'
           (cd release && sha256sum -- *.tgz > SHA256SUMS)
           ls -l release
 

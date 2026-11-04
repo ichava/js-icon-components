@@ -1,6 +1,6 @@
 import { createComponent, createRenderEffect, mergeProps, splitProps, type Component, type JSX } from 'solid-js';
 import { Dynamic, isServer } from 'solid-js/web';
-import { rootAttributes, SVG_NS, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
+import { rootAttributes, SVG_NS, themed, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
 
 /**
  * The SolidJS flavour's one template. It is written with Solid's runtime functions rather than
@@ -36,8 +36,9 @@ function title(text: () => string): JSX.Element {
 }
 
 export function Icon(props: SolidIconProps & { icon: IconData }): JSX.Element {
-  const [own, rest] = splitProps(props, ['icon', 'size', 'color', 'strokeWidth', 'title', 'class']);
-  const root = () => rootAttributes(own.icon, { size: own.size, color: own.color, strokeWidth: own.strokeWidth, title: own.title });
+  const [own, rest] = splitProps(props, ['icon', 'size', 'color', 'strokeWidth', 'title', 'primaryColor', 'variant', 'class']);
+  const root = () =>
+    rootAttributes(own.icon, { size: own.size, color: own.color, strokeWidth: own.strokeWidth, title: own.title, primaryColor: own.primaryColor, variant: own.variant });
   return createComponent(
     Dynamic,
     mergeProps(root, rest, {
@@ -47,7 +48,7 @@ export function Icon(props: SolidIconProps & { icon: IconData }): JSX.Element {
         return own.class ? `${root().class} ${own.class}` : root().class;
       },
       get children() {
-        return [own.title ? title(() => own.title as string) : null, ...own.icon.nodes.map(node)];
+        return [own.title ? title(() => own.title as string) : null, ...themed(own.icon, own.variant).nodes.map(node)];
       },
     }),
   );

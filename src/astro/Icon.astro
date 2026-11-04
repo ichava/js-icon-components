@@ -9,7 +9,7 @@
  *   ---
  *   <Icon icon={IconMug} size={20} title="Coffee" />
  */
-import { rootAttributes, type IconData, type IconProps } from '../shared/index.ts';
+import { rootAttributes, themed, type IconData, type IconProps } from '../shared/index.ts';
 import Nodes from './Nodes.astro';
 
 interface Props extends IconProps {
@@ -18,10 +18,10 @@ interface Props extends IconProps {
   [attribute: string]: unknown;
 }
 
-const { icon, size, color, strokeWidth, title, class: className, ...rest } = Astro.props as Props;
+const { icon, size, color, strokeWidth, title, primaryColor, variant, class: className, ...rest } = Astro.props as Props;
 // Spreading an object that holds `class` and then writing `class=` emits the attribute twice, so it is taken out.
-const { class: rootClass, ...root } = rootAttributes(icon, { size, color, strokeWidth, title });
+const { class: rootClass, ...root } = rootAttributes(icon, { size, color, strokeWidth, title, primaryColor, variant });
 // A caller's class adds to `ichava-icon` rather than replacing it, as in every flavour.
 const classes = className ? `${rootClass} ${className}` : rootClass;
 ---
-<svg {...root} {...rest} class={classes}>{title && <title>{title}</title>}<Nodes nodes={icon.nodes} /></svg>
+<svg {...root} {...rest} class={classes}>{title && <title>{title}</title>}<Nodes nodes={themed(icon, variant).nodes} /></svg>

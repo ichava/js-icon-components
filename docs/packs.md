@@ -81,7 +81,9 @@ repeats its ids, harmlessly: both copies define the same content.
 
 Add an entry to `packs.json`: `id`, `repository`, a full commit `ref`, `path`, `sets`,
 `defaultSet`, `kind`, `minIcons`, the artwork `licence` as an SPDX expression and its
-`attribution` files, plus `categories: true` when sets nest a category directory. A pack whose
+`attribution` files, plus `categories: true` when sets nest a category directory, and
+`themeVariants: { "dark": "-dark" }` when a pack ships theme twins (`scene-dark.svg` beside
+`scene.svg`), which then fold into their light item as `variants.dark`. A pack whose
 licence is CC-BY or CC-BY-SA must list attribution files, or the build refuses it. Then add its
 measured count to `tests/generate.test.ts`.
 

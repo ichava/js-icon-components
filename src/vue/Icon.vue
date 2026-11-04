@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
 import { computed, defineComponent, h, type FunctionalComponent, type PropType, type VNodeChild } from 'vue';
-import { rootAttributes, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
+import { rootAttributes, themed, type IconChild, type IconData, type IconProps, type IconVariant } from '../shared/index.ts';
 
 function renderChild(child: IconChild): VNodeChild {
   if (typeof child === 'string') return child;
@@ -23,10 +23,13 @@ const Icon = defineComponent({
     color: { type: String, default: undefined },
     strokeWidth: { type: [Number, String] as PropType<number | string>, default: undefined },
     title: { type: String, default: undefined },
+    primaryColor: { type: String, default: undefined },
+    variant: { type: String as PropType<IconVariant>, default: undefined },
   },
   setup(props) {
     const root = computed(() => rootAttributes(props.icon, props));
-    return { root };
+    const nodes = computed(() => themed(props.icon, props.variant).nodes);
+    return { root, nodes };
   },
 });
 
@@ -41,5 +44,5 @@ export function defineIcon(icon: IconData): FunctionalComponent<IconProps> {
 </script>
 
 <template>
-  <svg v-bind="root"><title v-if="title">{{ title }}</title><IconNodes :nodes="icon.nodes" /></svg>
+  <svg v-bind="root"><title v-if="title">{{ title }}</title><IconNodes :nodes="nodes" /></svg>
 </template>

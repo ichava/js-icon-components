@@ -1,6 +1,6 @@
 /** @jsxImportSource preact */
 import { h, type ComponentChild, type FunctionComponent, type JSX, type SVGAttributes } from 'preact';
-import { rootAttributes, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
+import { rootAttributes, themed, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
 
 /**
  * The Preact flavour's one template. Every generated Preact icon is `createIcon(data)`. Preact
@@ -21,14 +21,14 @@ function renderChild(child: IconChild): ComponentChild {
   return h(tag, { ...attrs }, children?.map(renderChild));
 }
 
-export function Icon({ icon, size, color, strokeWidth, title, class: className, ...rest }: PreactIconProps & { icon: IconData }): JSX.Element {
-  const root = rootAttributes(icon, { size, color, strokeWidth, title });
+export function Icon({ icon, size, color, strokeWidth, title, primaryColor, variant, class: className, ...rest }: PreactIconProps & { icon: IconData }): JSX.Element {
+  const root = rootAttributes(icon, { size, color, strokeWidth, title, primaryColor, variant });
   // A caller's class adds to `ichava-icon` rather than replacing it, as in every flavour.
   const classes = className ? `${root.class} ${String(className)}` : root.class;
   return (
     <svg {...(root as Record<string, string>)} {...rest} class={classes}>
       {title ? <title>{title}</title> : null}
-      {icon.nodes.map(renderChild)}
+      {themed(icon, variant).nodes.map(renderChild)}
     </svg>
   );
 }

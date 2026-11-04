@@ -18,22 +18,31 @@ npm install https://github.com/ichava/js-icon-components/releases/download/v0.1.
 ```
 
 The tarball is `npm pack` output, built once by `release.yml` when the release is tagged. It
-holds `dist/` for every pack and flavour and nothing else: no source, no tests, and no
+holds `dist/` for every pack, flavour and asset export and nothing else: no source, no tests, and no
 dependencies. npm runs no build for a tarball, so no compiler, `git` or network access to the
 packs is needed. Then import the flavour you use, as in the [README](../README.md#quick-start-guide-and-usage).
 
 ### One pack only
 
-Each release also attaches one tarball per pack, built with every flavour:
+Each release also attaches one tarball per pack, built with every flavour and export. Each is its
+own package, `@ichava/js-icon-components-<pack>`, with the same subpaths as the full one, so two
+or more install side by side:
 
 ```bash
-npm install https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-tabler-0.1.0.tgz
+npm install \
+  https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-tabler-0.1.0.tgz \
+  https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-flag-0.1.0.tgz
 ```
 
-The package name and import paths are the same as the full tarball's, so moving between them
-changes one line. An import of another pack throws, naming the pack. Because the package name is
-the same, an application installs one of these tarballs, not two: for two packs, use the full
-tarball or a git build.
+```ts
+import { IconMug } from '@ichava/js-icon-components-tabler/react/tabler';
+import { IconKe } from '@ichava/js-icon-components-flag/react/flag';
+```
+
+An import of another pack from a per-pack package throws, naming the pack. Moving from a per-pack
+tarball to the full one changes the package name in your imports. Until this release every per-pack
+tarball shared the full package's name, so npm kept only one of them; `tests/per-pack-tarball.test.ts`
+installs two and imports from both.
 
 `SHA256SUMS` on the release lists the checksum of every tarball.
 
@@ -61,13 +70,17 @@ final and never moves.
 | Variable | `package.json` key | Effect |
 |---|---|---|
 | `ICHAVA_ICONS_PACKS=tabler,flag` | `"packs": ["tabler", "flag"]` | builds only those packs |
-| `ICHAVA_ICONS_FLAVOURS=react,vue` | `"flavours": ["react", "vue"]` | builds only those flavours |
+| `ICHAVA_ICONS_FLAVOURS=react,css-mask` | `"flavours": ["react", "css-mask"]` | builds only those flavours and exports |
 | `ICHAVA_ICONS_SKIP_BUILD=1` | `"skipBuild": true` | builds nothing |
 
 Packs are `tabler`, `flag`, `emoji` and `openmoji`. Flavours are named by their subpath: `react`,
-`vue`, `svelte`, `wc`, `react-native`, `angular`, `solid`, `preact` and `astro` (the registry ids
-`webcomponent` and `reactNative` work too). Unset or empty means all of them; an unknown name fails
-the install, listing the valid ones.
+`vue`, `svelte`, `wc`, `react-native`, `angular`, `solid`, `preact`, `astro`, `qwik`, `ember` and
+`elm` (the registry ids `webcomponent` and `reactNative` work too). The asset exports go in the same
+list, by registry id: `css-mask`, `data-uri`, `png-zip`, `flutter`, `swiftui` and `android-vd`.
+Unset or empty means everything; a list builds exactly what it names, so `react` alone builds no
+export and `png-zip` alone builds no flavour. An unknown name fails the install, listing the valid
+ones. An Elm module or an export that was not built is simply absent: neither is a JavaScript module,
+so neither has a stand-in.
 
 The keys live under `"ichava"` → `"icons"` in the installing application's `package.json`, as an
 array or a comma-separated string. A variable that is set wins over the file:
@@ -104,25 +117,38 @@ writes no `dist/` at all.
 ## Size and time
 
 Measured 2026-11-04 on an Apple-silicon laptop with Node 24.17 and npm 11.13, a warm npm cache,
-the four packs (17,365 icons) and nine flavours. Install times are wall-clock for a fresh
-application; on disk is `du`, which is larger than the byte count because each small file takes at
-least one 4 KB block.
+the four packs (17,365 icons), twelve flavours and six asset exports. Install times are wall-clock
+for a fresh application, offline for a tarball and from GitHub for a git build; on disk is `du`, which is larger than the
+byte count because each small file takes at least one 4 KB block.
 
 | Install | Download | Unpacked | On disk | Files | Time |
 |---|---:|---:|---:|---:|---:|
-| Release tarball, full | 7.0 MB | 64.2 MB | 126 MB | 17,549 | 15 s |
-| Release tarball, `tabler` | 1.7 MB | 17.3 MB | 40 MB | 6,404 | 4 s |
-| Release tarball, `flag` | 2.1 MB | 12.4 MB | 14 MB | 679 | 1 s |
-| Release tarball, `emoji` | 2.4 MB | 20.1 MB | 32 MB | 3,572 | 2 s |
-| Release tarball, `openmoji` | 3.5 MB | 38.3 MB | 63 MB | 7,278 | 5 s |
-| Git, every pack and flavour | | | 126 MB | 17,549 | 61 s |
-| Git, `tabler` for `react` | | | 12 MB | 132 | 23 s |
-| Git, `ICHAVA_ICONS_SKIP_BUILD=1` | | | 0 | 3 | 20 s |
+| Release tarball, full | 133.4 MB | 358.0 MB | 407 MB | 17,636 | 15 s |
+| Release tarball, `tabler` | 28.3 MB | 68.0 MB | 89 MB | 6,451 | 6 s |
+| Release tarball, `flag` | 10.9 MB | 33.9 MB | 35 MB | 722 | 2 s |
+| Release tarball, `emoji` | 40.0 MB | 91.5 MB | 101 MB | 3,615 | 4 s |
+| Release tarball, `openmoji` | 57.4 MB | 192.9 MB | 211 MB | 7,325 | 6 s |
+| Git, every pack, flavour and export | | | 408 MB | 17,636 | 59 s |
+| Git, `tabler` for `react,css-mask` | | | 18 MB | 166 | 31 s |
+| Git, `ICHAVA_ICONS_SKIP_BUILD=1` | | | 0 | 3 | 14 s |
 
-About 20 seconds of every git install is npm installing the development dependencies in its
-temporary clone, which no selection avoids; the rest is the build and copying the files out. In
-`dist/` the icon data shared by every flavour is 40.0 MB of the full 64.2 MB, mostly the emoji,
-whose artwork is detailed. None of it reaches an application bundle beyond the icons it imports.
+Before the Tier 3 flavours and the exports (0.1.0 as merged in #5), the full tarball was 7.0 MB to
+download and 64.2 MB unpacked. The exports are most of the difference, and they are already
+compressed (the zips) or large text (the CSS and JSON), so gzip barely shrinks the tarball:
+
+| Export | All four packs | Generated in |
+|---|---:|---:|
+| CSS mask (`icons.css`) | 37.0 MB | 0.8 s |
+| Data URI (`data-uri.json`) | 36.5 MB | 0.8 s |
+| PNG (`png.zip`) | 92.1 MB | 14.3 s |
+| Flutter (`flutter.zip`) | 16.1 MB | 1.0 s |
+| SwiftUI (`swiftui.zip`) | 23.7 MB | 1.4 s |
+| Android (`android-vd.zip`) | 16.4 MB | 1.8 s |
+
+The whole build (`npm run build`: `tsc`, `ngc`, then the generator for every pack, flavour and
+export) takes 27 s, of which generation is 24 s; a git build that names only the flavours it uses
+writes no export at all. About 14 seconds of every git install is npm installing the development
+dependencies in its temporary clone, which no selection avoids. None of this reaches an application bundle beyond the icons it imports.
 
 ## Peers
 
@@ -137,6 +163,10 @@ whose artwork is detailed. None of it reaches an application bundle beyond the i
 | SolidJS | `solid-js` 1.8 or newer | `@ichava/js-icon-components/solid/<pack>` |
 | Preact | `preact` 10.19 or newer | `@ichava/js-icon-components/preact/<pack>` |
 | Astro | `astro` 5 or newer | `@ichava/js-icon-components/astro` and `/astro/<pack>` |
+| Qwik | `@builder.io/qwik` 1.5 or newer | `@ichava/js-icon-components/qwik/<pack>` |
+| Ember | `ember-source` 6.3 or newer | `@ichava/js-icon-components/ember` and `/ember/<pack>` |
+| Elm | `elm/svg` and `elm/virtual-dom` in your `elm.json` | `dist/elm/` as a source directory |
+| Exports | none | `@ichava/js-icon-components/assets/<pack>/<file>` |
 
 Every peer is optional. Install only the one you use.
 

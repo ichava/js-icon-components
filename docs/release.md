@@ -24,14 +24,16 @@ The same run installs and builds the package once and attaches:
 
 | Asset | Holds |
 |---|---|
-| `ichava-js-icon-components-X.Y.Z.tgz` | every pack and flavour |
-| `ichava-js-icon-components-<pack>-X.Y.Z.tgz` | one pack, every flavour, one per entry in `packs.json` |
+| `ichava-js-icon-components-X.Y.Z.tgz` | every pack, flavour and asset export, as `@ichava/js-icon-components` |
+| `ichava-js-icon-components-<pack>-X.Y.Z.tgz` | one pack, every flavour and export, as `@ichava/js-icon-components-<pack>`, one per entry in `packs.json` |
 | `SHA256SUMS` | the checksum of each tarball |
 | `js-icon-components.cdx.json` | the SBOM |
 
-Each tarball is `npm pack` output, checked by `scripts/check-tarball.mjs` before upload: `dist/`
-for everything its manifest says was built, a stand-in for the rest, nothing from the development
-tree, and no dependencies. To rebuild them for a tag, which creates or updates that tag's release
+Each tarball is `npm pack` output, written by `scripts/pack-tarball.mjs` (which gives a per-pack
+tarball its own package name while it packs, then restores `package.json`) and checked by
+`scripts/check-tarball.mjs` before upload: `dist/` for everything its manifest says was built, a
+stand-in for the rest, the Elm module and every export of each built pack, the package name its
+contents call for, nothing from the development tree, and no dependencies. To rebuild them for a tag, which creates or updates that tag's release
 only:
 
 ```bash

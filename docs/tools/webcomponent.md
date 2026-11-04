@@ -31,6 +31,7 @@ Or skip the registry: `document.querySelector('ichava-icon').icon = IconMug`.
 | `name` | the icon id, `<pack>:<set>/<name>` |
 | `size`, `color`, `stroke-width` | `size`, `color`, `strokeWidth` |
 | `label` | `title`. Not `title`, which is a global HTML attribute and would add a second, native tooltip |
+| `primary-color`, `variant` | illustrations: `primaryColor` and `variant` (`light` or `dark`) |
 
 Registration is explicit, so importing a pack module defines nothing and the bundle keeps only the
 icons registered. The icon renders into the element's children, so page CSS reaches it.

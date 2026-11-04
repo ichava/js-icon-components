@@ -6,7 +6,7 @@ import Svg, {
   LinearGradient, Mask, Path, Pattern, Polygon, Polyline, RadialGradient, Rect, Stop, Symbol as SvgSymbol, Text,
   TextPath, TSpan, Use, type SvgProps,
 } from 'react-native-svg';
-import { rootAttributes, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
+import { rootAttributes, themed, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
 
 /**
  * The React Native flavour's one template, on `react-native-svg`. Every generated icon is
@@ -65,8 +65,9 @@ function renderChild(child: IconChild, key: number): ReactNode {
   return createElement(element, { key, ...nativeProps(attrs) }, children?.map(renderChild));
 }
 
-export const Icon = forwardRef<Svg, NativeIconProps & { icon: IconData }>(function Icon({ icon, size, color, strokeWidth, title, ...rest }, ref) {
-  const root = rootAttributes(icon, { size, color, strokeWidth, title });
+export const Icon = forwardRef<Svg, NativeIconProps & { icon: IconData }>(function Icon({ icon, size, color, strokeWidth, title, primaryColor, variant, ...rest }, ref) {
+  // React Native has no CSS custom properties, so `primaryColor` reaches it as `color` alone.
+  const root = rootAttributes(icon, { size, color: color ?? primaryColor, strokeWidth, title, variant });
   const named = title !== undefined && title !== '';
   return (
     <Svg
@@ -79,7 +80,7 @@ export const Icon = forwardRef<Svg, NativeIconProps & { icon: IconData }>(functi
       {...rest}
       ref={ref}
     >
-      {icon.nodes.map(renderChild)}
+      {themed(icon, variant).nodes.map(renderChild)}
     </Svg>
   );
 });

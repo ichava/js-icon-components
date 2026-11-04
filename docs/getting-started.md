@@ -24,6 +24,18 @@ Component uses as its `name`.
 | `color` | CSS colour | inherited | the SVG `color`, which `currentColor` paints with |
 | `strokeWidth` | number or string | the source's | `stroke-width`; stroked icons only, ignored on filled ones |
 | `title` | string | none | the accessible name, as a `<title>` element |
+| `primaryColor` | CSS colour | none | illustrations: sets `--ichava-primary`, which an illustration paints its accent with, and `color` (an explicit `color` still wins) |
+| `variant` | `'light'` or `'dark'` | `'light'` | illustrations: draws the dark theme twin when the pack carries one, else the item itself |
+
+The Web Component takes `primary-color` and `variant` attributes; Ember takes `@primaryColor` and
+`@variant`; React Native has no CSS custom properties, so `primaryColor` reaches it as `color`.
+
+```tsx
+<IconScene primaryColor="#e11d48" variant="dark" />
+```
+
+No public illustration pack ships yet (owner rule, 2026-10-30), so the props are exercised by a
+test-only pack, `tests/fixtures/packs/illustration-demo`, three CC0 shapes drawn for the tests.
 
 Anything else you pass (a class, a style, an event handler, a ref) goes to the root `<svg>`. A
 class is added to `ichava-icon` rather than replacing it.
