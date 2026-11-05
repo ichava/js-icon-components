@@ -18,7 +18,7 @@ const NAMES = [
   'Circle', 'ClipPath', 'Defs', 'Ellipse', 'FeBlend', 'FeColorMatrix', 'FeComponentTransfer', 'FeComposite', 'FeConvolveMatrix',
   'FeDiffuseLighting', 'FeDisplacementMap', 'FeDropShadow', 'FeFlood', 'FeFuncA', 'FeFuncB', 'FeFuncG', 'FeFuncR', 'FeGaussianBlur',
   'FeMerge', 'FeMergeNode', 'FeMorphology', 'FeOffset', 'FeSpecularLighting', 'FeTile', 'FeTurbulence', 'Filter', 'G', 'Line',
-  'LinearGradient', 'Mask', 'Path', 'Pattern', 'Polygon', 'Polyline', 'RadialGradient', 'Rect', 'Stop', 'Symbol', 'Text',
+  'LinearGradient', 'Marker', 'Mask', 'Path', 'Pattern', 'Polygon', 'Polyline', 'RadialGradient', 'Rect', 'Stop', 'Symbol', 'Text',
   'TextPath', 'TSpan', 'Use',
 ] as const;
 
@@ -27,7 +27,7 @@ export const {
   Circle, ClipPath, Defs, Ellipse, FeBlend, FeColorMatrix, FeComponentTransfer, FeComposite, FeConvolveMatrix,
   FeDiffuseLighting, FeDisplacementMap, FeDropShadow, FeFlood, FeFuncA, FeFuncB, FeFuncG, FeFuncR, FeGaussianBlur,
   FeMerge, FeMergeNode, FeMorphology, FeOffset, FeSpecularLighting, FeTile, FeTurbulence, Filter, G, Line,
-  LinearGradient, Mask, Path, Pattern, Polygon, Polyline, RadialGradient, Rect, Stop, Symbol, Text,
+  LinearGradient, Marker, Mask, Path, Pattern, Polygon, Polyline, RadialGradient, Rect, Stop, Symbol, Text,
   TextPath, TSpan, Use,
 } = components;
 export default host('Svg');

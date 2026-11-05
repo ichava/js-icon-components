@@ -3,7 +3,7 @@ import Svg, {
   Circle, ClipPath, Defs, Ellipse, FeBlend, FeColorMatrix, FeComponentTransfer, FeComposite, FeConvolveMatrix,
   FeDiffuseLighting, FeDisplacementMap, FeDropShadow, FeFlood, FeFuncA, FeFuncB, FeFuncG, FeFuncR, FeGaussianBlur,
   FeMerge, FeMergeNode, FeMorphology, FeOffset, FeSpecularLighting, FeTile, FeTurbulence, Filter, G, Line,
-  LinearGradient, Mask, Path, Pattern, Polygon, Polyline, RadialGradient, Rect, Stop, Symbol as SvgSymbol, Text,
+  LinearGradient, Marker, Mask, Path, Pattern, Polygon, Polyline, RadialGradient, Rect, Stop, Symbol as SvgSymbol, Text,
   TextPath, TSpan, Use, type SvgProps,
 } from 'react-native-svg';
 import { rootAttributes, themed, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
@@ -25,7 +25,7 @@ export type NativeIchavaIcon = ForwardRefExoticComponent<NativeIconProps & RefAt
 
 /** Every element the SVG policy allows, by its react-native-svg component. `switch` renders as a group. */
 export const ELEMENTS: Readonly<Record<string, ComponentType<Record<string, unknown>>>> = {
-  svg: Svg, g: G, switch: G, defs: Defs, symbol: SvgSymbol, use: Use,
+  svg: Svg, g: G, switch: G, defs: Defs, symbol: SvgSymbol, marker: Marker, use: Use,
   path: Path, circle: Circle, ellipse: Ellipse, rect: Rect, line: Line, polyline: Polyline, polygon: Polygon,
   text: Text, tspan: TSpan, textPath: TextPath,
   linearGradient: LinearGradient, radialGradient: RadialGradient, stop: Stop, pattern: Pattern, mask: Mask, clipPath: ClipPath,

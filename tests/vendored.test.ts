@@ -12,7 +12,7 @@ import { ROOT } from './helpers.ts';
 const COPIES = [
   {
     file: 'vendor/svg-policy.json',
-    sha256: '7a7c07fdf4263c4d901b18f31955bde9fe797f3f135567ed6dddbddb64e1d705',
+    sha256: '49ee43cea254be2c1fcec2a1fdd37a097889df78466ffe6e9c2e653f65f8fd06',
     canonical: '../core/resources/security/svg-policy.json',
   },
   {
