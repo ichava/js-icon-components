@@ -19,7 +19,7 @@ let tgz: string;
 
 beforeAll(() => {
   const built = existsSync(join(ROOT, 'dist/manifest.json')) ? (JSON.parse(readFileSync(join(ROOT, 'dist/manifest.json'), 'utf8')) as Manifest) : undefined;
-  if (built === undefined || built.packs.length !== IDS.length || built.flavours.length !== 12 || built.assets?.length !== 6) {
+  if (built === undefined || built.packs.length !== IDS.length || built.flavours.length !== 12 || built.assets?.length !== 5) {
     throw new Error('dist/ is missing or was built selectively; run `npm run build` first');
   }
   tgz = packTarball(ROOT, work);
@@ -41,7 +41,7 @@ describe('the release tarball', () => {
 
   it('the checker refuses source, tests, a missing module and a required dependency', () => {
     const contents = readTarball(tgz);
-    const gone = ['dist/vue/packs/tabler.js', 'dist/elm/Ichava/Icons/Tabler.elm', 'dist/assets/tabler/png.zip'];
+    const gone = ['dist/vue/packs/tabler.js', 'dist/elm/Ichava/Icons/Tabler.elm', 'dist/assets/tabler/flutter.zip'];
     const files = [...contents.files.filter((f) => !gone.includes(f)), 'src/react/index.tsx', 'tests/react.test.ts'];
     const pkg = { ...contents.pkg, dependencies: { esbuild: '^0.28.0' } };
     expect(tarballProblems({ ...contents, files, pkg, packIds: IDS })).toEqual([
@@ -49,7 +49,7 @@ describe('the release tarball', () => {
       'ships tests/react.test.ts (nothing under tests/ belongs in the tarball)',
       'missing dist/vue/packs/tabler.js',
       'missing dist/elm/Ichava/Icons/Tabler.elm',
-      'missing dist/assets/tabler/png.zip',
+      'missing dist/assets/tabler/flutter.zip',
       'package.json declares dependencies; the tarball must install with nothing but the framework peers',
     ]);
   });
@@ -112,7 +112,7 @@ describe('the release tarball', () => {
         wc: Wc.id, angular: Angular.id, astro: Astro.id,
         native: typeof Native, solid: typeof Solid, qwik: typeof Qwik, ember: Ember.id,
         elm: existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/elm/Ichava/Icons/Tabler.elm'))),
-        assets: ['icons.css', 'data-uri.json', 'png.zip', 'flutter.zip', 'swiftui.zip', 'android-vd.zip', 'android-vd-skipped.json']
+        assets: ['icons.css', 'data-uri.json', 'flutter.zip', 'swiftui.zip', 'android-vd.zip', 'android-vd-skipped.json']
           .every((f) => existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/assets/tabler/' + f)))),
         flag: renderToStaticMarkup(createElement(IconKe)).slice(0, 4),
         emoji: renderToStaticMarkup(createElement(IconGrinningFace)).slice(0, 4),
@@ -120,7 +120,7 @@ describe('the release tarball', () => {
         svelte: existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/svelte/tabler')))
           && existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/svelte/tabler/IconMug.svelte'))),
       };
-      for (const tool of ['typescript', 'esbuild', '@angular/compiler-cli', '@astrojs/compiler-rs', 'svelte', 'content-tag', '@glimmer/compiler', '@resvg/resvg-js', 'elm']) {
+      for (const tool of ['typescript', 'esbuild', '@angular/compiler-cli', '@astrojs/compiler-rs', 'svelte', 'content-tag', '@glimmer/compiler', 'elm']) {
         try { import.meta.resolve(tool); out[tool] = 'present'; } catch { /* absent, as it must be */ }
       }
       console.log(JSON.stringify(out));

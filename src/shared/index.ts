@@ -96,7 +96,7 @@ export type AnyFlavour = Flavour | PendingFlavour | Tier3Flavour;
  * `dist/assets/<pack>/` rather than a module; the last three are the native targets
  * (`native: true` in the registry).
  */
-export const ASSET_TARGETS = ['css-mask', 'data-uri', 'png-zip', 'flutter', 'swiftui', 'android-vd'] as const;
+export const ASSET_TARGETS = ['css-mask', 'data-uri', 'flutter', 'swiftui', 'android-vd'] as const;
 export type AssetTarget = (typeof ASSET_TARGETS)[number];
 export const NATIVE_TARGETS = ['flutter', 'swiftui', 'android-vd'] as const satisfies readonly AssetTarget[];
 

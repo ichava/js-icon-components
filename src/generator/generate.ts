@@ -7,7 +7,7 @@ import { buildSync, transformSync } from 'esbuild';
 import { compile as compileSvelte } from 'svelte/compiler';
 import { compileScript, compileTemplate, parse as parseSfc } from 'vue/compiler-sfc';
 import { ALL_FLAVOURS, ASSET_TARGETS, PENDING_FLAVOURS, type AnyFlavour, type AssetTarget, type IconData, type IconTheme, type PendingFlavour } from '../shared/index.ts';
-import { androidZip, cssMask, dataUriMap, flutterZip, pngZip, PNG_SIZES, slugs, swiftuiZip } from './assets.ts';
+import { androidZip, cssMask, dataUriMap, flutterZip, slugs, swiftuiZip } from './assets.ts';
 import { elmModule } from './elm.ts';
 import type { ZipEntry } from './zip.ts';
 import { idPrefix, prefixIds } from './ids.ts';
@@ -491,7 +491,6 @@ function emitAssets(pack: PackConfig, icons: NamedIcon[], root: string, outDir: 
   const text = assetHeader(pack);
   if (assets.has('css-mask')) write(join(dir, 'icons.css'), cssMask(pack.id, icons, names, text));
   if (assets.has('data-uri')) write(join(dir, 'data-uri.json'), dataUriMap(icons, names));
-  if (assets.has('png-zip')) writeFileBuffer(join(dir, 'png.zip'), pngZip(icons, names, attribution));
   if (assets.has('flutter')) writeFileBuffer(join(dir, 'flutter.zip'), flutterZip(pack.id, icons, pack.sets, text, attribution));
   if (assets.has('swiftui')) writeFileBuffer(join(dir, 'swiftui.zip'), swiftuiZip(pack.id, icons, names, attribution));
   if (!assets.has('android-vd')) return undefined;
@@ -534,12 +533,6 @@ export function countAssets(outDir: string, packId: string, assets: readonly Ass
         return (readFileSync(join(dir, 'icons.css'), 'utf8').match(new RegExp(`^\\.i-${packId}-[a-z0-9-]+\\{`, 'gm')) ?? []).length;
       case 'data-uri':
         return Object.keys(JSON.parse(readFileSync(join(dir, 'data-uri.json'), 'utf8')) as object).length;
-      case 'png-zip': {
-        const pngs = entries('png.zip').filter((e) => e.endsWith('.png'));
-        const per = PNG_SIZES.map((size) => pngs.filter((e) => e.startsWith(`${size}/`)).length);
-        if (new Set(per).size !== 1) throw new Error(`${packId}: png.zip holds ${per.join('/')} PNGs at ${PNG_SIZES.join('/')} px`);
-        return per[0] as number;
-      }
       case 'flutter':
         return entries('flutter.zip').filter((e) => e.startsWith('assets/') && e.endsWith('.svg')).length;
       case 'swiftui':

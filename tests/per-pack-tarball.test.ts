@@ -86,14 +86,14 @@ describe('per-pack tarballs', () => {
           emoji: renderToStaticMarkup(createElement(IconGrinningFace)).slice(0, 4),
           data: KeData.id,
           flagCss: asset('@ichava/js-icon-components-flag/assets/flag/icons.css'),
-          emojiPng: asset('@ichava/js-icon-components-emoji/assets/emoji/png.zip'),
+          emojiDataUri: asset('@ichava/js-icon-components-emoji/assets/emoji/data-uri.json'),
           elm: asset('@ichava/js-icon-components-flag/elm/Ichava/Icons/Flag.elm'),
         }));
       `,
     );
     const r = spawnSync(process.execPath, ['probe.mjs'], { cwd: app, encoding: 'utf8' });
     expect(r.stderr).toBe('');
-    expect(JSON.parse(r.stdout)).toEqual({ flag: '<svg', emoji: '<svg', data: 'flag:4x3/ke', flagCss: true, emojiPng: true, elm: true });
+    expect(JSON.parse(r.stdout)).toEqual({ flag: '<svg', emoji: '<svg', data: 'flag:4x3/ke', flagCss: true, emojiDataUri: true, elm: true });
   });
 
   it('with one shared name, as before, the second install replaced the first', () => {

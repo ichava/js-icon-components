@@ -3,14 +3,14 @@ import { join } from 'node:path';
 import { JSDOM } from 'jsdom';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { parse as parseYaml } from 'yaml';
-import { cssMask, dataUriMap, isMonochrome, PNG_SIZES, slugs, standaloneSvg, svgDataUri } from '../src/generator/assets.ts';
+import { cssMask, dataUriMap, isMonochrome, slugs, standaloneSvg, svgDataUri } from '../src/generator/assets.ts';
 import { checkAssetCounts, countAssets, readPack, writeAssets, type NamedIcon } from '../src/generator/generate.ts';
 import { ASSET_TARGETS, type AssetTarget } from '../src/shared/index.ts';
 import { iconsFrom, pack, readZip, ROOT, SAMPLE } from './helpers.ts';
 
 /**
  * The asset exports. Golden output for three icons where the format is text, a structural check
- * for each format (CSS parses, the JSON is a map of data URIs, every PNG has the right size,
+ * for each format (CSS parses, the JSON is a map of data URIs,
  * pubspec parses as YAML and names paths that exist, every Contents.json uses only Apple's
  * documented keys), and the count guard over a real build of the flag pack, proven able to fail.
  */
@@ -67,26 +67,6 @@ describe('data-uri', () => {
       expect(uri).not.toContain('base64');
     }
     expect(map).toMatchSnapshot();
-  });
-});
-
-const pngSize = (png: Buffer): [number, number] => {
-  expect(png.subarray(1, 4).toString('latin1')).toBe('PNG');
-  return [png.readUInt32BE(16), png.readUInt32BE(20)];
-};
-
-describe('png-zip', () => {
-  it('holds every icon at every size, each PNG that width', () => {
-    const entries = readZip(asset('png.zip'));
-    const pngs = [...entries.keys()].filter((k) => k.endsWith('.png'));
-    const count = counts['png-zip'] as number;
-    expect(pngs).toHaveLength(count * PNG_SIZES.length);
-    for (const size of PNG_SIZES) {
-      const [w, h] = pngSize(entries.get(`${size}/ke.png`) as Buffer);
-      expect(w).toBe(size);
-      expect(h).toBe(Math.round((size * 3) / 4)); // the 4x3 flag keeps its aspect ratio
-    }
-    expect(entries.has('ATTRIBUTION.md')).toBe(true);
   });
 });
 

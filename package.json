@@ -1,7 +1,7 @@
 {
   "name": "@ichava/js-icon-components",
   "version": "0.1.0",
-  "description": "Generates React, Vue 3, Svelte 5, Web Component, React Native, Angular, SolidJS, Preact, Astro, Qwik, Ember and Elm icon components, plus CSS mask, data URI, PNG, Flutter, SwiftUI and Android VectorDrawable exports, from Ichava icon packs pinned at a git ref.",
+  "description": "Generates React, Vue 3, Svelte 5, Web Component, React Native, Angular, SolidJS, Preact, Astro, Qwik, Ember and Elm icon components, plus CSS mask, data URI, Flutter, SwiftUI and Android VectorDrawable exports, from Ichava icon packs pinned at a git ref.",
   "license": "MIT",
   "author": "Simtabi LLC <ichava@simtabi.com> (https://simtabi.com)",
   "homepage": "https://github.com/ichava/js-icon-components",
@@ -219,7 +219,6 @@
     "@eslint/js": "^10.0.1",
     "@glimmer/compiler": "^0.94.11",
     "@glimmer/env": "^0.1.7",
-    "@resvg/resvg-js": "^2.6.2",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",

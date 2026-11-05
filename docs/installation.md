@@ -76,9 +76,10 @@ final and never moves.
 Packs are `tabler`, `flag`, `emoji` and `openmoji`. Flavours are named by their subpath: `react`,
 `vue`, `svelte`, `wc`, `react-native`, `angular`, `solid`, `preact`, `astro`, `qwik`, `ember` and
 `elm` (the registry ids `webcomponent` and `reactNative` work too). The asset exports go in the same
-list, by registry id: `css-mask`, `data-uri`, `png-zip`, `flutter`, `swiftui` and `android-vd`.
+list, by registry id: `css-mask`, `data-uri`, `flutter`, `swiftui` and `android-vd`. There is no
+PNG export: `png-zip` was dropped with icon-browser's schema 1.7.0 (owner decision, 2026-11-04).
 Unset or empty means everything; a list builds exactly what it names, so `react` alone builds no
-export and `png-zip` alone builds no flavour. An unknown name fails the install, listing the valid
+export and `css-mask` alone builds no flavour. An unknown name fails the install, listing the valid
 ones. An Elm module or an export that was not built is simply absent: neither is a JavaScript module,
 so neither has a stand-in.
 
@@ -117,20 +118,20 @@ writes no `dist/` at all.
 ## Size and time
 
 Measured 2026-11-04 on an Apple-silicon laptop with Node 24.17 and npm 11.13, a warm npm cache,
-the four packs (17,365 icons), twelve flavours and six asset exports. Install times are wall-clock
+the four packs (17,365 icons), twelve flavours and five asset exports, after the PNG export was dropped. Install times are wall-clock
 for a fresh application, offline for a tarball and from GitHub for a git build; on disk is `du`, which is larger than the
 byte count because each small file takes at least one 4 KB block.
 
 | Install | Download | Unpacked | On disk | Files | Time |
 |---|---:|---:|---:|---:|---:|
-| Release tarball, full | 133.4 MB | 358.0 MB | 407 MB | 17,636 | 15 s |
-| Release tarball, `tabler` | 28.3 MB | 68.0 MB | 89 MB | 6,451 | 6 s |
-| Release tarball, `flag` | 10.9 MB | 33.9 MB | 35 MB | 722 | 2 s |
-| Release tarball, `emoji` | 40.0 MB | 91.5 MB | 101 MB | 3,615 | 4 s |
-| Release tarball, `openmoji` | 57.4 MB | 192.9 MB | 211 MB | 7,325 | 6 s |
-| Git, every pack, flavour and export | | | 408 MB | 17,636 | 59 s |
-| Git, `tabler` for `react,css-mask` | | | 18 MB | 166 | 31 s |
-| Git, `ICHAVA_ICONS_SKIP_BUILD=1` | | | 0 | 3 | 14 s |
+| Release tarball, full | 62.3 MB | 266.1 MB | 319 MB | 17,632 | 19 s |
+| Release tarball, `tabler` | 9.8 MB | 45.3 MB | 67 MB | 6,450 | 7 s |
+| Release tarball, `flag` | 9.2 MB | 31.8 MB | 32 MB | 721 | 2 s |
+| Release tarball, `emoji` | 16.8 MB | 65.8 MB | 75 MB | 3,614 | 4 s |
+| Release tarball, `openmoji` | 29.7 MB | 151.6 MB | 171 MB | 7,324 | 8 s |
+| Git, every pack, flavour and export | | | 319 MB | 17,632 | 69 s |
+| Git, `tabler` for `react,css-mask` | | | 17 MB | 166 | 24 s |
+| Git, `ICHAVA_ICONS_SKIP_BUILD=1` | | | 0 | 3 | 17 s |
 
 Before the Tier 3 flavours and the exports (0.1.0 as merged in #5), the full tarball was 7.0 MB to
 download and 64.2 MB unpacked. The exports are most of the difference, and they are already
@@ -140,13 +141,12 @@ compressed (the zips) or large text (the CSS and JSON), so gzip barely shrinks t
 |---|---:|---:|
 | CSS mask (`icons.css`) | 37.0 MB | 0.8 s |
 | Data URI (`data-uri.json`) | 36.5 MB | 0.8 s |
-| PNG (`png.zip`) | 92.1 MB | 14.3 s |
 | Flutter (`flutter.zip`) | 16.1 MB | 1.0 s |
 | SwiftUI (`swiftui.zip`) | 23.7 MB | 1.4 s |
-| Android (`android-vd.zip`) | 16.4 MB | 1.8 s |
+| Android (`android-vd.zip`) | 16.7 MB | 1.8 s |
 
 The whole build (`npm run build`: `tsc`, `ngc`, then the generator for every pack, flavour and
-export) takes 27 s, of which generation is 24 s; a git build that names only the flavours it uses
+export) takes about 15 s, of which generation is 11 to 12 s (27 s and 24 s while it still rasterised PNGs); a git build that names only the flavours it uses
 writes no export at all. About 14 seconds of every git install is npm installing the development
 dependencies in its temporary clone, which no selection avoids. None of this reaches an application bundle beyond the icons it imports.
 
