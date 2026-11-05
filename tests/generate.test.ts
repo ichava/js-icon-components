@@ -29,15 +29,15 @@ function inputCount(pack: PackConfig): number {
 }
 
 /** Measured 2026-11-04 at the pinned refs. A ref bump that changes a count updates this table. */
-const MEASURED: Record<string, number> = { tabler: 6257, flag: 542, emoji: 3435, openmoji: 8568 };
+const MEASURED: Record<string, number> = { tabler: 6257, flag: 542, twemoji: 3435, openmoji: 8568 };
 
 const PACKS = packs();
 const rows = PACKS.map((p) => [p.id, p] as const);
 
 describe('generation', () => {
   it('generates the four pinned packs, and none of the private ones', () => {
-    expect(PACKS.map((p) => p.id)).toEqual(['tabler', 'flag', 'emoji', 'openmoji']);
-    expect(manifest.packs.map((p) => p.id)).toEqual(['tabler', 'flag', 'emoji', 'openmoji']);
+    expect(PACKS.map((p) => p.id)).toEqual(['tabler', 'flag', 'twemoji', 'openmoji']);
+    expect(manifest.packs.map((p) => p.id)).toEqual(['tabler', 'flag', 'twemoji', 'openmoji']);
     for (const p of PACKS) expect(p.repository).not.toMatch(/icon-sets-(bundled|metronic)/);
   });
 
@@ -95,7 +95,7 @@ describe('attribution', () => {
   const ccPacks = PACKS.filter(needsAttribution);
 
   it('the CC-BY and CC-BY-SA packs are the two emoji packs', () => {
-    expect(ccPacks.map((p) => [p.id, p.licence])).toEqual([['emoji', 'CC-BY-4.0'], ['openmoji', 'CC-BY-SA-4.0']]);
+    expect(ccPacks.map((p) => [p.id, p.licence])).toEqual([['twemoji', 'CC-BY-4.0'], ['openmoji', 'CC-BY-SA-4.0']]);
   });
 
   it.each(PACKS.flatMap((p) => resolveAttribution(p, ROOT).flatMap((file) => ATTRIBUTION_DIRS.map((dir) => [p.id, dir, p.id, file.split('/').pop() as string] as const))))(
@@ -121,7 +121,7 @@ describe('attribution', () => {
 
   it('refuses a CC pack that lists no attribution files', () => {
     const file = join(CACHE, 'packs-no-attribution.json');
-    const emoji = PACKS.find((p) => p.id === 'emoji');
+    const emoji = PACKS.find((p) => p.id === 'twemoji');
     execFileSync('mkdir', ['-p', CACHE]);
     execFileSync('node', ['-e', `require('fs').writeFileSync(${JSON.stringify(file)}, JSON.stringify({ packs: [${JSON.stringify({ ...emoji, attribution: [] })}] }))`]);
     expect(() => loadPacks(file)).toThrow(/must list its attribution files/);

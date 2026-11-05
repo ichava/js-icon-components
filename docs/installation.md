@@ -76,7 +76,7 @@ reproducible installs; after it, pin the tag, which is final and never moves.
 | `ICHAVA_ICONS_FLAVOURS=react,css-mask` | `"flavours": ["react", "css-mask"]` | builds only those flavours and exports |
 | `ICHAVA_ICONS_SKIP_BUILD=1` | `"skipBuild": true` | builds nothing |
 
-Packs are `tabler`, `flag`, `emoji` and `openmoji`. Flavours are named by their subpath: `react`,
+Packs are `tabler`, `flag`, `twemoji` and `openmoji`. Flavours are named by their subpath: `react`,
 `vue`, `svelte`, `wc`, `react-native`, `angular`, `solid`, `preact`, `astro`, `qwik`, `ember` and
 `elm` (the registry ids `webcomponent` and `reactNative` work too). The asset exports go in the same
 list, by registry id: `css-mask`, `data-uri`, `flutter` and `swiftui`. The ichava icon ecosystem is
@@ -132,7 +132,7 @@ byte count because each small file takes at least one 4 KB block.
 | Release tarball, full | 49.6 MB | 249.4 MB | 303 MB | 17,622 | 12 s |
 | Release tarball, `tabler` | 7.6 MB | 42.1 MB | 64 MB | 6,446 | 6 s |
 | Release tarball, `flag` | 8.6 MB | 31.2 MB | 32 MB | 717 | 2 s |
-| Release tarball, `emoji` | 13.1 MB | 61.1 MB | 72 MB | 3,610 | 4 s |
+| Release tarball, `twemoji` | 13.1 MB | 61.1 MB | 72 MB | 3,610 | 4 s |
 | Release tarball, `openmoji` | 23.5 MB | 143.2 MB | 164 MB | 7,320 | 6 s |
 | Git, every pack, flavour and export | | | 303 MB | 17,622 | 69 s |
 | Git, `tabler` for `react,css-mask` | | | 17 MB | 166 | 24 s |

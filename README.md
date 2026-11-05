@@ -51,10 +51,10 @@ An import of a pack or flavour that was not built throws, naming the variable th
 ### Getting started
 
 Nothing to configure. Import the flavour you use and the pack you want (`tabler`, `flag`,
-`emoji` or `openmoji`); the frameworks are optional peers, so only the one you import has to be
+`twemoji` or `openmoji`); the frameworks are optional peers, so only the one you import has to be
 installed. Exports are tree-shakeable, so a bundle carries the icons it imports and nothing else.
 
-Twemoji (`emoji`) is CC-BY 4.0 and OpenMoji (`openmoji`) is CC-BY-SA 4.0: an application that ships
+Twemoji (`twemoji`) is CC-BY 4.0 and OpenMoji (`openmoji`) is CC-BY-SA 4.0: an application that ships
 them takes on their attribution terms. Each pack's `ATTRIBUTION.md` ships at
 `dist/<flavour>/<pack>/`; see [Packs](docs/packs.md).
 
@@ -73,7 +73,7 @@ Flags and emoji keep their own colours:
 
 ```tsx
 import { IconKe } from '@ichava/js-icon-components/react/flag';
-import { IconGrinningFace } from '@ichava/js-icon-components/react/emoji';
+import { IconGrinningFace } from '@ichava/js-icon-components/react/twemoji';
 
 <IconKe size={32} title="Kenya" />
 <IconGrinningFace size={24} />

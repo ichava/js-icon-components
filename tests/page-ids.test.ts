@@ -40,7 +40,7 @@ describe('ids on a page', () => {
   });
 
   it('icons from different packs share no id', async () => {
-    const icons = [...iconsFrom('openmoji', ['IconGrinningFace']), ...iconsFrom('flag', ['IconKe', 'IconKe1x1']), ...iconsFrom('emoji', ['IconRainbow'])];
+    const icons = [...iconsFrom('openmoji', ['IconGrinningFace']), ...iconsFrom('flag', ['IconKe', 'IconKe1x1']), ...iconsFrom('twemoji', ['IconRainbow'])];
     const ids = idsOn(await page(icons));
     expect(ids.length).toBeGreaterThanOrEqual(6);
     expect(duplicates(ids)).toEqual([]);
@@ -57,7 +57,7 @@ describe('ids across every pinned pack', () => {
   const all = packs().map((p) => [p.id, readPack(p, ROOT)] as const);
 
   it('read every pack', () => {
-    expect(all.map(([id]) => id)).toEqual(['tabler', 'flag', 'emoji', 'openmoji']);
+    expect(all.map(([id]) => id)).toEqual(['tabler', 'flag', 'twemoji', 'openmoji']);
   });
 
   it.each(all)('%s: no id is used by two icons, and every id carries its icon\'s prefix', (_id, icons) => {
@@ -73,8 +73,8 @@ describe('ids across every pinned pack', () => {
         owner.set(id, data.id);
       }
     }
-    // Measured 2026-11-04 at the pinned refs: tabler 0, flag 1,155, emoji 14, openmoji 26,314.
-    expect(seen).toBeGreaterThanOrEqual({ tabler: 0, flag: 1100, emoji: 14, openmoji: 26000 }[_id] as number);
+    // Measured 2026-11-04 at the pinned refs: tabler 0, flag 1,155, twemoji 14, openmoji 26,314.
+    expect(seen).toBeGreaterThanOrEqual({ tabler: 0, flag: 1100, twemoji: 14, openmoji: 26000 }[_id] as number);
     if (_id === 'tabler') expect(seen).toBe(0);
   });
 

@@ -26,11 +26,11 @@
       "licence": "MIT"
     },
     {
-      "id": "emoji",
-      "$comment": "Twemoji, the pack's only set since ichava/icon-sets-emoji#99 moved OpenMoji to ichava/icon-sets-openmoji, which the openmoji entry generates. It has one licence file (licenses/twemoji/license), so the attribution convention needs no explicit list.",
-      "repository": "https://github.com/ichava/icon-sets-emoji.git",
-      "ref": "eed0ae90540541f62988e1b4222cef9f9326e013",
-      "checkout": "../icon-sets-emoji",
+      "id": "twemoji",
+      "$comment": "Twemoji, the pack's only set since ichava/icon-sets-twemoji#99 moved OpenMoji to ichava/icon-sets-openmoji, which the openmoji entry generates. It has one licence file (licenses/twemoji/license), so the attribution convention needs no explicit list.",
+      "repository": "https://github.com/ichava/icon-sets-twemoji.git",
+      "ref": "48f232c7cc5e30a3cff338c62c7c8cf997dbfafa",
+      "checkout": "../icon-sets-twemoji",
       "path": "resources/assets/svg/files",
       "sets": ["twemoji"],
       "defaultSet": "twemoji",

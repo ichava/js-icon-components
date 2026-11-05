@@ -15,7 +15,7 @@
 
 ```tsx
 import { IconMug } from '@ichava/js-icon-components/solid/tabler';
-import { IconGrinningFace } from '@ichava/js-icon-components/solid/emoji';
+import { IconGrinningFace } from '@ichava/js-icon-components/solid/twemoji';
 
 <IconMug size={20} color="#7c3aed" strokeWidth={1.5} title="Coffee" class="me-2" />
 <IconGrinningFace size={24} />
