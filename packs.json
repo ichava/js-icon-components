@@ -17,7 +17,7 @@
     {
       "id": "flag",
       "repository": "https://github.com/ichava/icon-sets-flag.git",
-      "ref": "67075d3f8d41e9d95635200e91ba8f8135feeb34",
+      "ref": "2d7b51ce0edfa1854c43a36e2a6ede6ff4782052",
       "checkout": "../icon-sets-flag",
       "path": "resources/assets/svg/files",
       "sets": ["4x3", "1x1"],

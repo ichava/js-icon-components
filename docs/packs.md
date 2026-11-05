@@ -7,7 +7,7 @@ Four packs are generated, each read from git at a pinned commit and each keeping
 | Pack | Repository | Commit | Sets (default first) | Icons | Artwork licence |
 |---|---|---|---|---:|---|
 | `tabler` | `ichava/icon-sets-tabler` | `10a5f39c` | `outline`, `filled` | 6,257 | MIT |
-| `flag` | `ichava/icon-sets-flag` | `67075d3f` | `4x3`, `1x1` | 542 | MIT |
+| `flag` | `ichava/icon-sets-flag` | `2d7b51ce` | `4x3`, `1x1` | 542 | MIT |
 | `emoji` | `ichava/icon-sets-emoji` | `833f11fb` | `twemoji` | 3,435 | CC-BY-4.0 |
 | `openmoji` | `ichava/icon-sets-openmoji` | `d492519e` | `openmoji-color`, `openmoji-black` | 7,131 | CC-BY-SA-4.0 |
 

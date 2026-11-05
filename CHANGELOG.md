@@ -14,6 +14,7 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ### Changed
 
+- **The flag pack is pinned at `2d7b51ce`** (ichava/icon-sets-flag#94), up from `67075d3f`, so the generated US and UM flags carry their stars: the four `us`/`um` icons now hold the `<marker>` and its `marker-mid` reference, which the sanitiser accepts since ichava/js-icon-components#9. Still 542 icons. `docs/packs.md` names the commit.
 - **Each per-pack release tarball is its own package**, `@ichava/js-icon-components-<pack>`, with the same subpath exports; the full tarball keeps `@ichava/js-icon-components`. They used to share the full package's name, so npm kept only one: installing a second replaced the first. Imports from a per-pack tarball now name it (`@ichava/js-icon-components-tabler/react/tabler`). The tarball checker refuses a per-pack tarball with the shared name.
 - The full release tarball is 49.6 MB to download and 249.4 MB unpacked (was 7.0 MB and 64.2 MB), almost all of it the asset exports, and installs offline in about 12 s. Per-pack tarballs are 7.6 to 23.5 MB (measured 2026-11-04, after the PNG and Android VectorDrawable exports were dropped; with both the full tarball was 133.4 MB and 358 MB, and with the Android export alone 62.3 MB and 266.1 MB). A git build that lists only its flavours writes no export.
 - `manifest.json` gains `assets`, `unbuilt.assets` and, per pack, `assets` and `variants`.
