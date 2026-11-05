@@ -6,17 +6,17 @@ Four packs are generated, each read from git at a pinned commit and each keeping
 
 | Pack | Repository | Commit | Sets (default first) | Icons | Artwork licence |
 |---|---|---|---|---:|---|
-| `tabler` | `ichava/icon-sets-tabler` | `98b4b8ca` | `outline`, `filled` | 6,257 | MIT |
-| `flag` | `ichava/icon-sets-flag` | `6e995e95` | `4x3`, `1x1` | 542 | MIT |
-| `twemoji` | `ichava/icon-sets-twemoji` | `48f232c7` | `twemoji` | 3,435 | CC-BY-4.0 |
-| `openmoji` | `ichava/icon-sets-openmoji` | `8e51250f` | `openmoji-color`, `openmoji-black` | 8,568 | CC-BY-SA-4.0 |
+| `tabler` | `ichava/icon-sets-tabler` | `eddbd69f` | `outline`, `filled` | 6,257 | MIT |
+| `flag` | `ichava/icon-sets-flag` | `5acfe40c` | `4x3`, `1x1` | 542 | MIT |
+| `twemoji` | `ichava/icon-sets-twemoji` | `b0d686fb` | `twemoji` | 3,435 | CC-BY-4.0 |
+| `openmoji` | `ichava/icon-sets-openmoji` | `4c06bb6e` | `openmoji-color`, `openmoji-black` | 8,568 | CC-BY-SA-4.0 |
 
 Counts are measured at those commits on 2026-11-05: 18,802 icons in all. `packs.json` holds the full SHAs.
 
 - **`twemoji` is Twemoji only**, as `icon-sets-twemoji` itself is since icon-sets-twemoji#99, which
   moved the two OpenMoji sets to `icon-sets-openmoji`.
 - **`openmoji` includes `uncategorised/`**, the OpenMoji extras the Unicode taxonomy does not name,
-  511 per set at `8e51250f`, under their upstream file names.
+  511 per set at `4c06bb6e`, under their upstream file names.
 - **Not generated:** the private packs. A public package cannot ship them.
 
 ## Export names

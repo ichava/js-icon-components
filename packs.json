@@ -4,7 +4,7 @@
     {
       "id": "tabler",
       "repository": "https://github.com/ichava/icon-sets-tabler.git",
-      "ref": "98b4b8ca7501307683c6969cbcdcfb074b7f4e03",
+      "ref": "eddbd69fe8d112b9b525d66edfc33582062abdb2",
       "checkout": "../icon-sets-tabler",
       "path": "resources/assets/svg/files",
       "sets": ["outline", "filled"],
@@ -16,7 +16,7 @@
     {
       "id": "flag",
       "repository": "https://github.com/ichava/icon-sets-flag.git",
-      "ref": "6e995e952d5b4096736b1990aeae4375f927a8df",
+      "ref": "5acfe40c3ef85d5be4a5ed6f4a4530f21c4be9b2",
       "checkout": "../icon-sets-flag",
       "path": "resources/assets/svg/files",
       "sets": ["4x3", "1x1"],
@@ -29,7 +29,7 @@
       "id": "twemoji",
       "$comment": "Twemoji, the pack's only set since ichava/icon-sets-twemoji#99 moved OpenMoji to ichava/icon-sets-openmoji, which the openmoji entry generates. It has one licence file (licenses/twemoji/license), so the attribution convention needs no explicit list.",
       "repository": "https://github.com/ichava/icon-sets-twemoji.git",
-      "ref": "48f232c7cc5e30a3cff338c62c7c8cf997dbfafa",
+      "ref": "b0d686fb100e0adc1dc1326696a386e8020644fc",
       "checkout": "../icon-sets-twemoji",
       "path": "resources/assets/svg/files",
       "sets": ["twemoji"],
@@ -42,7 +42,7 @@
     {
       "id": "openmoji",
       "repository": "https://github.com/ichava/icon-sets-openmoji.git",
-      "ref": "8e51250f72ad98566c67e91c44131a40ce537f50",
+      "ref": "4c06bb6e662820a1185b217bdeb9d73f7d283983",
       "checkout": "../icon-sets-openmoji",
       "path": "resources/assets/svg/files",
       "sets": ["openmoji-color", "openmoji-black"],
