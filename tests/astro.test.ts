@@ -79,7 +79,7 @@ describe('Astro flavour', () => {
 
   it('renders nested elements, references and case-sensitive SVG names', async () => {
     const [ke] = iconsFrom('flag', ['IconKe']);
-    const [rainbow] = iconsFrom('emoji', ['IconRainbow']);
+    const [rainbow] = iconsFrom('twemoji', ['IconRainbow']);
     const flag = await render(ke!);
     expect(flag).toContain('<defs><path id="flag_4x3_ke_ke-a"');
     expect(flag).toMatch(/xlink:href="#flag_4x3_ke_ke-a"/);

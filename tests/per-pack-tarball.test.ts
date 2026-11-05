@@ -14,7 +14,7 @@ import { packs, ROOT } from './helpers.ts';
  * own package name, the second install replaced the first: npm keeps one package per name.
  */
 const IDS = packs().map((p) => p.id);
-const PAIR = ['flag', 'emoji'] as const;
+const PAIR = ['flag', 'twemoji'] as const;
 const work = mkdtempSync(join(tmpdir(), 'ichava-per-pack-'));
 const tarballs: Record<string, string> = {};
 
@@ -64,10 +64,10 @@ describe('per-pack tarballs', () => {
     const app = join(work, 'app');
     mkdirSync(app);
     writeFileSync(join(app, 'package.json'), JSON.stringify({ name: 'app', private: true, type: 'module' }));
-    execFileSync('npm', ['install', '--offline', '--no-audit', '--no-fund', '--no-package-lock', tarballs.flag as string, tarballs.emoji as string], { cwd: app, stdio: 'ignore' });
+    execFileSync('npm', ['install', '--offline', '--no-audit', '--no-fund', '--no-package-lock', tarballs.flag as string, tarballs.twemoji as string], { cwd: app, stdio: 'ignore' });
 
     const modules = join(app, 'node_modules');
-    expect(readdirSync(join(modules, '@ichava')).sort()).toEqual(['js-icon-components-emoji', 'js-icon-components-flag']);
+    expect(readdirSync(join(modules, '@ichava')).sort()).toEqual(['js-icon-components-flag', 'js-icon-components-twemoji']);
     for (const peer of ['react', 'react-dom']) symlinkSync(join(ROOT, 'node_modules', peer), join(modules, peer));
 
     writeFileSync(
@@ -76,24 +76,24 @@ describe('per-pack tarballs', () => {
         import { createElement } from 'react';
         import { renderToStaticMarkup } from 'react-dom/server';
         import { IconKe } from '@ichava/js-icon-components-flag/react/flag';
-        import { IconGrinningFace } from '@ichava/js-icon-components-emoji/react/emoji';
+        import { IconGrinningFace } from '@ichava/js-icon-components-twemoji/react/twemoji';
         import { IconKe as KeData } from '@ichava/js-icon-components-flag/data/flag';
         import { existsSync } from 'node:fs';
         import { fileURLToPath } from 'node:url';
         const asset = (spec) => existsSync(fileURLToPath(import.meta.resolve(spec)));
         console.log(JSON.stringify({
           flag: renderToStaticMarkup(createElement(IconKe)).slice(0, 4),
-          emoji: renderToStaticMarkup(createElement(IconGrinningFace)).slice(0, 4),
+          twemoji: renderToStaticMarkup(createElement(IconGrinningFace)).slice(0, 4),
           data: KeData.id,
           flagCss: asset('@ichava/js-icon-components-flag/assets/flag/icons.css'),
-          emojiDataUri: asset('@ichava/js-icon-components-emoji/assets/emoji/data-uri.json'),
+          twemojiDataUri: asset('@ichava/js-icon-components-twemoji/assets/twemoji/data-uri.json'),
           elm: asset('@ichava/js-icon-components-flag/elm/Ichava/Icons/Flag.elm'),
         }));
       `,
     );
     const r = spawnSync(process.execPath, ['probe.mjs'], { cwd: app, encoding: 'utf8' });
     expect(r.stderr).toBe('');
-    expect(JSON.parse(r.stdout)).toEqual({ flag: '<svg', emoji: '<svg', data: 'flag:4x3/ke', flagCss: true, emojiDataUri: true, elm: true });
+    expect(JSON.parse(r.stdout)).toEqual({ flag: '<svg', twemoji: '<svg', data: 'flag:4x3/ke', flagCss: true, twemojiDataUri: true, elm: true });
   });
 
   it('with one shared name, as before, the second install replaced the first', () => {
@@ -112,7 +112,7 @@ describe('per-pack tarballs', () => {
     for (const tgz of renamed) execFileSync('npm', ['install', '--offline', '--no-audit', '--no-fund', '--no-package-lock', tgz], { cwd: app, stdio: 'ignore' });
     const installed = join(app, 'node_modules/@ichava/js-icon-components');
     expect(readdirSync(join(app, 'node_modules/@ichava'))).toEqual(['js-icon-components']);
-    expect(existsSync(join(installed, 'dist/assets/emoji'))).toBe(true);
+    expect(existsSync(join(installed, 'dist/assets/twemoji'))).toBe(true);
     expect(existsSync(join(installed, 'dist/assets/flag'))).toBe(false);
   });
 });

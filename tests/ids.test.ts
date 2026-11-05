@@ -20,7 +20,7 @@ describe('per-icon id prefixing', () => {
     expect(idPrefix('openmoji', 'openmoji-color', 'grinning-face')).toBe('openmoji_openmoji-color_grinning-face_');
     expect(idPrefix('flag', '4x3', 'ke')).toBe('flag_4x3_ke_');
     // Characters outside [A-Za-z0-9-] become "-", so "_" stays a separator nothing else can contain.
-    expect(idPrefix('emoji', 'twemoji', 'a_b.c')).toBe('emoji_twemoji_a-b-c_');
+    expect(idPrefix('twemoji', 'twemoji', 'a_b.c')).toBe('twemoji_twemoji_a-b-c_');
   });
 
   it('rewrites every id and every reference to it', () => {

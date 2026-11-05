@@ -26,7 +26,7 @@ const PAINT = /\b(fill|stroke|stop-color|flood-color|lighting-color|color)\s*[=:
 /** Every colour literal in paint position, in document order, lowercased. Root `color` from props is excluded by not passing it. */
 const colours = (svg: string): string[] => [...svg.matchAll(PAINT)].map((m) => (m[2] as string).toLowerCase().replace(/\s+/g, ''));
 
-const COLOUR_PACKS = ['flag', 'emoji', 'openmoji'] as const;
+const COLOUR_PACKS = ['flag', 'twemoji', 'openmoji'] as const;
 
 describe('multi-colour icons keep their colours', () => {
   it.each(COLOUR_PACKS)('%s: every multi-colour icon renders every source colour', async (id) => {
@@ -45,12 +45,12 @@ describe('multi-colour icons keep their colours', () => {
       expect(colours(renderToStaticMarkup(createElement(createIcon(data)))), data.id).toEqual(expected);
     }
     // Floors, measured 2026-11-04 a little under the real counts, so a matcher that stops matching fails.
-    expect(checked).toBeGreaterThan({ flag: 500, emoji: 3000, openmoji: 3000 }[id]);
+    expect(checked).toBeGreaterThan({ flag: 500, twemoji: 3000, openmoji: 3000 }[id]);
   });
 
   it('renders three multi-colour icons', async () => {
     const { createIcon } = await flavour();
-    const icons = [...iconsFrom('emoji', ['IconRainbow']), ...iconsFrom('openmoji', ['IconRainbow']), ...iconsFrom('flag', ['IconKe'])];
+    const icons = [...iconsFrom('twemoji', ['IconRainbow']), ...iconsFrom('openmoji', ['IconRainbow']), ...iconsFrom('flag', ['IconKe'])];
     const html = icons.map((icon) => renderToStaticMarkup(createElement(createIcon(icon), { size: 48 })));
     for (const markup of html) expect(new Set(colours(markup)).size).toBeGreaterThanOrEqual(3);
     expect(html).toMatchSnapshot();

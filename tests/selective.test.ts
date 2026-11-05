@@ -57,7 +57,7 @@ describe('selection', () => {
   });
 
   it('refuses an unknown pack or flavour, naming the variable and the valid names', () => {
-    expect(() => parseSelection({ packs: 'tabler,metronic' }, IDS)).toThrow(/ICHAVA_ICONS_PACKS: unknown pack "metronic"\. The packs are tabler, flag, emoji, openmoji/);
+    expect(() => parseSelection({ packs: 'tabler,metronic' }, IDS)).toThrow(/ICHAVA_ICONS_PACKS: unknown pack "metronic"\. The packs are tabler, flag, twemoji, openmoji/);
     expect(() => parseSelection({ flavours: 'jquery' }, IDS)).toThrow(/ICHAVA_ICONS_FLAVOURS: unknown flavour "jquery"\. The flavours are react, vue, svelte, wc,/);
   });
 
@@ -71,7 +71,7 @@ describe('a selective build (flag, react)', () => {
   it('records what it built and what it left out', () => {
     expect(manifest.packs.map((p) => p.id)).toEqual(['flag']);
     expect(manifest.flavours).toEqual(['react']);
-    expect(manifest.unbuilt).toEqual({ packs: ['tabler', 'emoji', 'openmoji'], flavours: ALL_FLAVOURS.filter((f) => f !== 'react'), assets: [...ASSET_TARGETS] });
+    expect(manifest.unbuilt).toEqual({ packs: ['tabler', 'twemoji', 'openmoji'], flavours: ALL_FLAVOURS.filter((f) => f !== 'react'), assets: [...ASSET_TARGETS] });
     expect(manifest.assets).toEqual([]);
   });
 
@@ -96,7 +96,7 @@ describe('a selective build (flag, react)', () => {
     }
     expect(existsSync(join(out, 'vue/flag'))).toBe(false);
     expect(existsSync(join(out, 'assets'))).toBe(false);
-    for (const id of ['tabler', 'emoji', 'openmoji']) expect(statSync(join(out, `data/${id}.js`)).size).toBeLessThan(400_000);
+    for (const id of ['tabler', 'twemoji', 'openmoji']) expect(statSync(join(out, `data/${id}.js`)).size).toBeLessThan(400_000);
   });
 
   it('an unbuilt pack throws on a named import, naming ICHAVA_ICONS_PACKS', () => {
@@ -115,7 +115,7 @@ describe('a selective build (flag, react)', () => {
 
   it("an unbuilt flavour's entry point and an unbuilt pack's data throw too", () => {
     expect(importIn('vue/index.js', 'defineIcon').stderr).toContain('ICHAVA_ICONS_FLAVOURS=react,vue');
-    expect(importIn('svelte/packs/emoji/index.js', 'IconGrinningFace').stderr).toContain('ICHAVA_ICONS_PACKS=flag,emoji and ICHAVA_ICONS_FLAVOURS=react,svelte');
+    expect(importIn('svelte/packs/twemoji/index.js', 'IconGrinningFace').stderr).toContain('ICHAVA_ICONS_PACKS=flag,twemoji and ICHAVA_ICONS_FLAVOURS=react,svelte');
     expect(importIn('data/openmoji.js', 'IconGrinningFace').stderr).toContain('the "openmoji" pack was not built');
   });
 

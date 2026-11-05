@@ -102,7 +102,7 @@ describe('the release tarball', () => {
       import { IconMug as Qwik } from '@ichava/js-icon-components/qwik/tabler';
       import { IconMug as Ember } from '@ichava/js-icon-components/ember/tabler';
       import { IconKe } from '@ichava/js-icon-components/react/flag';
-      import { IconGrinningFace } from '@ichava/js-icon-components/react/emoji';
+      import { IconGrinningFace } from '@ichava/js-icon-components/react/twemoji';
       import { existsSync } from 'node:fs';
       import { fileURLToPath } from 'node:url';
       const out = {
@@ -116,7 +116,7 @@ describe('the release tarball', () => {
         assets: ['icons.css', 'data-uri.json', 'flutter.zip', 'swiftui.zip']
           .every((f) => existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/assets/tabler/' + f)))),
         flag: renderToStaticMarkup(createElement(IconKe)).slice(0, 4),
-        emoji: renderToStaticMarkup(createElement(IconGrinningFace)).slice(0, 4),
+        twemoji: renderToStaticMarkup(createElement(IconGrinningFace)).slice(0, 4),
         // Svelte ships .svelte source, compiled by the application's own Svelte.
         svelte: existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/svelte/tabler')))
           && existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/svelte/tabler/IconMug.svelte'))),
@@ -144,7 +144,7 @@ describe('the release tarball', () => {
       elm: true,
       assets: true,
       flag: '<svg',
-      emoji: '<svg',
+      twemoji: '<svg',
       svelte: true,
     });
   });
