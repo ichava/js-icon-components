@@ -35,7 +35,6 @@ export const FLAVOUR_DIRS = {
 export const ASSET_FILES = {
   'css-mask': ['icons.css'],
   'data-uri': ['data-uri.json'],
-  'png-zip': ['png.zip'],
   flutter: ['flutter.zip'],
   swiftui: ['swiftui.zip'],
   'android-vd': ['android-vd.zip', 'android-vd-skipped.json'],

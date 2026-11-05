@@ -85,7 +85,7 @@ with no attribution files is refused when `packs.json` loads.
 | No id repeats on a page holding two icons from one pack, or from two packs; every id carries its icon's prefix; prefixing breaks no reference | `tests/page-ids.test.ts`, `tests/ids.test.ts` |
 | Every multi-colour flag and emoji renders every source colour, in order; three are snapshotted | `tests/colours.test.ts` |
 | Attribution and licence files ship beside every flavour of every pack, and name the CC licence | `tests/generate.test.ts` |
-| All 27 formats in icon-browser's registry are read; every `generated` and `asset` one is written here (twelve flavours, six exports), nothing `laravel` or `client` is claimed, and the reverse | `tests/registry.test.ts` |
+| All 26 formats in icon-browser's registry are read; every `generated` and `asset` one is written here (twelve flavours, five exports), nothing `laravel` or `client` is claimed, and the reverse | `tests/registry.test.ts` |
 | Every asset export holds every icon (Android: written plus listed as skipped), counted from the files | `tests/assets.test.ts`, the build itself |
 | Every Android drawable is well-formed and uses only VectorDrawable's names; refusals name the construct | `tests/vectordrawable.test.ts` |
 | Two per-pack tarballs install side by side and both import | `tests/per-pack-tarball.test.ts` |
@@ -138,8 +138,8 @@ the generator writes them through `PENDING_OUTPUTS`.
 ## Tier 3 flavours and the exports
 
 Qwik (`qwik`), Ember (`ember`) and Elm (`elm`) are generated, counted and tested like the others;
-icon-browser lists them since schema 1.6.0, with the six asset exports (`css-mask`, `data-uri`,
-`png-zip`, and the native `flutter`, `swiftui` and `android-vd`). An export writes files under
+icon-browser lists them since schema 1.6.0, with the asset exports (`css-mask`, `data-uri`, and
+the native `flutter`, `swiftui` and `android-vd`; `png-zip` was dropped in schema 1.7.0). An export writes files under
 `dist/assets/<pack>/` from the same parsed, policy-checked tree every flavour renders, and is chosen
 in the same `ICHAVA_ICONS_FLAVOURS` list as the flavours.
 
@@ -149,7 +149,6 @@ in the same `ICHAVA_ICONS_FLAVOURS` list as the flavours.
 | Ember | content-tag and the Glimmer precompiler, at build and in the test | the helper's markup, parsed back in jsdom (no Ember app is booted) |
 | Elm | `elm make`, in the test | the compiled program, run in jsdom |
 | CSS mask, data URI | | golden output; parsed as CSS; a break-out attempt stays inside `url("…")` |
-| PNG | resvg (`@resvg/resvg-js`, development only) | every PNG's header gives the right size |
 | Flutter | | `pubspec.fragment.yaml` parsed as YAML; every Dart path exists |
 | SwiftUI | | every `Contents.json` against Apple's documented keys |
 | Android | `src/native/vectordrawable.ts` | golden XML; every drawable parsed as XML with VectorDrawable's names |

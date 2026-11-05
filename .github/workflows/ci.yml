@@ -23,8 +23,9 @@ jobs:
   test:
     name: Typecheck, test, build & generate (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
-    # 20, up from 15: the build now writes six asset exports (24 s locally, most of it PNG)
-    # and the tests run elm make and pack two per-pack tarballs.
+    # 20, up from 15 when the build wrote six asset exports including PNG. Without PNG it is
+    # about 15 s locally (generation 11 to 12 s), and the tests still run elm make and pack two
+    # per-pack tarballs, so the ceiling stays.
     timeout-minutes: 20
     # Drafts run nothing: CI starts when the pull request is marked ready.
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
@@ -73,7 +74,7 @@ jobs:
           node -e '
             const m = require("./dist/manifest.json");
             if (m.packs.length === 0) { console.error("::error::manifest lists no packs"); process.exit(1); }
-            if (m.flavours.length !== 12 || m.assets.length !== 6) { console.error(`::error::built ${m.flavours.length} flavours and ${m.assets.length} asset exports`); process.exit(1); }
+            if (m.flavours.length !== 12 || m.assets.length !== 5) { console.error(`::error::built ${m.flavours.length} flavours and ${m.assets.length} asset exports`); process.exit(1); }
             for (const p of m.packs) {
               const expected = p.inputs - p.excluded.length - (p.variants ?? 0);
               for (const f of m.flavours) {

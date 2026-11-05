@@ -1,4 +1,3 @@
-import { Resvg } from '@resvg/resvg-js';
 import { serialiseSvg, SVG_NS, type AssetTarget, type IconChild, type IconData } from '../shared/index.ts';
 import { toVectorDrawable, VdUnsupported } from '../native/vectordrawable.ts';
 import { elmModuleSegment } from './elm.ts';
@@ -12,19 +11,15 @@ import { zip, type ZipEntry } from './zip.ts';
  *
  *   css-mask    icons.css         one `.i-<pack>-<slug>` class per icon (mask-image, data URI)
  *   data-uri    data-uri.json     { "<slug>": "data:image/svg+xml,…" }
- *   png-zip     png.zip           <size>/<slug>.png at 16, 24, 32, 48 and 64 px
  *   flutter     flutter.zip       assets/ichava/<pack>/<set>/<name>.svg, lib/ichava_<pack>_icons.dart, pubspec.fragment.yaml
  *   swiftui     swiftui.zip       Ichava<Pack>.xcassets with one imageset per icon
  *   android-vd  android-vd.zip    res/drawable/ichava_<pack>_<slug>.xml, plus android-vd-skipped.json
  */
 
-export const PNG_SIZES = [16, 24, 32, 48, 64] as const;
-
 /** Where each target writes, relative to `dist/assets/<pack>/`. */
 export const ASSET_FILES: Readonly<Record<AssetTarget, readonly string[]>> = {
   'css-mask': ['icons.css'],
   'data-uri': ['data-uri.json'],
-  'png-zip': ['png.zip'],
   flutter: ['flutter.zip'],
   swiftui: ['swiftui.zip'],
   'android-vd': ['android-vd.zip', 'android-vd-skipped.json'],
@@ -104,18 +99,6 @@ export function cssMask(packId: string, icons: readonly NamedIcon[], names: read
 
 export function dataUriMap(icons: readonly NamedIcon[], names: readonly string[]): string {
   return JSON.stringify(Object.fromEntries(icons.map((icon, n) => [names[n], svgDataUri(standaloneSvg(icon.data))])), null, 1) + '\n';
-}
-
-export function pngZip(icons: readonly NamedIcon[], names: readonly string[], attribution: readonly ZipEntry[] = []): Buffer {
-  const entries: ZipEntry[] = [...attribution];
-  icons.forEach((icon, n) => {
-    const svg = standaloneSvg(icon.data);
-    for (const size of PNG_SIZES) {
-      const png = new Resvg(svg, { fitTo: { mode: 'width', value: size }, font: { loadSystemFonts: false } }).render().asPng();
-      entries.push({ path: `${size}/${names[n]}.png`, data: png });
-    }
-  });
-  return zip(entries);
 }
 
 const dartName = (exportName: string): string => exportName.charAt(0).toLowerCase() + exportName.slice(1);
