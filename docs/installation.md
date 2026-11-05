@@ -129,9 +129,9 @@ byte count because each small file takes at least one 4 KB block.
 | Release tarball, `flag` | 9.2 MB | 31.8 MB | 32 MB | 721 | 2 s |
 | Release tarball, `emoji` | 16.8 MB | 65.8 MB | 75 MB | 3,614 | 4 s |
 | Release tarball, `openmoji` | 29.7 MB | 151.6 MB | 171 MB | 7,324 | 8 s |
-| Git, every pack, flavour and export | | | 408 MB | 17,636 | 59 s |
-| Git, `tabler` for `react,css-mask` | | | 18 MB | 166 | 31 s |
-| Git, `ICHAVA_ICONS_SKIP_BUILD=1` | | | 0 | 3 | 14 s |
+| Git, every pack, flavour and export | | | 319 MB | 17,632 | 69 s |
+| Git, `tabler` for `react,css-mask` | | | 17 MB | 166 | 24 s |
+| Git, `ICHAVA_ICONS_SKIP_BUILD=1` | | | 0 | 3 | 17 s |
 
 Before the Tier 3 flavours and the exports (0.1.0 as merged in #5), the full tarball was 7.0 MB to
 download and 64.2 MB unpacked. The exports are most of the difference, and they are already
