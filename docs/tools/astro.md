@@ -30,7 +30,7 @@ plain SVG markup and ships no JavaScript.
 
 ## Why one component and not one per icon
 
-An Astro component is a compiled `.astro` file, so one component per icon would mean 17,365 more
+An Astro component is a compiled `.astro` file, so one component per icon would mean 18,802 more
 source files in `dist/`, like the Svelte wrappers. Instead, the pack module exports each icon's
 data by name, and one `Icon` draws any of them. Tree-shaking works the same way: a page carries the
 data it imports.

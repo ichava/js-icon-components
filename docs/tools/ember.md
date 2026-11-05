@@ -38,7 +38,7 @@ one written here.
 ## Why one component and not one per icon
 
 As for Angular and Astro: the pack module exports each icon's data, and one component draws any of
-them, so there are no 17,365 component modules to compile.
+them, so there are no 18,802 component modules to compile.
 
 ## Template
 

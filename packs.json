@@ -1,10 +1,10 @@
 {
-  "$comment": "The packs this repository generates components for. Each is read from git at the pinned commit `ref` (a full SHA, never a branch), from the sibling checkout `checkout` when it holds that commit, else by a shallow fetch of `repository`. Adding a pack is a new entry here; moving a pack forward is a new `ref`. `minIcons` is the floor the count guard enforces, set a little under the measured count. `licence` is the artwork's SPDX expression; attribution files are found by convention, read at `ref`: the pack's ATTRIBUTION.md and every file under resources/assets/svg/licenses/, copied to dist/<flavour>/<pack>/; an optional `attribution` list overrides that for a pack that needs it, and an entry that names no file fails the build. `exclude` lists source SVGs the policy rejects, each with its reason; an entry that stops being rejected fails the build. ichava/icon-sets-bundled is not here: it is private, proprietary and for internal and client use only, so a public package cannot ship it. ichava/icon-sets-metronic is private and never shown publicly.",
+  "$comment": "The packs this repository generates components for. Each is read from git at the pinned commit `ref` (a full SHA, never a branch), from the sibling checkout `checkout` when it holds that commit, else by a shallow fetch of `repository`. Adding a pack is a new entry here; moving a pack forward is a new `ref`. `minIcons` is the floor the count guard enforces, set a little under the measured count. `licence` is the artwork's SPDX expression; attribution files are found by convention, read at `ref`: the pack's ATTRIBUTION.md and every file under resources/assets/svg/licenses/, copied to dist/<flavour>/<pack>/; an optional `attribution` list overrides that for a pack that needs it, and an entry that names no file fails the build. `exclude` lists source SVGs the policy rejects, each with its reason; an entry that stops being rejected fails the build. A private pack is never listed here: a public package cannot ship it.",
   "packs": [
     {
       "id": "tabler",
       "repository": "https://github.com/ichava/icon-sets-tabler.git",
-      "ref": "10a5f39c60859b864abd2899622bdedb824e5664",
+      "ref": "98b4b8ca7501307683c6969cbcdcfb074b7f4e03",
       "checkout": "../icon-sets-tabler",
       "path": "resources/assets/svg/files",
       "sets": ["outline", "filled"],
@@ -16,7 +16,7 @@
     {
       "id": "flag",
       "repository": "https://github.com/ichava/icon-sets-flag.git",
-      "ref": "2d7b51ce0edfa1854c43a36e2a6ede6ff4782052",
+      "ref": "6e995e952d5b4096736b1990aeae4375f927a8df",
       "checkout": "../icon-sets-flag",
       "path": "resources/assets/svg/files",
       "sets": ["4x3", "1x1"],
@@ -27,9 +27,9 @@
     },
     {
       "id": "emoji",
-      "$comment": "Twemoji only. The pack's two OpenMoji sets are deprecated there and moved to ichava/icon-sets-openmoji, which the openmoji entry generates; carrying them here too would ship 7,132 icons twice.",
+      "$comment": "Twemoji, the pack's only set since ichava/icon-sets-emoji#99 moved OpenMoji to ichava/icon-sets-openmoji, which the openmoji entry generates. It has one licence file (licenses/twemoji/license), so the attribution convention needs no explicit list.",
       "repository": "https://github.com/ichava/icon-sets-emoji.git",
-      "ref": "833f11fb7c3a0b34135dab53aae91dfd8019ff98",
+      "ref": "eed0ae90540541f62988e1b4222cef9f9326e013",
       "checkout": "../icon-sets-emoji",
       "path": "resources/assets/svg/files",
       "sets": ["twemoji"],
@@ -42,7 +42,7 @@
     {
       "id": "openmoji",
       "repository": "https://github.com/ichava/icon-sets-openmoji.git",
-      "ref": "44d4dba5d203ffbab643bd905a06e2f5ef8d47e0",
+      "ref": "8e51250f72ad98566c67e91c44131a40ce537f50",
       "checkout": "../icon-sets-openmoji",
       "path": "resources/assets/svg/files",
       "sets": ["openmoji-color", "openmoji-black"],

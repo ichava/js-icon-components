@@ -120,7 +120,7 @@ writes no `dist/` at all.
 ## Size and time
 
 Measured 2026-11-04 on an Apple-silicon laptop with Node 24.17 and npm 11.13, a warm npm cache,
-the four packs (17,365 icons), twelve flavours and four asset exports, after the PNG and Android VectorDrawable exports were dropped. The tarball rows were re-measured after the Android export left; the git rows' times were measured before it, when the tree held about 16 MB more. Install times are wall-clock
+the four packs (18,802 icons), twelve flavours and four asset exports, after the PNG and Android VectorDrawable exports were dropped. The tarball rows were re-measured after the Android export left; the git rows' times were measured before it, when the tree held about 16 MB more. Install times are wall-clock
 for a fresh application, offline for a tarball and from GitHub for a git build; on disk is `du`, which is larger than the
 byte count because each small file takes at least one 4 KB block.
 

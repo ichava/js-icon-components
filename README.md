@@ -9,7 +9,7 @@ tests.
 
 > Icon components for twelve frameworks, plus CSS mask, data URI, Flutter and SwiftUI exports, generated from Ichava icon packs pinned at a git commit.
 
-Four packs: Tabler, flags, Twemoji and OpenMoji, 17,365 icons in all.
+Four packs: Tabler, flags, Twemoji and OpenMoji, 18,802 icons in all.
 
 Node 24 or newer to install. The framework is an optional peer, for the flavour you use: React 18+, Vue 3.4+, Svelte 5, `react-native-svg` 15+, Angular 20+, SolidJS 1.8+, Preact 10.19+, Astro 5+, Qwik 1.5+ or Ember 6.3+. Elm and the exports need none.
 
