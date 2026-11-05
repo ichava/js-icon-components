@@ -29,7 +29,7 @@ function inputCount(pack: PackConfig): number {
 }
 
 /** Measured 2026-11-04 at the pinned refs. A ref bump that changes a count updates this table. */
-const MEASURED: Record<string, number> = { tabler: 6257, flag: 542, emoji: 3435, openmoji: 7132 };
+const MEASURED: Record<string, number> = { tabler: 6257, flag: 542, emoji: 3435, openmoji: 8568 };
 
 const PACKS = packs();
 const rows = PACKS.map((p) => [p.id, p] as const);
@@ -81,7 +81,10 @@ describe('generation', () => {
 describe('exclusions', () => {
   it('lists only icons the policy still rejects', () => {
     const openmoji = PACKS.find((p) => p.id === 'openmoji') as PackConfig;
-    expect(readPackWithCounts(openmoji, ROOT).excluded).toEqual(['resources/assets/svg/files/openmoji-color/travel-places/high-speed-train.svg']);
+    expect(readPackWithCounts(openmoji, ROOT).excluded.sort()).toEqual([
+      'resources/assets/svg/files/openmoji-black/uncategorised/1f3f4-e0063-e0061-e0071-e0063-e007f.svg',
+      'resources/assets/svg/files/openmoji-color/uncategorised/1f3f4-e0063-e0061-e0071-e0063-e007f.svg',
+    ]);
   });
 
   it('fails on an entry that now passes, or that names no file', () => {
