@@ -32,11 +32,15 @@ export interface PackConfig {
   /** SPDX expression for the artwork (not the pack's PHP code), e.g. `CC-BY-SA-4.0`. */
   readonly licence: string;
   /**
-   * Files in the pack repository, read at `ref`, that must travel with the artwork: its
-   * `ATTRIBUTION.md` and, where the pack carries one, the artwork's licence text. Written beside
+   * Files in the pack repository, read at `ref`, that must travel with the artwork. Written beside
    * every flavour's modules as `dist/<flavour>/<pack>/<basename>`.
+   *
+   * Optional, and normally absent: `resolveAttribution` finds them by convention, the pack's
+   * `ATTRIBUTION.md` and every file under `resources/assets/svg/licenses/`, so a pack can rename
+   * its licence text without this repository noticing. Give the list only for a pack that needs
+   * something else; every entry must then name a file at `ref`, or the build fails.
    */
-  readonly attribution: readonly string[];
+  readonly attribution?: readonly string[];
   /**
    * Source SVGs the policy rejects and that are knowingly left out, each with its reason. An entry
    * that names no file, or a file that now passes, fails the build: an exemption is a ceiling.
@@ -84,12 +88,14 @@ export function loadPacks(file: string): PackConfig[] {
     if (!Number.isInteger(p.minIcons) || p.minIcons < 1) throw new Error(`${where}: minIcons must be a positive integer`);
     if (typeof p.path !== 'string' || p.path === '' || p.path.includes('..')) throw new Error(`${where}: path must be a relative path`);
     if (typeof p.licence !== 'string' || p.licence.trim() === '') throw new Error(`${where}: licence must be the artwork's SPDX expression`);
-    if (!Array.isArray(p.attribution) || p.attribution.some((f) => typeof f !== 'string' || f === '' || f.includes('..') || f.startsWith('/'))) {
-      throw new Error(`${where}: attribution must list relative paths in the pack repository`);
+    if (p.attribution !== undefined) {
+      if (!Array.isArray(p.attribution) || p.attribution.some((f) => typeof f !== 'string' || f === '' || f.includes('..') || f.startsWith('/'))) {
+        throw new Error(`${where}: attribution must list relative paths in the pack repository`);
+      }
+      if (needsAttribution(p) && p.attribution.length === 0) throw new Error(`${where}: a ${p.licence} pack must list its attribution files`);
+      const basenames = p.attribution.map((f) => f.split('/').pop());
+      if (new Set(basenames).size !== basenames.length) throw new Error(`${where}: attribution files must have distinct basenames`);
     }
-    if (needsAttribution(p) && p.attribution.length === 0) throw new Error(`${where}: a ${p.licence} pack must list its attribution files`);
-    const basenames = p.attribution.map((f) => f.split('/').pop());
-    if (new Set(basenames).size !== basenames.length) throw new Error(`${where}: attribution files must have distinct basenames`);
     if (p.themeVariants !== undefined) {
       const entries = Object.entries(p.themeVariants);
       if (entries.length === 0 || entries.some(([t, suffix]) => t !== 'dark' || typeof suffix !== 'string' || !/^-[a-z0-9-]+$/.test(suffix))) {
@@ -161,6 +167,50 @@ export function readFileAt(dir: string, pack: PackConfig, path: string): Buffer 
   } catch {
     throw new Error(`${pack.id}: ${path} does not exist at ${pack.ref.slice(0, 12)}`);
   }
+}
+
+/** Where a pack keeps the licence texts of its artwork, read by convention. */
+export const LICENCES_DIR = 'resources/assets/svg/licenses';
+
+const resolvedAttribution = new Map<string, readonly string[]>();
+
+/**
+ * The files that travel with a pack's artwork, at `pack.ref`: the explicit `attribution` list when
+ * packs.json gives one, otherwise `ATTRIBUTION.md` and every file under `LICENCES_DIR`. An explicit
+ * entry that names no file fails, and so does a CC-BY pack that resolves to nothing, or two files
+ * that would land on one basename in dist/.
+ */
+export function resolveAttribution(pack: PackConfig, root: string): readonly string[] {
+  const key = `${pack.id}@${pack.ref}:${JSON.stringify(pack.attribution ?? null)}`;
+  const cached = resolvedAttribution.get(key);
+  if (cached) return cached;
+
+  const dir = resolveSource(pack, root);
+  const tracked = git(dir, ['ls-tree', '-r', '-z', '--name-only', '--full-tree', pack.ref, '--', 'ATTRIBUTION.md', LICENCES_DIR])
+    .toString('utf8')
+    .split('\0')
+    .filter((f) => f !== '');
+
+  let files: string[];
+  if (pack.attribution !== undefined) {
+    const all = new Set(git(dir, ['ls-tree', '-r', '-z', '--name-only', '--full-tree', pack.ref]).toString('utf8').split('\0'));
+    for (const f of pack.attribution) {
+      if (!all.has(f)) throw new Error(`${pack.id}: attribution entry ${f} matches no file at ${pack.ref.slice(0, 12)}`);
+    }
+    files = [...pack.attribution];
+  } else {
+    files = tracked.sort((a, b) => (a === 'ATTRIBUTION.md' ? -1 : b === 'ATTRIBUTION.md' ? 1 : a.localeCompare(b, 'en')));
+  }
+
+  if (needsAttribution(pack) && files.length === 0) {
+    throw new Error(`${pack.id}: a ${pack.licence} pack must list its attribution files, and none were found at ${pack.ref.slice(0, 12)}`);
+  }
+  const basenames = files.map((f) => f.split('/').pop());
+  if (new Set(basenames).size !== basenames.length) {
+    throw new Error(`${pack.id}: attribution files must have distinct basenames (${files.join(', ')}); give an explicit attribution list in packs.json`);
+  }
+  resolvedAttribution.set(key, files);
+  return files;
 }
 
 /** Reads blobs in one `git cat-file --batch` round trip. */

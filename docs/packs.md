@@ -9,19 +9,14 @@ Four packs are generated, each read from git at a pinned commit and each keeping
 | `tabler` | `ichava/icon-sets-tabler` | `10a5f39c` | `outline`, `filled` | 6,257 | MIT |
 | `flag` | `ichava/icon-sets-flag` | `2d7b51ce` | `4x3`, `1x1` | 542 | MIT |
 | `emoji` | `ichava/icon-sets-emoji` | `833f11fb` | `twemoji` | 3,435 | CC-BY-4.0 |
-| `openmoji` | `ichava/icon-sets-openmoji` | `25280ae1` | `openmoji-color`, `openmoji-black` | 8,566 | CC-BY-SA-4.0 |
+| `openmoji` | `ichava/icon-sets-openmoji` | `44d4dba5` | `openmoji-color`, `openmoji-black` | 8,568 | CC-BY-SA-4.0 |
 
 Counts are measured at those commits on 2026-11-04 (flag and openmoji on 2026-11-05). `packs.json` holds the full SHAs.
 
 - **`emoji` is Twemoji only.** `icon-sets-emoji` also carries the two OpenMoji sets, but deprecates
   them there in favour of `icon-sets-openmoji`. Generating them twice would ship 7,132 icons twice.
-- **`openmoji` leaves out two icons.** The `uncategorised/1f3f4-e0063-e0061-e0071-e0063-e007f.svg`
-  flag in both sets keeps an unused `xmlns:sodipodi` declaration on `<svg>`, which the SVG gate
-  rejects. Both are listed under `exclude` in `packs.json` with that reason, and the build fails if
-  an entry stops being rejected, so the fix upstream brings them back. The high-speed train excluded
-  before is fixed upstream (icon-sets-openmoji#4) and generated again.
 - **`openmoji` includes `uncategorised/`**, the OpenMoji extras the Unicode taxonomy does not name,
-  511 per set at `25280ae1`, under their upstream file names.
+  511 per set at `44d4dba5`, under their upstream file names.
 - **Not generated:** `icon-sets-bundled` is private and licensed for Simtabi's internal and client
   use only, so a public package cannot ship it; `icon-sets-metronic` is private and never shown
   publicly.
@@ -63,7 +58,7 @@ dist/vue/openmoji/…  dist/svelte/openmoji/…  dist/wc/openmoji/…
 Every generated module also opens with a legal comment, which bundlers keep:
 
 ```js
-/*! openmoji artwork: CC-BY-SA-4.0. Attribution and licence: ../openmoji/ATTRIBUTION.md, ../openmoji/LICENSE */
+/*! openmoji artwork: CC-BY-SA-4.0. Attribution and licence: ../openmoji/ATTRIBUTION.md, ../openmoji/LICENSE.txt */
 ```
 
 **If you ship Twemoji or OpenMoji icons, you take on their licence.** CC-BY 4.0 asks for credit
@@ -83,12 +78,16 @@ repeats its ids, harmlessly: both copies define the same content.
 ## Adding a pack
 
 Add an entry to `packs.json`: `id`, `repository`, a full commit `ref`, `path`, `sets`,
-`defaultSet`, `kind`, `minIcons`, the artwork `licence` as an SPDX expression and its
-`attribution` files, plus `categories: true` when sets nest a category directory, and
-`themeVariants: { "dark": "-dark" }` when a pack ships theme twins (`scene-dark.svg` beside
-`scene.svg`), which then fold into their light item as `variants.dark`. A pack whose
-licence is CC-BY or CC-BY-SA must list attribution files, or the build refuses it. Then add its
-measured count to `tests/generate.test.ts`.
+`defaultSet`, `kind`, `minIcons` and the artwork `licence` as an SPDX expression, plus
+`categories: true` when sets nest a category directory, and `themeVariants: { "dark": "-dark" }`
+when a pack ships theme twins (`scene-dark.svg` beside `scene.svg`), which then fold into their
+light item as `variants.dark`. Then add its measured count to `tests/generate.test.ts`.
+
+The attribution files are found by convention at the pinned commit: the pack's `ATTRIBUTION.md`
+and every file under `resources/assets/svg/licenses/`. A pack can rename its licence text without
+an edit here. Give an `attribution` list only for a pack that needs something else; each entry must
+name a file at `ref`, or the build fails. A CC-BY or CC-BY-SA pack with no attribution files, or
+two files that would share a basename in `dist/`, is refused.
 
 ---
 
