@@ -80,7 +80,7 @@ describe('a selective build (flag, react)', () => {
     expect(flag?.outputs).toEqual({ react: 542 });
     expect(countOutputs(out, 'flag', ['react', 'webcomponent'])).toEqual({ react: 542, webcomponent: 542 });
     expect(readFileSync(join(out, 'data/flag.js'), 'utf8')).toMatch(/^export const IconKe = \{/m);
-    expect(flag?.attribution).toEqual(['data/flag/ATTRIBUTION.md', 'react/flag/ATTRIBUTION.md']);
+    expect(flag?.attribution).toEqual(['data/flag/ATTRIBUTION.md', 'react/flag/ATTRIBUTION.md', 'data/flag/LICENSE', 'react/flag/LICENSE']);
   });
 
   it('writes no icon for anything it did not select', () => {

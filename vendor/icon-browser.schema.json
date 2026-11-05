@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/ichava/icon-browser/resources/schema/icon-browser.schema.json",
+  "$id": "https://raw.githubusercontent.com/ichava/icon-browser/main/resources/schema/icon-browser.schema.json",
   "title": "ichava/icon-browser payloads",
   "description": "Every REST resource, session and bootstrap document, and Inertia prop this package serves. Version 1.8.0, matching PayloadSchema::VERSION. react-icon-browser generates its types from this file.",
   "version": "1.8.0",

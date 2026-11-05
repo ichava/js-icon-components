@@ -40,7 +40,7 @@ export const svgPolicy = policy as unknown as SvgPolicy;
  * after a value check, and puts the second kind in their own blocks: `style`
  * under `styleAttribute`, `href`/`xlink:href` under `fragmentOnlyRefs`. A
  * consumer that reads only `allowedAttributes` therefore strips `style` -- the
- * sole paint source for 261 of 501 metronic icons, which then render as solid
+ * sole paint source for 261 of the 501 icons in one private pack, which then render as solid
  * black shapes.
  *
  * That is not hypothetical: it is exactly how this runtime was wrong before

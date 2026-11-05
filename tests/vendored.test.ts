@@ -1,35 +1,56 @@
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ROOT } from './helpers.ts';
 
 /**
- * Two files are copies of another repository's canonical file. Each is pinned by digest, so an
- * edit here fails, and compared with the sibling checkout when one is on disk, so a stale copy
- * fails locally the moment the canonical file moves. Update the copy and the digest together.
+ * Every file in vendor/ is a copy of another repository's canonical file, recorded in
+ * vendor/source.json with its repository, path, commit and SHA-256. Never a path into a
+ * sibling checkout at build time: that exists on one machine only.
+ *
+ * Each copy is pinned by digest, so an edit here fails everywhere, CI included. When the source
+ * repository is checked out beside this one (or under ICHAVA_PACKAGES_DIR), the copy is also
+ * compared with its canonical file and fails on drift; without that checkout the comparison is
+ * skipped, not passed.
  */
-const COPIES = [
-  {
-    file: 'vendor/svg-policy.json',
-    sha256: '49ee43cea254be2c1fcec2a1fdd37a097889df78466ffe6e9c2e653f65f8fd06',
-    canonical: '../core/resources/security/svg-policy.json',
-  },
-  {
-    file: 'vendor/icon-browser.schema.json',
-    sha256: '16c6376247e61ca5f2d2345a7bd17602d443ce87ec93462bbe44cee389cb35e9',
-    canonical: '../icon-browser/resources/schema/icon-browser.schema.json',
-  },
-];
+interface Source {
+  repository: string;
+  path: string;
+  commit: string;
+  sha256: string;
+}
+const { files } = JSON.parse(readFileSync(join(ROOT, 'vendor/source.json'), 'utf8')) as { files: Record<string, Source> };
+const COPIES = Object.entries(files).map(([file, src]) => ({ file, ...src }));
+const PACKAGES = resolve(process.env.ICHAVA_PACKAGES_DIR || join(ROOT, '..'));
+
+/** The canonical file in the sibling checkout, or null when that checkout is not on disk. */
+function sibling(repository: string, path: string): string | null {
+  const checkout = join(PACKAGES, repository.replace(/^ichava\//, ''));
+  return existsSync(join(checkout, '.git')) ? join(checkout, path) : null;
+}
 
 describe('vendored copies', () => {
-  it.each(COPIES)('$file matches its pinned digest', ({ file, sha256 }) => {
-    expect(createHash('sha256').update(readFileSync(join(ROOT, file))).digest('hex')).toBe(sha256);
+  it('records every file in vendor/, and nothing else', () => {
+    const onDisk = readdirSync(join(ROOT, 'vendor')).filter((f) => f !== 'source.json').sort();
+    expect(onDisk.length).toBeGreaterThanOrEqual(2);
+    expect(Object.keys(files).sort()).toEqual(onDisk);
   });
 
-  it.each(COPIES)('$file matches the sibling checkout when present', ({ file, canonical }) => {
-    const sibling = join(ROOT, canonical);
-    if (!existsSync(sibling)) return; // CI has no siblings; the digest pin above still holds.
-    expect(readFileSync(join(ROOT, file), 'utf8')).toBe(readFileSync(sibling, 'utf8'));
+  it.each(COPIES)('$file names its source: repository, path and a full commit', ({ repository, path, commit }) => {
+    expect(repository).toMatch(/^ichava\/[a-z0-9.-]+$/);
+    expect(path).not.toMatch(/^\.|\.\./);
+    expect(commit).toMatch(/^[0-9a-f]{40}$/);
   });
+
+  it.each(COPIES)('$file matches its pinned digest', ({ file, sha256 }) => {
+    expect(createHash('sha256').update(readFileSync(join(ROOT, 'vendor', file))).digest('hex')).toBe(sha256);
+  });
+
+  for (const { file, repository, path } of COPIES) {
+    const canonical = sibling(repository, path);
+    it.skipIf(canonical === null)(`${file} matches ${repository}'s ${path} in the sibling checkout`, () => {
+      expect(readFileSync(join(ROOT, 'vendor', file), 'utf8')).toBe(readFileSync(canonical!, 'utf8'));
+    });
+  }
 });

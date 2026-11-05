@@ -6,7 +6,7 @@ How a pinned pack becomes four flavours of components, and what keeps the output
 
 The icons already exist as SVG files in each pack, and the browser already shows a code tab for
 React, Vue, Svelte and the Web Component. Writing those components by hand is out of the question
-at 17,365 icons across four packs, and the alternatives each lose something:
+at 18,802 icons across four packs, and the alternatives each lose something:
 
 - **Raw SVG strings plus `innerHTML`** ship whatever markup the source holds, and trip Trusted
   Types. Here the markup is parsed and checked at build time, and every flavour renders from the

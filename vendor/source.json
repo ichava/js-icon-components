@@ -1,0 +1,17 @@
+{
+  "$comment": "Where each file in vendor/ was copied from. tests/vendored.test.ts pins each copy by sha256, and compares it with the canonical file when that repository is checked out beside this one (ICHAVA_PACKAGES_DIR names another packages directory). To take a new copy: copy the file at a commit on the source repository's main, then update commit and sha256 here.",
+  "files": {
+    "svg-policy.json": {
+      "repository": "ichava/core",
+      "path": "resources/security/svg-policy.json",
+      "commit": "49938407a5cc62e855b369e58534284d3f4ef84a",
+      "sha256": "49ee43cea254be2c1fcec2a1fdd37a097889df78466ffe6e9c2e653f65f8fd06"
+    },
+    "icon-browser.schema.json": {
+      "repository": "ichava/icon-browser",
+      "path": "resources/schema/icon-browser.schema.json",
+      "commit": "3531662dfb221c6fe01238e2e44dabe44d2907cc",
+      "sha256": "4c9c51a357acb248de29eafe7f4b930bda2327a009a8e017309e53e25c9fd310"
+    }
+  }
+}

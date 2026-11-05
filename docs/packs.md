@@ -6,20 +6,18 @@ Four packs are generated, each read from git at a pinned commit and each keeping
 
 | Pack | Repository | Commit | Sets (default first) | Icons | Artwork licence |
 |---|---|---|---|---:|---|
-| `tabler` | `ichava/icon-sets-tabler` | `10a5f39c` | `outline`, `filled` | 6,257 | MIT |
-| `flag` | `ichava/icon-sets-flag` | `2d7b51ce` | `4x3`, `1x1` | 542 | MIT |
-| `emoji` | `ichava/icon-sets-emoji` | `833f11fb` | `twemoji` | 3,435 | CC-BY-4.0 |
-| `openmoji` | `ichava/icon-sets-openmoji` | `44d4dba5` | `openmoji-color`, `openmoji-black` | 8,568 | CC-BY-SA-4.0 |
+| `tabler` | `ichava/icon-sets-tabler` | `98b4b8ca` | `outline`, `filled` | 6,257 | MIT |
+| `flag` | `ichava/icon-sets-flag` | `6e995e95` | `4x3`, `1x1` | 542 | MIT |
+| `emoji` | `ichava/icon-sets-emoji` | `eed0ae90` | `twemoji` | 3,435 | CC-BY-4.0 |
+| `openmoji` | `ichava/icon-sets-openmoji` | `8e51250f` | `openmoji-color`, `openmoji-black` | 8,568 | CC-BY-SA-4.0 |
 
-Counts are measured at those commits on 2026-11-04 (flag and openmoji on 2026-11-05). `packs.json` holds the full SHAs.
+Counts are measured at those commits on 2026-11-05: 18,802 icons in all. `packs.json` holds the full SHAs.
 
-- **`emoji` is Twemoji only.** `icon-sets-emoji` also carries the two OpenMoji sets, but deprecates
-  them there in favour of `icon-sets-openmoji`. Generating them twice would ship 7,132 icons twice.
+- **`emoji` is Twemoji only**, as `icon-sets-emoji` itself is since icon-sets-emoji#99, which moved
+  the two OpenMoji sets to `icon-sets-openmoji`.
 - **`openmoji` includes `uncategorised/`**, the OpenMoji extras the Unicode taxonomy does not name,
-  511 per set at `44d4dba5`, under their upstream file names.
-- **Not generated:** `icon-sets-bundled` is private and licensed for Simtabi's internal and client
-  use only, so a public package cannot ship it; `icon-sets-metronic` is private and never shown
-  publicly.
+  511 per set at `8e51250f`, under their upstream file names.
+- **Not generated:** the private packs. A public package cannot ship them.
 
 ## Export names
 
