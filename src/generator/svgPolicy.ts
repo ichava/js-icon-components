@@ -34,7 +34,28 @@ export interface SvgPolicy {
   styleAttribute: { allow: string; block: string[] };
 }
 
-export const svgPolicy = policy as unknown as SvgPolicy;
+const isStrings = (x: unknown): x is string[] => Array.isArray(x) && x.every((s) => typeof s === 'string');
+
+/** Whether the parsed policy has the shape this runtime interprets; checked once, at load. */
+export function isSvgPolicy(value: unknown): value is SvgPolicy {
+  if (typeof value !== 'object' || value === null) return false;
+  const v = value as Record<string, unknown>;
+  const refs = v.fragmentOnlyRefs as Record<string, unknown> | undefined;
+  const style = v.styleAttribute as Record<string, unknown> | undefined;
+  return (
+    typeof v.version === 'number' &&
+    ['allowedTags', 'allowedAttributes', 'allowedAttributePrefixes', 'forbiddenTags', 'denyAttributePrefixes'].every((k) => isStrings(v[k])) &&
+    typeof refs === 'object' && refs !== null && isStrings(refs.attributes) && typeof refs.allow === 'string' &&
+    typeof style === 'object' && style !== null && typeof style.allow === 'string' && isStrings(style.block)
+  );
+}
+
+function loadPolicy(value: unknown): SvgPolicy {
+  if (!isSvgPolicy(value)) throw new Error('svg-policy.json does not have the shape SvgPolicy describes');
+  return value;
+}
+
+export const svgPolicy: SvgPolicy = loadPolicy(policy);
 
 /**
  * The by-name allow-list, which is NOT simply `policy.allowedAttributes`.

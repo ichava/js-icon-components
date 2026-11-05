@@ -19,8 +19,8 @@
     "src/generator/svgPolicy.ts": {
       "repository": "ichava/react-icon-browser",
       "path": "src/modules/svg/domain/svgPolicy.ts",
-      "commit": "c9707562a3f081eec5ef9504fa49acfcf2620f75",
-      "sha256": "2d4850a2d5475eab17c751dbedf55c210ce1cce87008258d88a6dbc42e31be82"
+      "commit": "876bba9c246280006d24f3c265ddfdfcb60db66f",
+      "sha256": "3555ca7b1c0de456a6cbc85ebacb61a828279e7b9e0da335df36ea8d48c0a72e"
     }
   }
 }
