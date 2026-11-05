@@ -1,7 +1,7 @@
 {
   "name": "@ichava/js-icon-components",
   "version": "0.1.0",
-  "description": "Generates React, Vue 3, Svelte 5, Web Component, React Native, Angular, SolidJS, Preact, Astro, Qwik, Ember and Elm icon components, plus CSS mask, data URI, Flutter, SwiftUI and Android VectorDrawable exports, from Ichava icon packs pinned at a git ref.",
+  "description": "Generates React, Vue 3, Svelte 5, Web Component, React Native, Angular, SolidJS, Preact, Astro, Qwik, Ember and Elm icon components, plus CSS mask, data URI, Flutter and SwiftUI exports, from Ichava icon packs pinned at a git ref.",
   "license": "MIT",
   "author": "Simtabi LLC <ichava@simtabi.com> (https://simtabi.com)",
   "homepage": "https://github.com/ichava/js-icon-components",
@@ -29,9 +29,7 @@
     "ember",
     "elm",
     "flutter",
-    "swiftui",
-    "android",
-    "vectordrawable"
+    "swiftui"
   ],
   "type": "module",
   "sideEffects": false,

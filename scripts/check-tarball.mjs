@@ -37,7 +37,6 @@ export const ASSET_FILES = {
   'data-uri': ['data-uri.json'],
   flutter: ['flutter.zip'],
   swiftui: ['swiftui.zip'],
-  'android-vd': ['android-vd.zip', 'android-vd-skipped.json'],
 };
 
 export const BASE_NAME = '@ichava/js-icon-components';
@@ -77,7 +76,7 @@ export function tarballProblems({ files, manifest, pkg, packIds, expectPacks }) 
   const wanted = expectPacks ?? packIds;
   if (built.join(',') !== wanted.join(',')) problems.push(`built packs are [${built.join(', ')}], expected [${wanted.join(', ')}]`);
   if (manifest.flavours.length !== Object.keys(FLAVOUR_DIRS).length) problems.push(`built flavours are [${manifest.flavours.join(', ')}], expected all twelve`);
-  if ((manifest.assets ?? []).length !== Object.keys(ASSET_FILES).length) problems.push(`built asset exports are [${(manifest.assets ?? []).join(', ')}], expected all six`);
+  if ((manifest.assets ?? []).length !== Object.keys(ASSET_FILES).length) problems.push(`built asset exports are [${(manifest.assets ?? []).join(', ')}], expected all ${Object.keys(ASSET_FILES).length}`);
   if (pkg.name !== packageName(expectPacks)) problems.push(`package.json name is ${pkg.name}, expected ${packageName(expectPacks)}`);
 
   for (const id of packIds) {

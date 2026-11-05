@@ -7,7 +7,7 @@ import { buildSync, transformSync } from 'esbuild';
 import { compile as compileSvelte } from 'svelte/compiler';
 import { compileScript, compileTemplate, parse as parseSfc } from 'vue/compiler-sfc';
 import { ALL_FLAVOURS, ASSET_TARGETS, PENDING_FLAVOURS, type AnyFlavour, type AssetTarget, type IconData, type IconTheme, type PendingFlavour } from '../shared/index.ts';
-import { androidZip, cssMask, dataUriMap, flutterZip, slugs, swiftuiZip } from './assets.ts';
+import { cssMask, dataUriMap, flutterZip, slugs, swiftuiZip } from './assets.ts';
 import { elmModule } from './elm.ts';
 import type { ZipEntry } from './zip.ts';
 import { idPrefix, prefixIds } from './ids.ts';
@@ -39,8 +39,6 @@ export interface PackManifest {
   readonly variants?: number;
   /** Icons written per built asset export, counted from the files. */
   readonly assets?: Partial<Record<AssetTarget, number>>;
-  /** Icons the Android export could not express exactly, each with the construct that stopped it. */
-  readonly skipped?: { readonly 'android-vd': readonly { readonly id: string; readonly reason: string }[] };
 }
 
 export interface Manifest {
@@ -459,7 +457,7 @@ const assetHeader = (pack: PackConfig): string =>
 
 /**
  * Writes the selected asset exports for one pack, counts each from its files, and fails when one
- * holds a different number of icons than the pack has. Returns the counts and the Android report.
+ * holds a different number of icons than the pack has. Returns the counts.
  */
 export function writeAssets(
   pack: PackConfig,
@@ -467,23 +465,23 @@ export function writeAssets(
   root: string,
   outDir: string,
   assets: ReadonlySet<AssetTarget>,
-): { counts: Partial<Record<AssetTarget, number>>; skipped: PackManifest['skipped'] } {
-  const skipped = emitAssets(pack, icons, root, outDir, assets);
+): { counts: Partial<Record<AssetTarget, number>> } {
+  emitAssets(pack, icons, root, outDir, assets);
   const selected = ASSET_TARGETS.filter((a) => assets.has(a));
   const counts = countAssets(outDir, pack.id, selected);
   checkAssetCounts(pack.id, counts, icons.length);
-  return { counts, skipped };
+  return { counts };
 }
 
-/** The asset count guard: every export holds exactly the pack's icons, written or (Android) reported. */
+/** The asset count guard: every export holds exactly the pack's icons. */
 export function checkAssetCounts(packId: string, counts: Partial<Record<AssetTarget, number>>, expected: number): void {
   for (const [asset, n] of Object.entries(counts)) {
     if (n !== expected) throw new Error(`${packId}: the ${asset} export holds ${n} icons, expected ${expected}`);
   }
 }
 
-function emitAssets(pack: PackConfig, icons: NamedIcon[], root: string, outDir: string, assets: ReadonlySet<AssetTarget>): PackManifest['skipped'] {
-  if (assets.size === 0) return undefined;
+function emitAssets(pack: PackConfig, icons: NamedIcon[], root: string, outDir: string, assets: ReadonlySet<AssetTarget>): void {
+  if (assets.size === 0) return;
   const dir = join(outDir, 'assets', pack.id);
   const names = slugs(icons, pack.defaultSet);
   const source = resolveSource(pack, root);
@@ -493,11 +491,6 @@ function emitAssets(pack: PackConfig, icons: NamedIcon[], root: string, outDir: 
   if (assets.has('data-uri')) write(join(dir, 'data-uri.json'), dataUriMap(icons, names));
   if (assets.has('flutter')) writeFileBuffer(join(dir, 'flutter.zip'), flutterZip(pack.id, icons, pack.sets, text, attribution));
   if (assets.has('swiftui')) writeFileBuffer(join(dir, 'swiftui.zip'), swiftuiZip(pack.id, icons, names, attribution));
-  if (!assets.has('android-vd')) return undefined;
-  const android = androidZip(pack.id, icons, names, attribution);
-  writeFileBuffer(join(dir, 'android-vd.zip'), android.zip);
-  write(join(dir, 'android-vd-skipped.json'), JSON.stringify({ pack: pack.id, written: android.written, skipped: android.skipped }, null, 2) + '\n');
-  return { 'android-vd': android.skipped };
 }
 
 function writeFileBuffer(file: string, content: Buffer): void {
@@ -537,10 +530,6 @@ export function countAssets(outDir: string, packId: string, assets: readonly Ass
         return entries('flutter.zip').filter((e) => e.startsWith('assets/') && e.endsWith('.svg')).length;
       case 'swiftui':
         return entries('swiftui.zip').filter((e) => /\.imageset\/Contents\.json$/.test(e)).length;
-      case 'android-vd': {
-        const report = JSON.parse(readFileSync(join(dir, 'android-vd-skipped.json'), 'utf8')) as { skipped: unknown[] };
-        return entries('android-vd.zip').filter((e) => e.startsWith('res/drawable/')).length + report.skipped.length;
-      }
     }
   };
   return Object.fromEntries(assets.map((a) => [a, count(a)]));
@@ -696,7 +685,7 @@ export function generate(options: GenerateOptions): Manifest {
     const { icons, inputs, excluded, variants } = readPackWithCounts(pack, options.root);
     emitPack(pack, icons, options.outDir, flavours);
     if (flavours.size < ALL_FLAVOURS.length) emitPackStubs(pack, icons.map((i) => i.exportName), options.outDir, selection, true);
-    const { counts: assetCounts, skipped } = writeAssets(pack, icons, options.root, options.outDir, assets);
+    const { counts: assetCounts } = writeAssets(pack, icons, options.root, options.outDir, assets);
     const attribution = emitAttribution(pack, options.root, options.outDir, ['data', ...selection.flavours.map((f) => FLAVOUR_DIRS[f]), ...(assets.size > 0 ? ['assets'] : [])]);
     const outputs = countOutputs(options.outDir, pack.id, selection.flavours);
     const expected = inputs - excluded.length - variants;
@@ -707,7 +696,7 @@ export function generate(options: GenerateOptions): Manifest {
     }
     manifest.packs.push({
       id: pack.id, repository: pack.repository, ref: pack.ref, licence: pack.licence, inputs, excluded, outputs, attribution,
-      variants, assets: assetCounts, ...(skipped === undefined ? {} : { skipped }),
+      variants, assets: assetCounts,
     });
   }
 

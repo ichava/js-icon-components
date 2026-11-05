@@ -6,6 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { readTarball, tarballProblems } from '../scripts/check-tarball.mjs';
 import { packTarball } from '../scripts/pack-tarball.mjs';
 import type { Manifest } from '../src/generator/generate.ts';
+import { ASSET_TARGETS } from '../src/shared/index.ts';
 import { packs, ROOT } from './helpers.ts';
 
 /**
@@ -19,7 +20,7 @@ let tgz: string;
 
 beforeAll(() => {
   const built = existsSync(join(ROOT, 'dist/manifest.json')) ? (JSON.parse(readFileSync(join(ROOT, 'dist/manifest.json'), 'utf8')) as Manifest) : undefined;
-  if (built === undefined || built.packs.length !== IDS.length || built.flavours.length !== 12 || built.assets?.length !== 5) {
+  if (built === undefined || built.packs.length !== IDS.length || built.flavours.length !== 12 || built.assets?.length !== ASSET_TARGETS.length) {
     throw new Error('dist/ is missing or was built selectively; run `npm run build` first');
   }
   tgz = packTarball(ROOT, work);
@@ -112,7 +113,7 @@ describe('the release tarball', () => {
         wc: Wc.id, angular: Angular.id, astro: Astro.id,
         native: typeof Native, solid: typeof Solid, qwik: typeof Qwik, ember: Ember.id,
         elm: existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/elm/Ichava/Icons/Tabler.elm'))),
-        assets: ['icons.css', 'data-uri.json', 'flutter.zip', 'swiftui.zip', 'android-vd.zip', 'android-vd-skipped.json']
+        assets: ['icons.css', 'data-uri.json', 'flutter.zip', 'swiftui.zip']
           .every((f) => existsSync(fileURLToPath(import.meta.resolve('@ichava/js-icon-components/assets/tabler/' + f)))),
         flag: renderToStaticMarkup(createElement(IconKe)).slice(0, 4),
         emoji: renderToStaticMarkup(createElement(IconGrinningFace)).slice(0, 4),

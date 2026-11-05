@@ -7,7 +7,7 @@ Two badges, not four: the package is not on npm (it installs from a GitHub relea
 git tag), so there is no registry version to show, and lint runs in the same CI workflow as the
 tests.
 
-> Icon components for twelve frameworks, plus CSS mask, data URI, Flutter, SwiftUI and Android VectorDrawable exports, generated from Ichava icon packs pinned at a git commit.
+> Icon components for twelve frameworks, plus CSS mask, data URI, Flutter and SwiftUI exports, generated from Ichava icon packs pinned at a git commit.
 
 Four packs: Tabler, flags, Twemoji and OpenMoji, 17,365 icons in all.
 
@@ -18,7 +18,7 @@ Node 24 or newer to install. The framework is an optional peer, for the flavour 
 | Flavour (component) | React, Vue 3, Svelte 5, Web Component, React Native, Angular, SolidJS, Preact, Astro, Qwik, Ember | `@ichava/js-icon-components/<flavour>/<pack>` |
 | Flavour (source) | Elm, one `Ichava.Icons.<Pack>` module per pack | `dist/elm/` |
 | Export | CSS mask, data URI | `dist/assets/<pack>/icons.css`, `data-uri.json` |
-| Native export | Flutter (`flutter_svg` assets), SwiftUI (`.xcassets`), Android VectorDrawable | `dist/assets/<pack>/flutter.zip`, `swiftui.zip`, `android-vd.zip` |
+| Native export | Flutter (`flutter_svg` assets), SwiftUI (`.xcassets`), both shipping the original SVG | `dist/assets/<pack>/flutter.zip`, `swiftui.zip` |
 
 ## Install
 
@@ -188,7 +188,6 @@ The documentation lives in this repository's [`docs/`](https://github.com/ichava
 - [Data URI](docs/tools/data-uri.md) — `dist/assets/<pack>/data-uri.json`
 - [Flutter](docs/tools/flutter.md) — `dist/assets/<pack>/flutter.zip`
 - [SwiftUI](docs/tools/swiftui.md) — `dist/assets/<pack>/swiftui.zip`
-- [Android VectorDrawable](docs/tools/android-vd.md) — `dist/assets/<pack>/android-vd.zip`
 
 ## Contributing and security
 

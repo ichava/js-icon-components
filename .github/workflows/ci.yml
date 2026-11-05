@@ -74,7 +74,7 @@ jobs:
           node -e '
             const m = require("./dist/manifest.json");
             if (m.packs.length === 0) { console.error("::error::manifest lists no packs"); process.exit(1); }
-            if (m.flavours.length !== 12 || m.assets.length !== 5) { console.error(`::error::built ${m.flavours.length} flavours and ${m.assets.length} asset exports`); process.exit(1); }
+            if (m.flavours.length !== 12 || m.assets.length !== 4) { console.error(`::error::built ${m.flavours.length} flavours and ${m.assets.length} asset exports`); process.exit(1); }
             for (const p of m.packs) {
               const expected = p.inputs - p.excluded.length - (p.variants ?? 0);
               for (const f of m.flavours) {
@@ -85,7 +85,6 @@ jobs:
                 if (p.assets[a] !== expected) { console.error(`::error::${p.id} ${a}: ${p.assets[a]} of ${expected}`); process.exit(1); }
                 console.log(`${p.id} ${a}: ${p.assets[a]}`);
               }
-              console.log(`${p.id} android-vd skipped: ${p.skipped["android-vd"].length}`);
             }'
           # The artwork's licence travels with it: every listed attribution file is in dist/.
           # shellcheck disable=SC2016

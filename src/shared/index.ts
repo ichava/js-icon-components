@@ -93,12 +93,13 @@ export type AnyFlavour = Flavour | PendingFlavour | Tier3Flavour;
 
 /**
  * The asset exports, by their registry id (`delivery: "asset"`). Each writes files under
- * `dist/assets/<pack>/` rather than a module; the last three are the native targets
- * (`native: true` in the registry).
+ * `dist/assets/<pack>/` rather than a module; the last two are the native targets
+ * (`native: true` in the registry). Every one carries SVG: the ichava icon ecosystem is strictly
+ * SVG (owner rule, 2026-11-04), so `android-vd` left with icon-browser's schema 1.8.0.
  */
-export const ASSET_TARGETS = ['css-mask', 'data-uri', 'flutter', 'swiftui', 'android-vd'] as const;
+export const ASSET_TARGETS = ['css-mask', 'data-uri', 'flutter', 'swiftui'] as const;
 export type AssetTarget = (typeof ASSET_TARGETS)[number];
-export const NATIVE_TARGETS = ['flutter', 'swiftui', 'android-vd'] as const satisfies readonly AssetTarget[];
+export const NATIVE_TARGETS = ['flutter', 'swiftui'] as const satisfies readonly AssetTarget[];
 
 /** Every format the generator owns: the generated flavours and the asset exports. */
 export const GENERATOR_FORMATS = [...ALL_FLAVOURS, ...ASSET_TARGETS] as const;
