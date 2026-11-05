@@ -17,7 +17,7 @@
     {
       "id": "flag",
       "repository": "https://github.com/ichava/icon-sets-flag.git",
-      "ref": "67075d3f8d41e9d95635200e91ba8f8135feeb34",
+      "ref": "2d7b51ce0edfa1854c43a36e2a6ede6ff4782052",
       "checkout": "../icon-sets-flag",
       "path": "resources/assets/svg/files",
       "sets": ["4x3", "1x1"],
@@ -45,7 +45,7 @@
     {
       "id": "openmoji",
       "repository": "https://github.com/ichava/icon-sets-openmoji.git",
-      "ref": "d492519e061732592a7d7c57bd6531747f10694c",
+      "ref": "25280ae1f030f748ed6613d42a24569fcb1bd18f",
       "checkout": "../icon-sets-openmoji",
       "path": "resources/assets/svg/files",
       "sets": ["openmoji-color", "openmoji-black"],
@@ -54,11 +54,15 @@
       "kind": "icon",
       "minIcons": 7000,
       "licence": "CC-BY-SA-4.0",
-      "attribution": ["ATTRIBUTION.md", "resources/assets/svg/licenses/openmoji/LICENSE"],
+      "attribution": ["ATTRIBUTION.md", "resources/assets/svg/licenses/openmoji/LICENSE.txt"],
       "exclude": [
         {
-          "path": "openmoji-color/travel-places/high-speed-train.svg",
-          "reason": "A stray text node (\"d\") inside <g id=\"color\">, outside any text element, at d492519e. The policy rejects rather than strips; the fix belongs upstream in icon-sets-openmoji. Measured 2026-11-04: the only one of 7,132."
+          "path": "openmoji-color/uncategorised/1f3f4-e0063-e0061-e0071-e0063-e007f.svg",
+          "reason": "An unused xmlns:sodipodi declaration on <svg>, left by Inkscape, at 25280ae1. icon-sets-sync's sanitiser strips sodipodi:docname but keeps namespace declarations, and this policy rejects any attribute not on the allow-list. The fix belongs in icon-sets-sync (drop unused namespace declarations) or upstream. Measured 2026-11-05: the only 2 of 8,568."
+        },
+        {
+          "path": "openmoji-black/uncategorised/1f3f4-e0063-e0061-e0071-e0063-e007f.svg",
+          "reason": "An unused xmlns:sodipodi declaration on <svg>, left by Inkscape, at 25280ae1. icon-sets-sync's sanitiser strips sodipodi:docname but keeps namespace declarations, and this policy rejects any attribute not on the allow-list. The fix belongs in icon-sets-sync (drop unused namespace declarations) or upstream. Measured 2026-11-05: the only 2 of 8,568."
         }
       ]
     }
