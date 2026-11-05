@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { build } from 'esbuild';
 import { ATTRIBUTION_DIRS, countOutputs, generate, readPackWithCounts, type Manifest } from '../src/generator/generate.ts';
-import { loadPacks, needsAttribution, resolveSource, type PackConfig } from '../src/generator/packs.ts';
+import { loadPacks, needsAttribution, resolveAttribution, resolveSource, type PackConfig } from '../src/generator/packs.ts';
 import { ALL_FLAVOURS } from '../src/shared/index.ts';
 import { CACHE, packs, ROOT, tabler } from './helpers.ts';
 
@@ -101,7 +101,7 @@ describe('attribution', () => {
     expect(ccPacks.map((p) => [p.id, p.licence])).toEqual([['emoji', 'CC-BY-4.0'], ['openmoji', 'CC-BY-SA-4.0']]);
   });
 
-  it.each(PACKS.flatMap((p) => p.attribution.flatMap((file) => ATTRIBUTION_DIRS.map((dir) => [p.id, dir, p.id, file.split('/').pop() as string] as const))))(
+  it.each(PACKS.flatMap((p) => resolveAttribution(p, ROOT).flatMap((file) => ATTRIBUTION_DIRS.map((dir) => [p.id, dir, p.id, file.split('/').pop() as string] as const))))(
     '%s ships dist/%s/%s/%s',
     (id, dir, _id, name) => {
       const file = join(out, dir, id, name);
@@ -113,7 +113,7 @@ describe('attribution', () => {
   it.each(ccPacks.map((p) => [p.id, p] as const))('%s: the attribution names the artwork licence, and the manifest lists every copy', (id, pack) => {
     const text = readFileSync(join(out, 'react', id, 'ATTRIBUTION.md'), 'utf8');
     expect(text).toContain(pack.licence === 'CC-BY-SA-4.0' ? 'CC-BY-SA 4.0' : 'CC-BY 4.0');
-    expect(manifest.packs.find((p) => p.id === id)?.attribution).toHaveLength(pack.attribution.length * ATTRIBUTION_DIRS.length);
+    expect(manifest.packs.find((p) => p.id === id)?.attribution).toHaveLength(resolveAttribution(pack, ROOT).length * ATTRIBUTION_DIRS.length);
   });
 
   it('every generated module carries the artwork licence in a comment bundlers keep', () => {

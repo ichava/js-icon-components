@@ -71,10 +71,16 @@ refuses two icons with one name. See [Packs](packs.md#ids-are-prefixed-per-icon)
 
 ## Artwork licences
 
-The generator is MIT; the art keeps its licence. Each pack names its artwork's SPDX expression and
-the files that travel with it, read at the pinned commit and copied to `dist/<flavour>/<pack>/`,
-and every generated module opens with a `/*!` legal comment naming both. A CC-BY or CC-BY-SA pack
-with no attribution files is refused when `packs.json` loads.
+The generator is MIT; the art keeps its licence. Each pack names its artwork's SPDX expression.
+The files that travel with it are found by convention at the pinned commit, the pack's
+`ATTRIBUTION.md` and every file under `resources/assets/svg/licenses/`, unless `packs.json` gives
+an explicit `attribution` list. They are copied to `dist/<flavour>/<pack>/`, and every generated
+module opens with a `/*!` legal comment naming them. A CC-BY or CC-BY-SA pack with no attribution
+files, or an explicit entry that names no file, fails the build.
+
+Why convention: packs.json used to name each file, so a pack renaming its licence
+(icon-sets-openmoji#8, `LICENSE` to `LICENSE.txt`) broke the next pin bump here, in a repository
+that had not changed.
 
 ## The guards
 

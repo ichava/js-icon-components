@@ -1,5 +1,5 @@
 {
-  "$comment": "The packs this repository generates components for. Each is read from git at the pinned commit `ref` (a full SHA, never a branch), from the sibling checkout `checkout` when it holds that commit, else by a shallow fetch of `repository`. Adding a pack is a new entry here; moving a pack forward is a new `ref`. `minIcons` is the floor the count guard enforces, set a little under the measured count. `licence` is the artwork's SPDX expression; `attribution` lists the files, read at `ref`, copied to dist/<flavour>/<pack>/. `exclude` lists source SVGs the policy rejects, each with its reason; an entry that stops being rejected fails the build. ichava/icon-sets-bundled is not here: it is private, proprietary and for internal and client use only, so a public package cannot ship it. ichava/icon-sets-metronic is private and never shown publicly.",
+  "$comment": "The packs this repository generates components for. Each is read from git at the pinned commit `ref` (a full SHA, never a branch), from the sibling checkout `checkout` when it holds that commit, else by a shallow fetch of `repository`. Adding a pack is a new entry here; moving a pack forward is a new `ref`. `minIcons` is the floor the count guard enforces, set a little under the measured count. `licence` is the artwork's SPDX expression; Attribution files are found by convention, read at `ref`: the pack's ATTRIBUTION.md and every file under resources/assets/svg/licenses/, copied to dist/<flavour>/<pack>/; an optional `attribution` list overrides that for a pack that needs it, and an entry that names no file fails the build. `exclude` lists source SVGs the policy rejects, each with its reason; an entry that stops being rejected fails the build. ichava/icon-sets-bundled is not here: it is private, proprietary and for internal and client use only, so a public package cannot ship it. ichava/icon-sets-metronic is private and never shown publicly.",
   "packs": [
     {
       "id": "tabler",
@@ -11,8 +11,7 @@
       "defaultSet": "outline",
       "kind": "icon",
       "minIcons": 6000,
-      "licence": "MIT",
-      "attribution": ["ATTRIBUTION.md", "resources/assets/svg/licenses/tabler-icons/LICENSE"]
+      "licence": "MIT"
     },
     {
       "id": "flag",
@@ -24,8 +23,7 @@
       "defaultSet": "4x3",
       "kind": "icon",
       "minIcons": 520,
-      "licence": "MIT",
-      "attribution": ["ATTRIBUTION.md"]
+      "licence": "MIT"
     },
     {
       "id": "emoji",
@@ -39,8 +37,7 @@
       "categories": true,
       "kind": "icon",
       "minIcons": 3300,
-      "licence": "CC-BY-4.0",
-      "attribution": ["ATTRIBUTION.md"]
+      "licence": "CC-BY-4.0"
     },
     {
       "id": "openmoji",
@@ -54,7 +51,6 @@
       "kind": "icon",
       "minIcons": 7000,
       "licence": "CC-BY-SA-4.0",
-      "attribution": ["ATTRIBUTION.md", "resources/assets/svg/licenses/openmoji/LICENSE.txt"],
       "exclude": [
         {
           "path": "openmoji-color/uncategorised/1f3f4-e0063-e0061-e0071-e0063-e007f.svg",

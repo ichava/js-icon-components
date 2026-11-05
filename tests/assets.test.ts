@@ -5,6 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { parse as parseYaml } from 'yaml';
 import { ASSET_FILES, cssMask, dataUriMap, isMonochrome, slugs, standaloneSvg, svgDataUri } from '../src/generator/assets.ts';
 import { checkAssetCounts, countAssets, readPack, writeAssets, type NamedIcon } from '../src/generator/generate.ts';
+import { resolveAttribution } from '../src/generator/packs.ts';
 import { ASSET_TARGETS, type AssetTarget } from '../src/shared/index.ts';
 import { iconsFrom, pack, readZip, ROOT, SAMPLE } from './helpers.ts';
 
@@ -133,7 +134,7 @@ describe('SVG only', () => {
   const SVG_BASED = /\.(svg|css|json|dart|yaml)$/;
 
   it('every file the asset exports write, and every entry in their zips, is SVG-based', () => {
-    const attribution = new Set(pack('flag').attribution.map((f) => f.split('/').pop() as string));
+    const attribution = new Set(resolveAttribution(pack('flag'), ROOT).map((f) => f.split('/').pop() as string));
     const dir = join(out, 'assets/flag');
     const files = readdirSync(dir);
     expect(files.sort()).toEqual(ASSET_TARGETS.flatMap((t) => ASSET_FILES[t]).sort());

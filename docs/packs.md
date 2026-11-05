@@ -63,7 +63,7 @@ dist/vue/openmoji/…  dist/svelte/openmoji/…  dist/wc/openmoji/…
 Every generated module also opens with a legal comment, which bundlers keep:
 
 ```js
-/*! openmoji artwork: CC-BY-SA-4.0. Attribution and licence: ../openmoji/ATTRIBUTION.md, ../openmoji/LICENSE */
+/*! openmoji artwork: CC-BY-SA-4.0. Attribution and licence: ../openmoji/ATTRIBUTION.md, ../openmoji/LICENSE.txt */
 ```
 
 **If you ship Twemoji or OpenMoji icons, you take on their licence.** CC-BY 4.0 asks for credit
@@ -83,12 +83,16 @@ repeats its ids, harmlessly: both copies define the same content.
 ## Adding a pack
 
 Add an entry to `packs.json`: `id`, `repository`, a full commit `ref`, `path`, `sets`,
-`defaultSet`, `kind`, `minIcons`, the artwork `licence` as an SPDX expression and its
-`attribution` files, plus `categories: true` when sets nest a category directory, and
-`themeVariants: { "dark": "-dark" }` when a pack ships theme twins (`scene-dark.svg` beside
-`scene.svg`), which then fold into their light item as `variants.dark`. A pack whose
-licence is CC-BY or CC-BY-SA must list attribution files, or the build refuses it. Then add its
-measured count to `tests/generate.test.ts`.
+`defaultSet`, `kind`, `minIcons` and the artwork `licence` as an SPDX expression, plus
+`categories: true` when sets nest a category directory, and `themeVariants: { "dark": "-dark" }`
+when a pack ships theme twins (`scene-dark.svg` beside `scene.svg`), which then fold into their
+light item as `variants.dark`. Then add its measured count to `tests/generate.test.ts`.
+
+The attribution files are found by convention at the pinned commit: the pack's `ATTRIBUTION.md`
+and every file under `resources/assets/svg/licenses/`. A pack can rename its licence text without
+an edit here. Give an `attribution` list only for a pack that needs something else; each entry must
+name a file at `ref`, or the build fails. A CC-BY or CC-BY-SA pack with no attribution files, or
+two files that would share a basename in `dist/`, is refused.
 
 ---
 
