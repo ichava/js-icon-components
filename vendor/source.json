@@ -4,13 +4,13 @@
     "svg-policy.json": {
       "repository": "ichava/core",
       "path": "resources/security/svg-policy.json",
-      "commit": "49938407a5cc62e855b369e58534284d3f4ef84a",
+      "commit": "9bd8b3a9de2ddd25bbd48be5996953a9171d2b0c",
       "sha256": "49ee43cea254be2c1fcec2a1fdd37a097889df78466ffe6e9c2e653f65f8fd06"
     },
     "icon-browser.schema.json": {
       "repository": "ichava/icon-browser",
       "path": "resources/schema/icon-browser.schema.json",
-      "commit": "3531662dfb221c6fe01238e2e44dabe44d2907cc",
+      "commit": "97631b1991f2ee54632500c8c5b66c17a323fa71",
       "sha256": "4c9c51a357acb248de29eafe7f4b930bda2327a009a8e017309e53e25c9fd310"
     }
   },
@@ -19,7 +19,7 @@
     "src/generator/svgPolicy.ts": {
       "repository": "ichava/react-icon-browser",
       "path": "src/modules/svg/domain/svgPolicy.ts",
-      "commit": "876bba9c246280006d24f3c265ddfdfcb60db66f",
+      "commit": "054c2b329b5787c75dac03bfd4b0c905fd5f2d2a",
       "sha256": "3555ca7b1c0de456a6cbc85ebacb61a828279e7b9e0da335df36ea8d48c0a72e"
     }
   }
