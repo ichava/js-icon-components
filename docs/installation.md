@@ -1,18 +1,20 @@
 # Installation
 
-Two ways in: the prebuilt tarball from a GitHub release (the default, nothing to build or
-configure), or a build from a git tag that you can limit to the packs and flavours you use.
+There is no release yet, so today there is one way in: a build from git, from the default branch or
+a commit you pin, that you can limit to the packs and flavours you use. The first release adds a
+prebuilt tarball, described below so its shape is known; this page names its URL once the tag exists.
+`tests/install-docs.test.ts` fails if a page names a tag the repository does not have.
 
-## From the release tarball
+## From a release tarball (after the first release)
 
 ```bash
-npm install https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-0.1.0.tgz
+npm install https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-<version>.tgz
 ```
 
 ```json
 {
   "dependencies": {
-    "@ichava/js-icon-components": "https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-0.1.0.tgz"
+    "@ichava/js-icon-components": "https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-<version>.tgz"
   }
 }
 ```
@@ -30,8 +32,8 @@ or more install side by side:
 
 ```bash
 npm install \
-  https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-tabler-0.1.0.tgz \
-  https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-flag-0.1.0.tgz
+  https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-tabler-<version>.tgz \
+  https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-flag-<version>.tgz
 ```
 
 ```ts
@@ -46,10 +48,11 @@ installs two and imports from both.
 
 `SHA256SUMS` on the release lists the checksum of every tarball.
 
-## From a git tag
+## From git
 
 ```bash
-npm install "github:ichava/js-icon-components#v0.1.0"
+npm install "github:ichava/js-icon-components"
+npm install "github:ichava/js-icon-components#<commit-sha>"   # pinned
 ```
 
 npm clones the repository, installs its development dependencies (the compilers) in a temporary
@@ -62,8 +65,8 @@ directory and runs `prepare`, which is `scripts/prepare.mjs`:
    that commit, checks every SVG against the policy and writes the modules.
 
 So `git` must be on the path and `github.com` reachable. Only `dist/` reaches your
-`node_modules`; the compilers stay in npm's temporary clone. Pin a tag, never a branch: a tag is
-final and never moves.
+`node_modules`; the compilers stay in npm's temporary clone. Until the first tag, pin a commit SHA for
+reproducible installs; after it, pin the tag, which is final and never moves.
 
 ### Choosing what to build
 

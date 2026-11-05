@@ -35,6 +35,9 @@ jobs:
         node: ['24', '26']
     steps:
       - uses: actions/checkout@v7
+        with:
+          # tests/install-docs.test.ts checks every documented tag against `git tag -l`.
+          fetch-tags: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v7

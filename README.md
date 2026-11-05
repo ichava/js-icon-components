@@ -22,31 +22,20 @@ Node 24 or newer to install. The framework is an optional peer, for the flavour 
 
 ## Install
 
-The prebuilt tarball from the GitHub release. Nothing is compiled on your machine and nothing
-needs configuring:
-
-```bash
-npm install https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-0.1.0.tgz
-```
-
-It has every pack, flavour and export (62 MB to download, most of it the CSS, data URI and native exports).
-Each release also carries one tarball per pack, `ichava-js-icon-components-<pack>-0.1.0.tgz`
-(`tabler`, `flag`, `emoji` or `openmoji`), installed as `@ichava/js-icon-components-<pack>` with
-the same subpaths, so two packs install side by side:
-
-```ts
-import { IconMug } from '@ichava/js-icon-components-tabler/react/tabler';
-import { IconKe } from '@ichava/js-icon-components-flag/react/flag';
-```
-
-Or build from a git tag. npm clones the repository, installs the compilers and runs `prepare`,
-which needs `git` on the path. Choose what it builds with environment variables, or the same keys
-under `"ichava": { "icons": { … } }` in your `package.json`:
+There is no release yet: no tag, no GitHub release and no tarball. Until the first one, install from
+the default branch, or pin the commit you tested with. npm clones the repository, installs the
+compilers and runs `prepare`, which needs `git` on the path. Choose what it builds with environment
+variables, or the same keys under `"ichava": { "icons": { … } }` in your `package.json`:
 
 ```bash
 ICHAVA_ICONS_PACKS=tabler ICHAVA_ICONS_FLAVOURS=react \
-  npm install "github:ichava/js-icon-components#v0.1.0"
+  npm install "github:ichava/js-icon-components"
+# or pinned: npm install "github:ichava/js-icon-components#<commit-sha>"
 ```
+
+The first release will also attach a prebuilt tarball with every pack, flavour and export, and one
+per pack (`@ichava/js-icon-components-<pack>`, so two packs install side by side). This README names
+its URL once the tag exists; `tests/install-docs.test.ts` fails if it names a tag that does not.
 
 | Variable | `package.json` key | Effect |
 |---|---|---|
