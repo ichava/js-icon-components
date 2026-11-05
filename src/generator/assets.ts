@@ -1,5 +1,4 @@
 import { serialiseSvg, SVG_NS, type AssetTarget, type IconChild, type IconData } from '../shared/index.ts';
-import { toVectorDrawable, VdUnsupported } from '../native/vectordrawable.ts';
 import { elmModuleSegment } from './elm.ts';
 import type { NamedIcon } from './generate.ts';
 import { zip, type ZipEntry } from './zip.ts';
@@ -13,7 +12,9 @@ import { zip, type ZipEntry } from './zip.ts';
  *   data-uri    data-uri.json     { "<slug>": "data:image/svg+xml,…" }
  *   flutter     flutter.zip       assets/ichava/<pack>/<set>/<name>.svg, lib/ichava_<pack>_icons.dart, pubspec.fragment.yaml
  *   swiftui     swiftui.zip       Ichava<Pack>.xcassets with one imageset per icon
- *   android-vd  android-vd.zip    res/drawable/ichava_<pack>_<slug>.xml, plus android-vd-skipped.json
+ *
+ * Every file they write is SVG, or CSS, JSON, Dart or YAML that carries or indexes SVG, plus the
+ * pack's attribution files (tests/assets.test.ts holds this): the ecosystem is strictly SVG.
  */
 
 /** Where each target writes, relative to `dist/assets/<pack>/`. */
@@ -22,7 +23,6 @@ export const ASSET_FILES: Readonly<Record<AssetTarget, readonly string[]>> = {
   'data-uri': ['data-uri.json'],
   flutter: ['flutter.zip'],
   swiftui: ['swiftui.zip'],
-  'android-vd': ['android-vd.zip', 'android-vd-skipped.json'],
 };
 
 /** `mug` in the default set is `mug`; in `filled` it is `mug-filled`. Lower-case, `[a-z0-9-]`. */
@@ -178,28 +178,4 @@ export function swiftuiZip(packId: string, icons: readonly NamedIcon[], names: r
     );
   });
   return zip(entries);
-}
-
-export interface AndroidResult {
-  readonly zip: Buffer;
-  readonly written: number;
-  /** Icons that could not be expressed exactly, each with the construct that stopped it. */
-  readonly skipped: readonly { readonly id: string; readonly reason: string }[];
-}
-
-/** An Android resource name: `[a-z0-9_]`, starting with a letter. */
-export const androidName = (packId: string, s: string): string => `ichava_${packId}_${s}`.replace(/[^a-z0-9_]/g, '_');
-
-export function androidZip(packId: string, icons: readonly NamedIcon[], names: readonly string[], attribution: readonly ZipEntry[] = []): AndroidResult {
-  const entries: ZipEntry[] = [];
-  const skipped: { id: string; reason: string }[] = [];
-  icons.forEach((icon, n) => {
-    try {
-      entries.push({ path: `res/drawable/${androidName(packId, names[n] as string)}.xml`, data: toVectorDrawable(icon.data) });
-    } catch (e) {
-      if (!(e instanceof VdUnsupported)) throw e;
-      skipped.push({ id: icon.data.id, reason: e.message });
-    }
-  });
-  return { zip: zip([...attribution, ...entries]), written: entries.length, skipped };
 }

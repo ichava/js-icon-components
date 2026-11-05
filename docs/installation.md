@@ -76,8 +76,10 @@ final and never moves.
 Packs are `tabler`, `flag`, `emoji` and `openmoji`. Flavours are named by their subpath: `react`,
 `vue`, `svelte`, `wc`, `react-native`, `angular`, `solid`, `preact`, `astro`, `qwik`, `ember` and
 `elm` (the registry ids `webcomponent` and `reactNative` work too). The asset exports go in the same
-list, by registry id: `css-mask`, `data-uri`, `flutter`, `swiftui` and `android-vd`. There is no
-PNG export: `png-zip` was dropped with icon-browser's schema 1.7.0 (owner decision, 2026-11-04).
+list, by registry id: `css-mask`, `data-uri`, `flutter` and `swiftui`. The ichava icon ecosystem is
+strictly SVG, so there is no PNG export (`png-zip`, dropped with icon-browser's schema 1.7.0) and no
+Android VectorDrawable export (`android-vd`, dropped with schema 1.8.0), both by owner decision on
+2026-11-04.
 Unset or empty means everything; a list builds exactly what it names, so `react` alone builds no
 export and `css-mask` alone builds no flavour. An unknown name fails the install, listing the valid
 ones. An Elm module or an export that was not built is simply absent: neither is a JavaScript module,
@@ -118,18 +120,18 @@ writes no `dist/` at all.
 ## Size and time
 
 Measured 2026-11-04 on an Apple-silicon laptop with Node 24.17 and npm 11.13, a warm npm cache,
-the four packs (17,365 icons), twelve flavours and five asset exports, after the PNG export was dropped. Install times are wall-clock
+the four packs (17,365 icons), twelve flavours and four asset exports, after the PNG and Android VectorDrawable exports were dropped. The tarball rows were re-measured after the Android export left; the git rows' times were measured before it, when the tree held about 16 MB more. Install times are wall-clock
 for a fresh application, offline for a tarball and from GitHub for a git build; on disk is `du`, which is larger than the
 byte count because each small file takes at least one 4 KB block.
 
 | Install | Download | Unpacked | On disk | Files | Time |
 |---|---:|---:|---:|---:|---:|
-| Release tarball, full | 62.3 MB | 266.1 MB | 319 MB | 17,632 | 19 s |
-| Release tarball, `tabler` | 9.8 MB | 45.3 MB | 67 MB | 6,450 | 7 s |
-| Release tarball, `flag` | 9.2 MB | 31.8 MB | 32 MB | 721 | 2 s |
-| Release tarball, `emoji` | 16.8 MB | 65.8 MB | 75 MB | 3,614 | 4 s |
-| Release tarball, `openmoji` | 29.7 MB | 151.6 MB | 171 MB | 7,324 | 8 s |
-| Git, every pack, flavour and export | | | 319 MB | 17,632 | 69 s |
+| Release tarball, full | 49.6 MB | 249.4 MB | 303 MB | 17,622 | 12 s |
+| Release tarball, `tabler` | 7.6 MB | 42.1 MB | 64 MB | 6,446 | 6 s |
+| Release tarball, `flag` | 8.6 MB | 31.2 MB | 32 MB | 717 | 2 s |
+| Release tarball, `emoji` | 13.1 MB | 61.1 MB | 72 MB | 3,610 | 4 s |
+| Release tarball, `openmoji` | 23.5 MB | 143.2 MB | 164 MB | 7,320 | 6 s |
+| Git, every pack, flavour and export | | | 303 MB | 17,622 | 69 s |
 | Git, `tabler` for `react,css-mask` | | | 17 MB | 166 | 24 s |
 | Git, `ICHAVA_ICONS_SKIP_BUILD=1` | | | 0 | 3 | 17 s |
 
@@ -143,7 +145,6 @@ compressed (the zips) or large text (the CSS and JSON), so gzip barely shrinks t
 | Data URI (`data-uri.json`) | 36.5 MB | 0.8 s |
 | Flutter (`flutter.zip`) | 16.1 MB | 1.0 s |
 | SwiftUI (`swiftui.zip`) | 23.7 MB | 1.4 s |
-| Android (`android-vd.zip`) | 16.7 MB | 1.8 s |
 
 The whole build (`npm run build`: `tsc`, `ngc`, then the generator for every pack, flavour and
 export) takes about 15 s, of which generation is 11 to 12 s (27 s and 24 s while it still rasterised PNGs); a git build that names only the flavours it uses

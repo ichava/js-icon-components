@@ -49,10 +49,11 @@ describe('selection', () => {
 
   it('names asset exports in the same list as flavours, and a list of exports alone builds no flavour', () => {
     expect(parseSelection({ flavours: 'data-uri,react,css-mask' }, IDS)).toEqual({ packs: IDS, flavours: ['react'], assets: ['css-mask', 'data-uri'] });
-    expect(parseSelection({ flavours: 'android-vd' }, IDS)).toEqual({ packs: IDS, flavours: [], assets: ['android-vd'] });
+    expect(parseSelection({ flavours: 'swiftui' }, IDS)).toEqual({ packs: IDS, flavours: [], assets: ['swiftui'] });
+    expect(() => parseSelection({ flavours: 'android-vd' }, IDS)).toThrow(/unknown/);
     expect(parseSelection({ flavours: 'qwik,elm,ember' }, IDS)).toEqual({ packs: IDS, flavours: ['qwik', 'ember', 'elm'], assets: [] });
     expect(() => parseSelection({ flavours: 'png-zip' }, IDS)).toThrow(/unknown/);
-    expect(() => parseSelection({ flavours: 'png' }, IDS)).toThrow(/the asset exports are css-mask, data-uri, flutter, swiftui, android-vd/);
+    expect(() => parseSelection({ flavours: 'png' }, IDS)).toThrow(/the asset exports are css-mask, data-uri, flutter, swiftui\./);
   });
 
   it('refuses an unknown pack or flavour, naming the variable and the valid names', () => {

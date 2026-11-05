@@ -1,9 +1,9 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { JSDOM } from 'jsdom';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { parse as parseYaml } from 'yaml';
-import { cssMask, dataUriMap, isMonochrome, slugs, standaloneSvg, svgDataUri } from '../src/generator/assets.ts';
+import { ASSET_FILES, cssMask, dataUriMap, isMonochrome, slugs, standaloneSvg, svgDataUri } from '../src/generator/assets.ts';
 import { checkAssetCounts, countAssets, readPack, writeAssets, type NamedIcon } from '../src/generator/generate.ts';
 import { ASSET_TARGETS, type AssetTarget } from '../src/shared/index.ts';
 import { iconsFrom, pack, readZip, ROOT, SAMPLE } from './helpers.ts';
@@ -124,15 +124,32 @@ describe('swiftui', () => {
   });
 });
 
-describe('android-vd', () => {
-  it('writes or reports every icon, and lists each skipped one with its reason', () => {
-    const report = JSON.parse(asset('android-vd-skipped.json').toString('utf8')) as { written: number; skipped: { id: string; reason: string }[] };
-    const drawables = [...readZip(asset('android-vd.zip')).keys()].filter((k) => k.startsWith('res/drawable/'));
-    expect(drawables).toHaveLength(report.written);
-    expect(report.written + report.skipped.length).toBe(counts['android-vd'] as number);
-    expect(report.skipped.length).toBeGreaterThan(0);
-    for (const s of report.skipped) expect(s.reason).not.toBe('');
-    expect(drawables.every((d) => /^res\/drawable\/ichava_flag_[a-z0-9_]+\.xml$/.test(d))).toBe(true);
+describe('SVG only', () => {
+  /**
+   * The ichava icon ecosystem is strictly SVG (owner rule, 2026-11-04): an asset export writes SVG,
+   * or CSS, JSON, Dart or YAML that carries or indexes SVG (Contents.json included), and the pack's
+   * own attribution files. A raster or a non-SVG vector file (PNG, VectorDrawable XML, PDF) fails.
+   */
+  const SVG_BASED = /\.(svg|css|json|dart|yaml)$/;
+
+  it('every file the asset exports write, and every entry in their zips, is SVG-based', () => {
+    const attribution = new Set(pack('flag').attribution.map((f) => f.split('/').pop() as string));
+    const dir = join(out, 'assets/flag');
+    const files = readdirSync(dir);
+    expect(files.sort()).toEqual(ASSET_TARGETS.flatMap((t) => ASSET_FILES[t]).sort());
+    const written: string[] = [];
+    for (const file of files) {
+      if (file.endsWith('.zip')) written.push(...[...readZip(asset(file)).keys()].filter((k) => !k.endsWith('/')).map((k) => `${file}:${k}`));
+      else written.push(file);
+    }
+    expect(written.length).toBeGreaterThan(flagIcons * 3);
+    const bad = written.filter((w) => !SVG_BASED.test(w) && !attribution.has(w.split('/').pop()!.split(':').pop()!));
+    expect(bad).toEqual([]);
+  });
+
+  it('owns no android-vd export: the targets are the four SVG-carrying ones', () => {
+    expect([...ASSET_TARGETS]).toEqual(['css-mask', 'data-uri', 'flutter', 'swiftui']);
+    expect(Object.keys(ASSET_FILES)).toEqual([...ASSET_TARGETS]);
   });
 });
 

@@ -31,18 +31,23 @@ const SUBPATH: Record<(typeof ALL_FLAVOURS)[number], string> = {
 };
 
 describe('format registry', () => {
-  it('read the whole 1.7.0 registry: 26 formats, every one with a delivery', () => {
-    expect(schema.version).toBe('1.7.0');
-    expect(registry).toHaveLength(26);
-    expect(new Set(registry.map((f) => f.id)).size).toBe(26);
-    expect(schema.$defs.format.enum).toHaveLength(26);
+  it('read the whole 1.8.0 registry: 25 formats, every one with a delivery', () => {
+    expect(schema.version).toBe('1.8.0');
+    expect(registry).toHaveLength(25);
+    expect(new Set(registry.map((f) => f.id)).size).toBe(25);
+    expect(schema.$defs.format.enum).toHaveLength(25);
     expect(registry.every((f) => ['generated', 'asset', 'laravel', 'client'].includes(f.delivery))).toBe(true);
     expect(ALL_FLAVOURS).toHaveLength(12);
-    expect(ASSET_TARGETS).toHaveLength(5);
+    expect(ASSET_TARGETS).toHaveLength(4);
     expect(FLAVOURS.length + PENDING_FLAVOURS.length + TIER3_FLAVOURS.length).toBe(ALL_FLAVOURS.length);
-    expect(GENERATOR_FORMATS).toHaveLength(17);
+    expect(GENERATOR_FORMATS).toHaveLength(16);
     expect(registry.map((f) => f.id)).not.toContain('png-zip');
     expect(GENERATOR_FORMATS as readonly string[]).not.toContain('png-zip');
+    // The ichava icon ecosystem is strictly SVG (owner rule, 2026-11-04): android-vd left with 1.8.0.
+    expect(registry.map((f) => f.id)).not.toContain('android-vd');
+    expect(schema.$defs.format.enum).not.toContain('android-vd');
+    expect(GENERATOR_FORMATS as readonly string[]).not.toContain('android-vd');
+    expect([...NATIVE_TARGETS]).toEqual(['flutter', 'swiftui']);
   });
 
   it.each(ALL_FLAVOURS)('%s is a generated, copyable format in the registry and the enum', (flavour) => {
@@ -65,7 +70,7 @@ describe('format registry', () => {
     const owned = registry.filter((f) => f.delivery === 'generated' || f.delivery === 'asset').map((f) => f.id);
     expect(owned.sort()).toEqual([...GENERATOR_FORMATS].sort());
     const elsewhere = registry.filter((f) => f.delivery === 'laravel' || f.delivery === 'client').map((f) => f.id);
-    expect(elsewhere).toHaveLength(26 - GENERATOR_FORMATS.length);
+    expect(elsewhere).toHaveLength(25 - GENERATOR_FORMATS.length);
     for (const id of elsewhere) expect(GENERATOR_FORMATS as readonly string[]).not.toContain(id);
   });
 
