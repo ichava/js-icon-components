@@ -14,6 +14,7 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ### Changed
 
+- **The SVG policy interpreter follows react-icon-browser at `876bba9`**: the policy is narrowed by `isSvgPolicy` at load instead of cast (re-audit F-15). Body re-copied byte for byte; `vendor/source.json` records the new commit and digest.
 - **The install docs promise nothing that does not exist.** There is no tag or release yet, so the README and `docs/installation.md` install from git (the default branch, or a pinned commit) and describe the release tarball without naming a tag. `tests/install-docs.test.ts` fails when the README or a docs page names a tag (`#vX.Y.Z`, `/releases/download/vX.Y.Z/`) that `git tag -l` does not list; CI checks out with tags. `docs/release.md` is exempt, since it names the tag it tells you to cut.
 - **The SVG policy interpreter is pinned to its source.** `src/generator/svgPolicy.ts` is the runtime preamble, a marker, then react-icon-browser's `svgPolicy.ts` from its second line, byte for byte (`c9707562`, which adds the `PRESENTATION_ATTRIBUTES` export the hand copy had lost). `vendor/source.json` records it under `interpreters`, and `tests/vendored.test.ts` pins the body by digest and compares it with the sibling checkout when present.
 
