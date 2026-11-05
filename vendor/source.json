@@ -13,5 +13,14 @@
       "commit": "3531662dfb221c6fe01238e2e44dabe44d2907cc",
       "sha256": "4c9c51a357acb248de29eafe7f4b930bda2327a009a8e017309e53e25c9fd310"
     }
+  },
+  "$comment_interpreters": "Source files whose body is a copy of another repository's file. Each file holds its own preamble (imports that differ by runtime), then the marker line, then the source file from its second line onward, byte for byte. tests/vendored.test.ts pins the body by sha256 and compares it with the sibling checkout when present. To take a new copy: replace everything after the marker with the source from line 2, then update commit and sha256 here.",
+  "interpreters": {
+    "src/generator/svgPolicy.ts": {
+      "repository": "ichava/react-icon-browser",
+      "path": "src/modules/svg/domain/svgPolicy.ts",
+      "commit": "c9707562a3f081eec5ef9504fa49acfcf2620f75",
+      "sha256": "2d4850a2d5475eab17c751dbedf55c210ce1cce87008258d88a6dbc42e31be82"
+    }
   }
 }

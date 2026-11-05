@@ -1,11 +1,14 @@
-// Copied from ichava/react-icon-browser src/modules/svg/domain/svgPolicy.ts at
-// 7188f57a5c3027e75e3833424a24e83c5a324bae. Only the policy import differs: that package bundles the
-// JSON through Vite, this one reads vendor/svg-policy.json (a byte copy of
-// core/resources/security/svg-policy.json, pinned by digest in tests/svg-policy.test.ts).
-// Keep the logic below identical to the source so the runtimes agree about what the policy means.
+// The SVG policy interpreter, copied from ichava/react-icon-browser
+// src/modules/svg/domain/svgPolicy.ts at the commit vendor/source.json records under `interpreters`.
+// Only this preamble differs: that package bundles the JSON through Vite, this one reads
+// vendor/svg-policy.json (a byte copy of core/resources/security/svg-policy.json, pinned by
+// digest). Everything after the marker is the source from its second line, pinned by digest in
+// tests/vendored.test.ts, so the runtimes agree about what the policy means.
 import { readFileSync } from 'node:fs';
 
 const policy: unknown = JSON.parse(readFileSync(new URL('../../vendor/svg-policy.json', import.meta.url), 'utf8'));
+
+// ---- vendored body: the source file from its second line, byte for byte ----
 
 /**
  * Derives this runtime's sanitiser configuration from the shared SVG policy.
@@ -179,24 +182,25 @@ export function styleValueIsSafe(value: string): boolean {
 }
 
 /**
- * `display` holds one or more bare keywords: no parens, so no `url()` or other function, and no
- * backslash, so no escape that spells one.
+ * `display` holds one or more bare keywords: no parens, so no `url()` or other function,
+ * and no backslash, so no escape that spells one.
  */
 const DISPLAY_KEYWORDS = /^[A-Za-z][A-Za-z-]*(?: [A-Za-z][A-Za-z-]*)*$/;
 
 /** The only non-keyword a `marker-*` attribute may hold: `url(#id)`, quotes matched. */
 const MARKER_REFERENCE = /^url\(\s*(?:#[A-Za-z_][\w.:-]*|"#[A-Za-z_][\w.:-]*"|'#[A-Za-z_][\w.:-]*')\s*\)$/;
 
+/** The attributes `presentationValueIsSafe` judges. Every other name passes it. */
+export const PRESENTATION_ATTRIBUTES: readonly string[] = ['display', 'color', 'marker-start', 'marker-mid', 'marker-end'];
+
 /**
- * Value guards for the presentation attributes added in icon-sets-sync#85. OpenMoji hides the
- * construction shapes of its subdivision flags with `display="none"`, and stripping it makes them
- * render.
+ * Value guards for the presentation attributes added in icon-sets-sync#85. OpenMoji
+ * hides the construction shapes of its subdivision flags with `display="none"`, and
+ * stripping it makes them render.
  *
  *  - `display`: bare keywords only, and through `cssValueIsSafe`.
  *  - `color`: `cssValueIsSafe`.
  *  - `marker-start`, `marker-mid`, `marker-end`: `none`, or `url(#id)` through `cssValueIsSafe`.
- *
- * Every other name passes.
  */
 export function presentationValueIsSafe(name: string, value: string): boolean {
   const v = value.trim();
