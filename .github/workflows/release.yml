@@ -38,14 +38,17 @@ concurrency:
   # queued one.
   cancel-in-progress: false
 
+# Read-only by default; the one job that writes the release asks for it.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   release:
     name: Publish release
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
 
     env:
       # The tag being released: the pushed tag, or the dispatch input.
@@ -76,6 +79,8 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: '24'
+          # A release never restores a cache another run could have written.
+          package-manager-cache: false
 
       # --ignore-scripts: `prepare` builds with the dev toolchain, which --omit=dev leaves
       # out. The SBOM describes what ships, and this package ships no runtime dependency.
