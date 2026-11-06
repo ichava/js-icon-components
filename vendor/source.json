@@ -4,13 +4,13 @@
     "svg-policy.json": {
       "repository": "ichava/core",
       "path": "resources/security/svg-policy.json",
-      "commit": "9bd8b3a9de2ddd25bbd48be5996953a9171d2b0c",
+      "commit": "c2d79a6bd30cfb86e74761eed4e5d644e2306a14",
       "sha256": "49ee43cea254be2c1fcec2a1fdd37a097889df78466ffe6e9c2e653f65f8fd06"
     },
     "icon-browser.schema.json": {
       "repository": "ichava/icon-browser",
       "path": "resources/schema/icon-browser.schema.json",
-      "commit": "97631b1991f2ee54632500c8c5b66c17a323fa71",
+      "commit": "466b8fb1c1d6ceebe0cc299e776ce71d986f796f",
       "sha256": "4c9c51a357acb248de29eafe7f4b930bda2327a009a8e017309e53e25c9fd310"
     }
   },
