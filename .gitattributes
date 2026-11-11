@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+# Keep the dist tarball lean: none of this is needed to consume the package.
+/.github         export-ignore
+/docs            export-ignore
+/tests           export-ignore
+/.editorconfig   export-ignore
+/.gitattributes  export-ignore
+/CONTRIBUTING.md export-ignore
