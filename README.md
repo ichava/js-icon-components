@@ -22,29 +22,31 @@ Node 24 or newer to install. The framework is an optional peer, for the flavour 
 
 ## Install
 
-There is no release yet: no tag, no GitHub release and no tarball. Until the first one, install from
-the default branch, or pin the commit you tested with. npm clones the repository, installs the
-compilers and runs `prepare`, which needs `git` on the path. Choose what it builds with environment
-variables, or the same keys under `"ichava": { "icons": { … } }` in your `package.json`:
+Two paths, chosen per application. The prebuilt release tarball has every pack, flavour and export
+and builds nothing:
+
+```bash
+npm install https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-0.1.0.tgz
+```
+
+A git build compiles only what you choose, with environment variables or the same keys under
+`"ichava": { "icons": { … } }` in your `package.json`. It needs `git` on the path:
 
 ```bash
 ICHAVA_ICONS_PACKS=tabler ICHAVA_ICONS_FLAVOURS=react \
-  npm install "github:ichava/js-icon-components"
-# or pinned: npm install "github:ichava/js-icon-components#<commit-sha>"
+  npm install "github:ichava/js-icon-components#v0.1.0"
 ```
-
-The first release will also attach a prebuilt tarball with every pack, flavour and export, and one
-per pack (`@ichava/js-icon-components-<pack>`, so two packs install side by side). This README names
-its URL once the tag exists; `tests/install-docs.test.ts` fails if it names a tag that does not.
 
 | Variable | `package.json` key | Effect |
 |---|---|---|
 | `ICHAVA_ICONS_PACKS=tabler,flag` | `"packs": ["tabler", "flag"]` | builds only those packs |
 | `ICHAVA_ICONS_FLAVOURS=react,css-mask` | `"flavours": ["react", "css-mask"]` | builds only those flavours and exports |
 | `ICHAVA_ICONS_SKIP_BUILD=1` | `"skipBuild": true` | builds nothing |
+| `ICHAVA_ICONS_INSTALL=tarball` | `"install": "tarball"` | refuses the git build and names the release tarball |
 
-An import of a pack or flavour that was not built throws, naming the variable that adds it. See
-[Installation](docs/installation.md) for the sizes and times of each.
+The release also attaches one tarball per pack (`@ichava/js-icon-components-<pack>`) and
+`SHA256SUMS`. An import of a pack or flavour that was not built throws, naming the variable that adds
+it. See [Installation](docs/installation.md) for the per-pack tarballs, checksums, sizes and times.
 
 ## Quick start guide and usage
 

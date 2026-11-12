@@ -1,20 +1,29 @@
 # Installation
 
-There is no release yet, so today there is one way in: a build from git, from the default branch or
-a commit you pin, that you can limit to the packs and flavours you use. The first release adds a
-prebuilt tarball, described below so its shape is known; this page names its URL once the tag exists.
-`tests/install-docs.test.ts` fails if a page names a tag the repository does not have.
+There are two ways in. Pick one per application:
 
-## From a release tarball (after the first release)
+| Path | Choose it when | What npm does |
+|---|---|---|
+| **Release tarball** | You want every pack and flavour, installed fast | Downloads the prebuilt `dist/`; builds nothing, needs no `git` or compiler |
+| **Git build** | You want only some packs or flavours, or to pin a commit | Clones the repository and builds `dist/` for your selection |
+
+`"ichava": { "icons": { "install": "tarball" } }` in your application's `package.json` (or
+`ICHAVA_ICONS_INSTALL=tarball`) makes the choice binding: a git install then stops with the tarball
+command to run instead. `"build"`, or no key, allows the git build. Any other value fails the install,
+listing the two allowed. `tests/install-docs.test.ts` fails if a page names a tag the repository does not have.
+
+## From a release tarball
+
+The current release is [`v0.1.0`](https://github.com/ichava/js-icon-components/releases/tag/v0.1.0):
 
 ```bash
-npm install https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-<version>.tgz
+npm install https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-0.1.0.tgz
 ```
 
 ```json
 {
   "dependencies": {
-    "@ichava/js-icon-components": "https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-<version>.tgz"
+    "@ichava/js-icon-components": "https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-0.1.0.tgz"
   }
 }
 ```
@@ -32,9 +41,11 @@ or more install side by side:
 
 ```bash
 npm install \
-  https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-tabler-<version>.tgz \
-  https://github.com/ichava/js-icon-components/releases/download/<tag>/ichava-js-icon-components-flag-<version>.tgz
+  https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-tabler-0.1.0.tgz \
+  https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-flag-0.1.0.tgz
 ```
+
+The per-pack tarballs are `tabler`, `flag`, `twemoji` and `openmoji`.
 
 ```ts
 import { IconMug } from '@ichava/js-icon-components-tabler/react/tabler';
@@ -46,27 +57,36 @@ tarball to the full one changes the package name in your imports. Until this rel
 tarball shared the full package's name, so npm kept only one of them; `tests/per-pack-tarball.test.ts`
 installs two and imports from both.
 
-`SHA256SUMS` on the release lists the checksum of every tarball.
+`SHA256SUMS` on the release lists the checksum of every tarball. To check one before installing:
+
+```bash
+curl -sLO https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-0.1.0.tgz
+curl -sL https://github.com/ichava/js-icon-components/releases/download/v0.1.0/SHA256SUMS | grep ichava-js-icon-components-0.1.0.tgz | shasum -a 256 -c
+npm install ./ichava-js-icon-components-0.1.0.tgz
+```
 
 ## From git
 
 ```bash
 npm install "github:ichava/js-icon-components"
-npm install "github:ichava/js-icon-components#<commit-sha>"   # pinned
+npm install "github:ichava/js-icon-components#v0.1.0"         # pinned to the release
+npm install "github:ichava/js-icon-components#<commit-sha>"   # pinned to a commit
 ```
 
 npm clones the repository, installs its development dependencies (the compilers) in a temporary
 directory and runs `prepare`, which is `scripts/prepare.mjs`:
 
 1. If `dist/` is already built, it does nothing.
-2. If `ICHAVA_ICONS_SKIP_BUILD=1`, it does nothing.
-3. Otherwise it runs `npm run build`: `tsc` and Angular's `ngc` compile the templates, then the
+2. If `"install": "tarball"` (or `ICHAVA_ICONS_INSTALL=tarball`), it stops the install and prints the
+   tarball command for this version.
+3. If `ICHAVA_ICONS_SKIP_BUILD=1`, it does nothing.
+4. Otherwise it runs `npm run build`: `tsc` and Angular's `ngc` compile the templates, then the
    generator reads each selected pack at its pinned commit, from a shallow `git fetch` of exactly
    that commit, checks every SVG against the policy and writes the modules.
 
 So `git` must be on the path and `github.com` reachable. Only `dist/` reaches your
-`node_modules`; the compilers stay in npm's temporary clone. Until the first tag, pin a commit SHA for
-reproducible installs; after it, pin the tag, which is final and never moves.
+`node_modules`; the compilers stay in npm's temporary clone. For reproducible installs pin the tag,
+which is final and never moves, or a commit SHA.
 
 ### Choosing what to build
 
@@ -75,6 +95,7 @@ reproducible installs; after it, pin the tag, which is final and never moves.
 | `ICHAVA_ICONS_PACKS=tabler,flag` | `"packs": ["tabler", "flag"]` | builds only those packs |
 | `ICHAVA_ICONS_FLAVOURS=react,css-mask` | `"flavours": ["react", "css-mask"]` | builds only those flavours and exports |
 | `ICHAVA_ICONS_SKIP_BUILD=1` | `"skipBuild": true` | builds nothing |
+| `ICHAVA_ICONS_INSTALL=tarball` | `"install": "tarball"` | refuses the git build and names the release tarball |
 
 Packs are `tabler`, `flag`, `twemoji` and `openmoji`. Flavours are named by their subpath: `react`,
 `vue`, `svelte`, `wc`, `react-native`, `angular`, `solid`, `preact`, `astro`, `qwik`, `ember` and
