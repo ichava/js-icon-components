@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { consumerConfig, plan } from '../scripts/prepare.mjs';
+import { consumerConfig, INSTALL_MODES, plan, tarballUrl } from '../scripts/prepare.mjs';
 import { ROOT } from './helpers.ts';
 
 const app = mkdtempSync(join(tmpdir(), 'ichava-prepare-'));
@@ -48,6 +48,30 @@ describe('prepare', () => {
   it('skips the build on ICHAVA_ICONS_SKIP_BUILD=1 or "skipBuild": true', () => {
     expect(plan({ env: { ICHAVA_ICONS_SKIP_BUILD: '1' }, consumer: {}, built: false })).toEqual({ action: 'skip', reason: 'ICHAVA_ICONS_SKIP_BUILD=1' });
     expect(plan({ env: {}, consumer: consumer({ skipBuild: true }), built: false })).toEqual({ action: 'skip', reason: '"ichava.icons.skipBuild": true' });
+  });
+
+  it('"install": "build", or no install key, is the git build', () => {
+    expect(plan({ env: {}, consumer: consumer({ install: 'build', packs: ['flag'] }), built: false })).toEqual({ action: 'build', env: { ICHAVA_ICONS_PACKS: 'flag' } });
+    expect(plan({ env: { ICHAVA_ICONS_INSTALL: 'build' }, consumer: { install: 'tarball' }, built: false }).action).toBe('build');
+  });
+
+  it('"install": "tarball" refuses a git install and names the release tarball for this version', () => {
+    const step = plan({ env: {}, consumer: consumer({ install: 'tarball' }), built: false, version: '0.1.0' });
+    expect(step.action).toBe('refuse');
+    expect(step).toHaveProperty('reason', expect.stringContaining('"ichava.icons.install": "tarball"'));
+    expect(step).toHaveProperty('reason', expect.stringContaining(`npm install ${tarballUrl('0.1.0')}`));
+    expect(tarballUrl('0.1.0')).toBe('https://github.com/ichava/js-icon-components/releases/download/v0.1.0/ichava-js-icon-components-0.1.0.tgz');
+    expect(plan({ env: { ICHAVA_ICONS_INSTALL: 'tarball' }, consumer: {}, built: false }).action).toBe('refuse');
+  });
+
+  it('a tarball choice never blocks a dist/ that is already built, which is what a tarball install is', () => {
+    expect(plan({ env: { ICHAVA_ICONS_INSTALL: 'tarball' }, consumer: { install: 'tarball' }, built: true })).toEqual({ action: 'built' });
+  });
+
+  it('refuses an unknown install value, listing the allowed ones', () => {
+    expect(() => plan({ env: {}, consumer: { install: 'zip' }, built: false })).toThrow(`"ichava.icons.install" must be one of ${INSTALL_MODES.join(', ')}, got "zip"`);
+    expect(() => plan({ env: {}, consumer: { install: true }, built: false })).toThrow(/must be one of tarball, build, got true/);
+    expect(() => plan({ env: { ICHAVA_ICONS_INSTALL: 'Tarball' }, consumer: {}, built: false })).toThrow(/ICHAVA_ICONS_INSTALL must be one of tarball, build, got "Tarball"/);
   });
 
   it('never reads its own package.json as the consumer, and refuses a malformed block', () => {
