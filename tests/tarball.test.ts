@@ -1,10 +1,11 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { readTarball, tarballProblems } from '../scripts/check-tarball.mjs';
 import { packTarball } from '../scripts/pack-tarball.mjs';
+import { tarballUrl } from '../scripts/prepare.mjs';
 import type { Manifest } from '../src/generator/generate.ts';
 import { ASSET_TARGETS } from '../src/shared/index.ts';
 import { packs, ROOT } from './helpers.ts';
@@ -32,6 +33,8 @@ describe('the release tarball', () => {
   it('is named as the release download URL expects', () => {
     const { version } = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { version: string };
     expect(tgz.endsWith(`/ichava-js-icon-components-${version}.tgz`)).toBe(true);
+    // The name a `"install": "tarball"` refusal prints, so the two cannot drift.
+    expect(basename(tgz)).toBe(basename(tarballUrl(version)));
   });
 
   it('holds dist/ for every pack and flavour, and nothing from the development tree', () => {
