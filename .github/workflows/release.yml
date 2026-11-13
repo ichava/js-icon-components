@@ -8,7 +8,9 @@
 #   ichava-js-icon-components-<pack>-<version>.tgz   one pack, every flavour and export, as the
 #                                                     package @ichava/js-icon-components-<pack>
 #   SHA256SUMS                                        over the tarballs
-# Each is `npm pack` output, checked by scripts/check-tarball.mjs before upload.
+# Each is `npm pack` output, checked by scripts/check-tarball.mjs before upload, and the full
+# tarball's name is checked against prepare.mjs's tarballUrl() by scripts/check-release-name.mjs.
+# A pre-release tag (vX.Y.Z-rc.N) gets the same tarballs, on a GitHub pre-release.
 #
 # A tag is the only legitimate `push` trigger in this ecosystem; everything else
 # runs on `pull_request`.
@@ -213,6 +215,12 @@ jobs:
           test "$(node -p 'require("./package.json").name')" = '@ichava/js-icon-components'
           (cd release && sha256sum -- *.tgz > SHA256SUMS)
           ls -l release
+
+      # The full tarball must carry the exact name and tag scripts/prepare.mjs's tarballUrl()
+      # prints for a `"install": "tarball"` refusal, and SHA256SUMS must list it, or that
+      # command and the documented install line break. This fails before anything is published.
+      - name: Check the tarball matches the install URL
+        run: node scripts/check-release-name.mjs release "$TAG"
 
       - name: Publish
         uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4

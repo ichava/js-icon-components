@@ -33,7 +33,10 @@ Each tarball is `npm pack` output, written by `scripts/pack-tarball.mjs` (which 
 tarball its own package name while it packs, then restores `package.json`) and checked by
 `scripts/check-tarball.mjs` before upload: `dist/` for everything its manifest says was built, a
 stand-in for the rest, the Elm module and every export of each built pack, the package name its
-contents call for, nothing from the development tree, and no dependencies. To rebuild them for a tag, which creates or updates that tag's release
+contents call for, nothing from the development tree, and no dependencies. Then
+`scripts/check-release-name.mjs` checks the full tarball is named exactly as `tarballUrl()` in
+`scripts/prepare.mjs` builds its download URL, and that `SHA256SUMS` lists it; a mismatch fails the
+run before anything is published, so the install command `prepare` prints cannot drift from the asset. To rebuild them for a tag, which creates or updates that tag's release
 only:
 
 ```bash

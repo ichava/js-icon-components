@@ -1,11 +1,16 @@
 # Installation
 
-There are two ways in. Pick one per application:
+There are two ways in, and both are supported. Pick one per application:
 
 | Path | Choose it when | What npm does |
 |---|---|---|
-| **Release tarball** | You want every pack and flavour, installed fast | Downloads the prebuilt `dist/`; builds nothing, needs no `git` or compiler |
-| **Git build** | You want only some packs or flavours, or to pin a commit | Clones the repository and builds `dist/` for your selection |
+| **Release tarball** | Installing into an application: every pack and flavour, installed fast | Downloads the prebuilt `dist/`; builds nothing, needs no `git` or compiler |
+| **Git build** | Contributing, pinning a commit that has no release, or building only some packs or flavours | Clones the repository and runs the `prepare` build for your selection |
+
+The release tarball is built once, by `release.yml`, when a `vX.Y.Z` tag is pushed (and for a
+`vX.Y.Z-rc.N` tag, on a GitHub pre-release). It is attached to that release as
+`ichava-js-icon-components-X.Y.Z.tgz`, with its checksum in `SHA256SUMS`. A git install builds
+instead, with the compilers (several hundred MB) in npm's temporary clone; see [Size and time](#size-and-time).
 
 `"ichava": { "icons": { "install": "tarball" } }` in your application's `package.json` (or
 `ICHAVA_ICONS_INSTALL=tarball`) makes the choice binding: a git install then stops with the tarball
@@ -28,7 +33,10 @@ npm install https://github.com/ichava/js-icon-components/releases/download/v0.1.
 }
 ```
 
-The tarball is `npm pack` output, built once by `release.yml` when the release is tagged. It
+The tarball is `npm pack` output, built once by `release.yml` when the release is tagged. Its name
+is the one `scripts/prepare.mjs` prints for an `"install": "tarball"` refusal: `release.yml` runs
+`scripts/check-release-name.mjs` before publishing and fails on any other name, or a `SHA256SUMS`
+that does not list it. It
 holds `dist/` for every pack, flavour and asset export and nothing else: no source, no tests, and no
 dependencies. npm runs no build for a tarball, so no compiler, `git` or network access to the
 packs is needed. Then import the flavour you use, as in the [README](../README.md#quick-start-guide-and-usage).

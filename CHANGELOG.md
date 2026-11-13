@@ -4,6 +4,14 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ## [Unreleased]
 
+### Added
+
+- **The release checks its tarball against the install URL.** `scripts/check-release-name.mjs` runs in `release.yml` after packing and before publishing, and fails unless the release directory holds the full tarball under the exact name `tarballUrl()` in `scripts/prepare.mjs` gives for the tag (the command an `"install": "tarball"` refusal prints) and `SHA256SUMS` lists it. Pre-release tags are checked the same way. `tests/release-name.test.ts` covers final and pre-release tags, a drifted name and the workflow step's place (proven red by renaming the file in `tarballUrl()`, and by removing the step).
+
+### Changed
+
+- **The install docs offer both paths in order.** The README's Install and `docs/installation.md` lead with the release tarball (`npm install` of the release URL, and the `SHA256SUMS` check), for an install with no build, then the git install, for contributors or a pinned commit. The git install itself is unchanged.
+
 ## [0.1.0] - 2026-11-13
 
 First release.
