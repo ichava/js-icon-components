@@ -4,7 +4,7 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ## [Unreleased]
 
-## [0.1.0] - TBD
+## [0.1.0] - 2026-11-13
 
 First release.
 
