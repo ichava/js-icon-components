@@ -1,0 +1,27 @@
+---
+/*
+ * The Astro flavour's one template. It ships as source, the Astro convention, and the
+ * application's Astro compiler builds it. It takes an icon's data:
+ *
+ *   ---
+ *   import { Icon } from '@ichava/js-icon-components/astro';
+ *   import { IconMug } from '@ichava/js-icon-components/astro/tabler';
+ *   ---
+ *   <Icon icon={IconMug} size={20} title="Coffee" />
+ */
+import { rootAttributes, themed, type IconData, type IconProps } from '../shared/index.ts';
+import Nodes from './Nodes.astro';
+
+interface Props extends IconProps {
+  icon: IconData;
+  class?: string;
+  [attribute: string]: unknown;
+}
+
+const { icon, size, color, strokeWidth, title, primaryColor, variant, class: className, ...rest } = Astro.props as Props;
+// Spreading an object that holds `class` and then writing `class=` emits the attribute twice, so it is taken out.
+const { class: rootClass, ...root } = rootAttributes(icon, { size, color, strokeWidth, title, primaryColor, variant });
+// A caller's class adds to `ichava-icon` rather than replacing it, as in every flavour.
+const classes = className ? `${rootClass} ${className}` : rootClass;
+---
+<svg {...root} {...rest} class={classes}>{title && <title>{title}</title>}<Nodes nodes={themed(icon, variant).nodes} /></svg>

@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a problem with @ichava/js-icon-components
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to '...'
+        2. Click '...'
+        3. See error
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Node version, bundler, and the consuming package if any.
+      placeholder: Node 24, Vite 8, @ichava/react-icon-browser 0.1.0
+    validations:
+      required: false
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: Any relevant error output.
+      render: shell
