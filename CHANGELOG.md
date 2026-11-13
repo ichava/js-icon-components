@@ -4,6 +4,10 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ## [Unreleased]
 
+## [0.1.0] - TBD
+
+First release.
+
 ### Added
 
 - **`"ichava": { "icons": { "install": "tarball" | "build" } }`**, also `ICHAVA_ICONS_INSTALL`, makes the install path a setting. `tarball` stops a git install and prints the release tarball command for this version; `build`, or no key, is today's git build; any other value fails the install, listing the two. A built `dist/` is never refused, so the tarball itself installs as before. `tests/prepare.test.ts` covers each value (proven red by disabling the refusal).
@@ -12,6 +16,11 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 - **Illustration props.** `primaryColor` (sets `--ichava-primary` and `color`) and `variant: 'light' | 'dark'` in every component flavour (`primary-color` and `variant` attributes on the Web Component). `packs.json` takes `themeVariants: { "dark": "-dark" }`, core's twin rule: `scene-dark.svg` becomes `variants.dark` of `scene.svg`. Exercised in React, Vue, Svelte and the Web Component with a test-only pack of three CC0 shapes, `tests/fixtures/packs/illustration-demo`.
 - `scripts/pack-tarball.mjs`, which `release.yml` and the tests both pack with.
 - Guards: the registry guard reads all 25 formats of schema 1.8.0 and requires every `generated` and `asset` one (twelve flavours, four exports: 16 generator-owned formats) and none of the `laravel` or `client` ones; golden output and a structural check for each export (CSS parses, `pubspec` parses as YAML, `Contents.json` against Apple's documented keys); every file an export writes, and every zip entry, is SVG, CSS, JSON, Dart or YAML or the pack's attribution; Elm lines stay under the parser's 16-bit column limit; two per-pack tarballs install side by side.
+
+- A generator that reads each pack in `packs.json` from git at a pinned commit (the sibling checkout when it holds the commit, else a shallow fetch) and writes one data module plus React, Vue 3, Svelte 5 and Web Component modules per pack. The first pack is `ichava/icon-sets-tabler` at `10a5f39c`: 6,257 icons per flavour.
+- Four templates, one per flavour, each compiled by that framework's own compiler in its test and render-snapshotted for three icons. Every icon takes `size`, `color`, `title` and, on stroked icons, `strokeWidth`; it is `role="img"`, and `aria-hidden` unless titled.
+- An SVG gate that applies `ichava/core`'s policy (allow-list, `#fragment` references only, 30,000 elements, 4,500,000 bytes) and rejects rather than strips, so one bad icon fails the build.
+- Guard tests: hostile SVGs are rejected; the output count per flavour equals the input count, above a floor; every flavour is a `generated` format in icon-browser's format registry and the reverse; no lock file is tracked.
 
 ### Changed
 
@@ -64,13 +73,3 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 - **The release workflow reads by default and writes only in its one job**, and its `actions/setup-node` step restores no package-manager cache (zizmor `cache-poisoning`). An npm `overrides` entry lifts the dev-only `minimatch` past GHSA-g3hv-75wg-m249; `npm audit` on a fresh install: 10 moderate before, 0 after.
 
-## [0.1.0] - TBD
-
-First release.
-
-### Added
-
-- A generator that reads each pack in `packs.json` from git at a pinned commit (the sibling checkout when it holds the commit, else a shallow fetch) and writes one data module plus React, Vue 3, Svelte 5 and Web Component modules per pack. The first pack is `ichava/icon-sets-tabler` at `10a5f39c`: 6,257 icons per flavour.
-- Four templates, one per flavour, each compiled by that framework's own compiler in its test and render-snapshotted for three icons. Every icon takes `size`, `color`, `title` and, on stroked icons, `strokeWidth`; it is `role="img"`, and `aria-hidden` unless titled.
-- An SVG gate that applies `ichava/core`'s policy (allow-list, `#fragment` references only, 30,000 elements, 4,500,000 bytes) and rejects rather than strips, so one bad icon fails the build.
-- Guard tests: hostile SVGs are rejected; the output count per flavour equals the input count, above a floor; every flavour is a `generated` format in icon-browser's format registry and the reverse; no lock file is tracked.
