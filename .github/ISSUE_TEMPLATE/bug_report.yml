@@ -24,7 +24,7 @@ body:
     attributes:
       label: Environment
       description: Node version, bundler, and the consuming package if any.
-      placeholder: Node 24, Vite 8, @ichava/react-icon-browser 0.1.0
+      placeholder: Node 24, Vite 8, ichava/icon-browser 0.1.0
     validations:
       required: false
   - type: textarea

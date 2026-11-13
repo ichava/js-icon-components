@@ -4,6 +4,10 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ## [Unreleased]
 
+### Changed
+
+- The SVG policy interpreter (`src/generator/svgPolicy.ts`) is pinned to `ichava/icon-browser`'s `resources/js/modules/svg/domain/svgPolicy.ts`, not to the retired react-icon-browser, so `tests/vendored.test.ts` compares it with the live copy. Its body and digest are unchanged.
+
 ## [0.1.0] - 2026-11-13
 
 First release.

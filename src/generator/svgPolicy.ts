@@ -1,5 +1,6 @@
-// The SVG policy interpreter, copied from ichava/react-icon-browser
-// src/modules/svg/domain/svgPolicy.ts at the commit vendor/source.json records under `interpreters`.
+// The SVG policy interpreter, copied from ichava/icon-browser
+// resources/js/modules/svg/domain/svgPolicy.ts at the commit vendor/source.json records under
+// `interpreters`. It came from react-icon-browser, retired since 2026-11-13; the body is unchanged.
 // Only this preamble differs: that package bundles the JSON through Vite, this one reads
 // vendor/svg-policy.json (a byte copy of core/resources/security/svg-policy.json, pinned by
 // digest). Everything after the marker is the source from its second line, pinned by digest in
