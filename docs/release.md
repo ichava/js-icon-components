@@ -5,7 +5,7 @@ Tagging a release, and moving a pack to a new commit.
 ## Distribution is GitHub only
 
 There is no npm release. Consumers install the tarball attached to a GitHub release, or pin
-`github:ichava/js-icon-components#vX.Y.Z` and build, the way react-icon-browser pins js-ui-kernel.
+`github:ichava/js-icon-components#vX.Y.Z` and build, the way icon-browser and ichava.com pin js-ui-kernel.
 Publishing to a registry is a separate decision for the owner.
 
 ## Cutting a release

@@ -52,7 +52,7 @@ build.
 
 It applies `ichava/core`'s `svg-policy.json` (vendored, digest-pinned): the element and attribute
 allow-lists, `href` to a `#fragment` only, CSS values checked by the same functions
-react-icon-browser uses (copied verbatim), and core's caps of 30,000 elements and 4,500,000 bytes.
+icon-browser's browser uses (copied verbatim from `resources/js/modules/svg/domain/svgPolicy.ts`), and core's caps of 30,000 elements and 4,500,000 bytes.
 
 It **rejects** where core strips. A runtime sanitiser must render something for a user who is
 waiting; a build-time gate has no such user, so an icon the policy would alter fails the build and

@@ -16,8 +16,8 @@ import { ROOT } from './helpers.ts';
  * The generator rejects rather than strips, so "kept" here means the SVG is accepted with the
  * attribute in its tree, and "stripped" means it is refused.
  *
- * `tests/fixtures/svg/presentation-vectors.json` is byte-identical in core, react-icon-browser and
- * js-icon-components, and copies its rows from the Go table in icon-sets-sync.
+ * `tests/fixtures/svg/presentation-vectors.json` is byte-identical in core, icon-browser
+ * (`resources/js/test/fixtures/svg/`) and js-icon-components, and copies its rows from the Go table in icon-sets-sync.
  */
 
 interface Vector {
