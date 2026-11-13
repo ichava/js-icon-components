@@ -4,10 +4,6 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ## [Unreleased]
 
-### Changed
-
-- The SVG policy interpreter (`src/generator/svgPolicy.ts`) is pinned to `ichava/icon-browser`'s `resources/js/modules/svg/domain/svgPolicy.ts`, not to the retired react-icon-browser, so `tests/vendored.test.ts` compares it with the live copy. Its body and digest are unchanged.
-
 ## [0.1.0] - 2026-11-13
 
 First release.
@@ -29,6 +25,8 @@ First release.
 - Guard tests: hostile SVGs are rejected; the output count per flavour equals the input count, above a floor; every flavour is a `generated` format in icon-browser's format registry and the reverse; no lock file is tracked.
 
 ### Changed
+
+- The SVG policy interpreter (`src/generator/svgPolicy.ts`) is pinned to `ichava/icon-browser`'s `resources/js/modules/svg/domain/svgPolicy.ts`, not to the retired react-icon-browser, so `tests/vendored.test.ts` compares it with the live copy. Its body and digest are unchanged.
 
 - **The install docs offer both paths in order.** The README's Install and `docs/installation.md` lead with the release tarball (`npm install` of the release URL, and the `SHA256SUMS` check), for an install with no build, then the git install, for contributors or a pinned commit. The git install itself is unchanged.
 
