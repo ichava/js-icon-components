@@ -4,19 +4,13 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ## [Unreleased]
 
-### Added
-
-- **The release checks its tarball against the install URL.** `scripts/check-release-name.mjs` runs in `release.yml` after packing and before publishing, and fails unless the release directory holds the full tarball under the exact name `tarballUrl()` in `scripts/prepare.mjs` gives for the tag (the command an `"install": "tarball"` refusal prints) and `SHA256SUMS` lists it. Pre-release tags are checked the same way. `tests/release-name.test.ts` covers final and pre-release tags, a drifted name and the workflow step's place (proven red by renaming the file in `tarballUrl()`, and by removing the step).
-
-### Changed
-
-- **The install docs offer both paths in order.** The README's Install and `docs/installation.md` lead with the release tarball (`npm install` of the release URL, and the `SHA256SUMS` check), for an install with no build, then the git install, for contributors or a pinned commit. The git install itself is unchanged.
-
 ## [0.1.0] - 2026-11-13
 
 First release.
 
 ### Added
+
+- **The release checks its tarball against the install URL.** `scripts/check-release-name.mjs` runs in `release.yml` after packing and before publishing, and fails unless the release directory holds the full tarball under the exact name `tarballUrl()` in `scripts/prepare.mjs` gives for the tag (the command an `"install": "tarball"` refusal prints) and `SHA256SUMS` lists it. Pre-release tags are checked the same way. `tests/release-name.test.ts` covers final and pre-release tags, a drifted name and the workflow step's place (proven red by renaming the file in `tarballUrl()`, and by removing the step).
 
 - **`"ichava": { "icons": { "install": "tarball" | "build" } }`**, also `ICHAVA_ICONS_INSTALL`, makes the install path a setting. `tarball` stops a git install and prints the release tarball command for this version; `build`, or no key, is today's git build; any other value fails the install, listing the two. A built `dist/` is never refused, so the tarball itself installs as before. `tests/prepare.test.ts` covers each value (proven red by disabling the refusal).
 - **Three Tier 3 flavours** (icon-browser schema 1.6.0, now 1.8.0, vendored with its digest): Qwik (`./qwik`, one lightweight component per icon; Qwik's server renderer and optimizer in the test), Ember (`./ember`, a template-only Glimmer component in template-tag format, compiled with content-tag and checked by the Glimmer precompiler) and Elm (`dist/elm/Ichava/Icons/<Pack>.elm`, one `Svg msg` function per icon, compiled with `elm make` from npm's `elm` package and run in jsdom in the test). `@builder.io/qwik` and `ember-source` are optional peers.
@@ -31,6 +25,8 @@ First release.
 - Guard tests: hostile SVGs are rejected; the output count per flavour equals the input count, above a floor; every flavour is a `generated` format in icon-browser's format registry and the reverse; no lock file is tracked.
 
 ### Changed
+
+- **The install docs offer both paths in order.** The README's Install and `docs/installation.md` lead with the release tarball (`npm install` of the release URL, and the `SHA256SUMS` check), for an install with no build, then the git install, for contributors or a pinned commit. The git install itself is unchanged.
 
 - **The install docs name the real `v0.1.0` release.** `docs/installation.md` opens with a choice between the tarball and the git build, gives the full and per-pack tarball URLs, shows how to check one against `SHA256SUMS`, and pins git installs to `#v0.1.0`; the README's Install section follows. Both said there was no release yet.
 - **Every pin names its source's v0.1.0 root** for the re-squash, which gives each repository one root commit with the tree of its `main`: the packs at tabler `eddbd69f`, flag `5acfe40c`, twemoji `b0d686fb` and openmoji `4c06bb6e` (each on GitHub now as branch `release/v0.1.0-root`, so the build's shallow fetch works before and after the squash), and `vendor/source.json` at core `9bd8b3a9`, icon-browser `97631b19` and react-icon-browser `054c2b32`. The trees hold the same SVGs as the previous pins; the copies' digests are unchanged.
