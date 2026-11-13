@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+.cache/
+.DS_Store
+*.log
+*.tsbuildinfo
+
+# Lock files are never committed in a library.
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+bun.lock

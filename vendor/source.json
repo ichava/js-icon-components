@@ -1,0 +1,26 @@
+{
+  "$comment": "Where each file in vendor/ was copied from. tests/vendored.test.ts pins each copy by sha256, and compares it with the canonical file when that repository is checked out beside this one (ICHAVA_PACKAGES_DIR names another packages directory). To take a new copy: copy the file at a commit on the source repository's main, then update commit and sha256 here.",
+  "files": {
+    "svg-policy.json": {
+      "repository": "ichava/core",
+      "path": "resources/security/svg-policy.json",
+      "commit": "c2d79a6bd30cfb86e74761eed4e5d644e2306a14",
+      "sha256": "49ee43cea254be2c1fcec2a1fdd37a097889df78466ffe6e9c2e653f65f8fd06"
+    },
+    "icon-browser.schema.json": {
+      "repository": "ichava/icon-browser",
+      "path": "resources/schema/icon-browser.schema.json",
+      "commit": "466b8fb1c1d6ceebe0cc299e776ce71d986f796f",
+      "sha256": "4c9c51a357acb248de29eafe7f4b930bda2327a009a8e017309e53e25c9fd310"
+    }
+  },
+  "$comment_interpreters": "Source files whose body is a copy of another repository's file. Each file holds its own preamble (imports that differ by runtime), then the marker line, then the source file from its second line onward, byte for byte. tests/vendored.test.ts pins the body by sha256 and compares it with the sibling checkout when present. To take a new copy: replace everything after the marker with the source from line 2, then update commit and sha256 here.",
+  "interpreters": {
+    "src/generator/svgPolicy.ts": {
+      "repository": "ichava/icon-browser",
+      "path": "resources/js/modules/svg/domain/svgPolicy.ts",
+      "commit": "4583aa3d13bb6b7c76886057b4fa80cde09e5ebb",
+      "sha256": "3555ca7b1c0de456a6cbc85ebacb61a828279e7b9e0da335df36ea8d48c0a72e"
+    }
+  }
+}
