@@ -4,6 +4,10 @@ All notable changes to `@ichava/js-icon-components` follow [Keep a Changelog](ht
 
 ## [Unreleased]
 
+### Changed
+
+- **The Solid flavour runs on Solid 2, and no longer on Solid 1.** solid-js 2.0 moved the DOM renderer to `@solidjs/web` and replaced `mergeProps` and `splitProps` with `merge` and `omit`, so the template could not build against it (Dependabot's #27 failed typecheck, test and lint). The peers are now `solid-js` and `@solidjs/web` ^2.0.4 (2.0.4 is the first `@solidjs/web` accepts). The rendered markup is the same apart from Solid's own formatting: `class` comes last, without a trailing space. A Solid 1 project stays on 0.1.0. `tests/solid.test.ts` renders on the server and the client as before; Solid 2 batches signal writes, so the reactive check flushes before it reads.
+
 ## [0.1.0] - 2026-11-13
 
 First release.

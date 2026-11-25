@@ -193,7 +193,7 @@ dependencies in its temporary clone, which no selection avoids. None of this rea
 | Web Component | none | `@ichava/js-icon-components/wc/<pack>` |
 | React Native | `react-native-svg` 15 or newer | `@ichava/js-icon-components/react-native/<pack>` |
 | Angular | `@angular/core` 20 or newer | `@ichava/js-icon-components/angular` and `/angular/<pack>` |
-| SolidJS | `solid-js` 1.8 or newer | `@ichava/js-icon-components/solid/<pack>` |
+| SolidJS | `solid-js` and `@solidjs/web` 2.0.4 or newer | `@ichava/js-icon-components/solid/<pack>` |
 | Preact | `preact` 10.19 or newer | `@ichava/js-icon-components/preact/<pack>` |
 | Astro | `astro` 5 or newer | `@ichava/js-icon-components/astro` and `/astro/<pack>` |
 | Qwik | `@builder.io/qwik` 1.5 or newer | `@ichava/js-icon-components/qwik/<pack>` |

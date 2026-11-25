@@ -1,11 +1,12 @@
-import { createComponent, createRenderEffect, mergeProps, splitProps, type Component, type JSX } from 'solid-js';
-import { Dynamic, isServer } from 'solid-js/web';
+import { createComponent, createRenderEffect, merge, omit, type Component } from 'solid-js';
+import { Dynamic, isServer, type JSX } from '@solidjs/web';
 import { rootAttributes, SVG_NS, themed, type IconChild, type IconData, type IconProps } from '../shared/index.ts';
 
 /**
- * The SolidJS flavour's one template. It is written with Solid's runtime functions rather than
- * JSX, so the same module renders on the client and on the server with no compile step of the
- * consumer's: `solid-js/web` picks its client or server build by export condition, and `Dynamic`
+ * The SolidJS flavour's one template, for Solid 2 (`solid-js` and `@solidjs/web`). It is written
+ * with Solid's runtime functions rather than JSX, so the same module renders on the client and on
+ * the server with no compile step of the consumer's: `@solidjs/web` picks its client or server build
+ * by export condition, and `Dynamic`
  * creates each element by name in the SVG namespace on the client, or as a string on the server.
  * Every generated Solid icon is `createIcon(data)`.
  */
@@ -18,7 +19,7 @@ export type SolidIcon = Component<SolidIconProps>;
 function node(child: IconChild): JSX.Element {
   if (typeof child === 'string') return child;
   const [tag, attrs, children] = child;
-  return createComponent(Dynamic, mergeProps(attrs, { component: tag, children: children?.map(node) }));
+  return createComponent(Dynamic, merge(attrs, { component: tag, children: children?.map(node) }));
 }
 
 /**
@@ -29,19 +30,22 @@ function node(child: IconChild): JSX.Element {
 function title(text: () => string): JSX.Element {
   if (isServer) return createComponent(Dynamic, { component: 'title', get children() { return text(); } });
   const el = document.createElementNS(SVG_NS, 'title');
-  createRenderEffect(() => {
-    el.textContent = text();
+  createRenderEffect(text, (value) => {
+    el.textContent = value;
   });
   return el as unknown as JSX.Element;
 }
 
 export function Icon(props: SolidIconProps & { icon: IconData }): JSX.Element {
-  const [own, rest] = splitProps(props, ['icon', 'size', 'color', 'strokeWidth', 'title', 'primaryColor', 'variant', 'class']);
+  // Solid 2 replaced splitProps with omit: the own props are read from `props` itself, which stays
+  // reactive, and `rest` is everything else.
+  const own = props;
+  const rest = omit(props, 'icon', 'size', 'color', 'strokeWidth', 'title', 'primaryColor', 'variant', 'class');
   const root = () =>
     rootAttributes(own.icon, { size: own.size, color: own.color, strokeWidth: own.strokeWidth, title: own.title, primaryColor: own.primaryColor, variant: own.variant });
   return createComponent(
     Dynamic,
-    mergeProps(root, rest, {
+    merge(root, rest, {
       component: 'svg',
       // A caller's class adds to `ichava-icon` rather than replacing it, as in every flavour.
       get class() {
@@ -56,5 +60,5 @@ export function Icon(props: SolidIconProps & { icon: IconData }): JSX.Element {
 
 /** One named component per icon. Pure, so an unused icon is dropped by the bundler. */
 export function createIcon(icon: IconData): SolidIcon {
-  return (props) => createComponent(Icon, mergeProps(props, { icon }));
+  return (props) => createComponent(Icon, merge(props, { icon }));
 }

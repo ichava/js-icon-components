@@ -6,7 +6,7 @@ import type { IconData } from '../src/shared/index.ts';
 import { bundleAndImport, iconsFrom, ROOT, sampleIcons } from './helpers.ts';
 
 type Web = { renderToString: (fn: () => unknown) => string; render: (fn: () => unknown, el: Element) => () => void };
-type Core = { createComponent: (c: unknown, p: object) => unknown; createSignal: <T>(v: T) => [() => T, (v: T) => void] };
+type Core = { createComponent: (c: unknown, p: object) => unknown; createSignal: <T>(v: T) => [() => T, (v: T) => void]; flush: () => void };
 
 /**
  * The Solid template has no JSX, so there is nothing for babel-preset-solid to compile: it is
@@ -15,17 +15,17 @@ type Core = { createComponent: (c: unknown, p: object) => unknown; createSignal:
  */
 const server = () =>
   bundleAndImport<typeof SolidFlavour & Web & Core>('solid-server', {
-    stdin: { contents: "export * from './src/solid/index.ts'; export { renderToString } from 'solid-js/web'; export { createComponent } from 'solid-js';", resolveDir: ROOT, loader: 'ts' },
+    stdin: { contents: "export * from './src/solid/index.ts'; export { renderToString } from '@solidjs/web'; export { createComponent } from 'solid-js';", resolveDir: ROOT, loader: 'ts' },
     platform: 'node',
     conditions: ['node'],
-    external: ['solid-js', 'solid-js/web'],
+    external: ['solid-js', '@solidjs/web'],
   });
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>');
 const client = async () => {
   Object.assign(globalThis, { document: dom.window.document, window: dom.window, Node: dom.window.Node, Element: dom.window.Element });
   return bundleAndImport<typeof SolidFlavour & Web & Core>('solid-client', {
-    stdin: { contents: "export * from './src/solid/index.ts'; export { render } from 'solid-js/web'; export { createComponent, createSignal } from 'solid-js';", resolveDir: ROOT, loader: 'ts' },
+    stdin: { contents: "export * from './src/solid/index.ts'; export { render } from '@solidjs/web'; export { createComponent, createSignal, flush } from 'solid-js';", resolveDir: ROOT, loader: 'ts' },
     platform: 'browser',
     conditions: ['browser'],
   });
@@ -33,8 +33,9 @@ const client = async () => {
 
 async function ssr(icon: IconData, props: Record<string, unknown> = {}): Promise<string> {
   const { renderToString, createComponent, createIcon } = await server();
-  // Hydration keys and Solid's spacing before `>` are not the template's output, so they are not snapshotted.
-  return renderToString(() => createComponent(createIcon(icon), props)).replace(/ data-hk="[^"]*"/g, '').replace(/ +>/g, '>');
+  // Hydration keys (Solid 2 writes `_hk=…`) and Solid's spacing before `>` are not the template's
+  // output, so they are not snapshotted.
+  return renderToString(() => createComponent(createIcon(icon), props)).replace(/ _hk=[^\s>]+/g, '').replace(/ +>/g, '>');
 }
 
 describe('SolidJS flavour', () => {
@@ -76,7 +77,7 @@ describe('SolidJS flavour', () => {
   });
 
   it('keeps a flag\'s xlink references and re-renders reactive props on the client', async () => {
-    const { render, createComponent, createIcon, createSignal } = await client();
+    const { render, createComponent, createIcon, createSignal, flush } = await client();
     const [ke] = iconsFrom('flag', ['IconKe']);
     const [size, setSize] = createSignal(20);
     const host = dom.window.document.createElement('div');
@@ -84,6 +85,8 @@ describe('SolidJS flavour', () => {
     expect(host.querySelector('use')?.getAttributeNS('http://www.w3.org/1999/xlink', 'href')).toBe('#flag_4x3_ke_ke-a');
     expect(host.querySelector('svg')?.getAttribute('width')).toBe('20');
     setSize(40);
+    // Solid 2 batches writes until a flush, where Solid 1 applied them at once.
+    flush();
     expect(host.querySelector('svg')?.getAttribute('width')).toBe('40');
   });
 });
