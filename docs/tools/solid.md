@@ -9,7 +9,8 @@
 | `@ichava/js-icon-components/solid/<pack>` | one component per icon, e.g. `IconMug` |
 | `@ichava/js-icon-components/solid` | `Icon`, `createIcon`, the `SolidIconProps` and `SolidIcon` types |
 
-`solid-js` 1.8 or newer is an optional peer.
+Solid 2 is an optional peer: `solid-js` and `@solidjs/web` 2.0.4 or newer. Solid 1 is not supported
+from the next release; 0.1.0 is the last that runs on it.
 
 ## Usage
 
@@ -26,10 +27,10 @@ goes to the root `<svg>`, and `class` is added to `ichava-icon`.
 
 ## Why there is no JSX in the template
 
-The template calls Solid's runtime (`createComponent`, `mergeProps`, `Dynamic`) directly instead
+The template calls Solid's runtime (`createComponent`, `merge`, `Dynamic`) directly instead
 of using JSX. Solid's JSX has to be compiled differently for the client and for the server, so a
 JSX template would have to ship twice and lean on an export condition. Written this way, one module
-works in both: `solid-js/web` chooses its client or server build itself.
+works in both: `@solidjs/web` chooses its client or server build itself.
 
 The client creates every SVG element in the SVG namespace through `Dynamic`, except `<title>`:
 Solid treats `title` as an HTML element, and an HTML `<title>` inside an `<svg>` names nothing. The

@@ -159,7 +159,8 @@
     "preact": ">=10.19.0",
     "react": ">=18",
     "react-native-svg": ">=15",
-    "solid-js": "^1.8.0",
+    "solid-js": "^2.0.4",
+    "@solidjs/web": "^2.0.4",
     "svelte": "^5.0.0",
     "vue": "^3.4.0"
   },
@@ -186,6 +187,9 @@
       "optional": true
     },
     "solid-js": {
+      "optional": true
+    },
+    "@solidjs/web": {
       "optional": true
     },
     "svelte": {
@@ -237,7 +241,8 @@
     "react-native": "^0.88.1",
     "react-native-svg": "^15.16.0",
     "rxjs": "^7.8.2",
-    "solid-js": "^1.9.18",
+    "solid-js": "^2.0.4",
+    "@solidjs/web": "^2.0.4",
     "svelte": "^5.57.3",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "typescript-eslint": "^8.72.0",

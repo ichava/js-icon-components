@@ -73,7 +73,7 @@ describe('the release tarball', () => {
 
     // The runtimes the application would have as peers. react-native-svg needs a React Native
     // runtime, so a three-line stand-in takes its place.
-    for (const peer of ['react', 'react-dom', 'vue', 'preact', 'preact-render-to-string', 'solid-js', '@builder.io']) symlinkSync(join(ROOT, 'node_modules', peer), join(modules, peer));
+    for (const peer of ['react', 'react-dom', 'vue', 'preact', 'preact-render-to-string', 'solid-js', '@solidjs', '@builder.io']) symlinkSync(join(ROOT, 'node_modules', peer), join(modules, peer));
     mkdirSync(join(modules, 'react-native-svg'));
     writeFileSync(join(modules, 'react-native-svg/package.json'), JSON.stringify({ name: 'react-native-svg', type: 'module', exports: './index.js' }));
     // The stand-in exports exactly the element names the shipped module imports.
